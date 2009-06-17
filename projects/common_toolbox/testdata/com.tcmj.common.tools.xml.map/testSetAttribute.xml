@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<tcmj>
+  <xmlprop>
+    <level1 myat="435" myotherat="888">valuexy</level1>
+    <level2>
+      <level2 type="ProjectCode">value999</level2>
+    </level2>
+  </xmlprop>
+</tcmj>

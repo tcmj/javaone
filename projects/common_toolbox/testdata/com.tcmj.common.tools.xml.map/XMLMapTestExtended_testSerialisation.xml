@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<tcmj>
+  <xmlprop>
+    <a>123</a>
+    <b>
+      <c>456</c>
+    </b>
+    <d>
+      <e>
+        <f>789</f>
+      </e>
+    </d>
+    <ser>ser</ser>
+  </xmlprop>
+</tcmj>
