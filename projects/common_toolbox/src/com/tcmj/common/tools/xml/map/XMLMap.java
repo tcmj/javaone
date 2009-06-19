@@ -22,7 +22,9 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.regex.Pattern;
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -33,6 +35,8 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -76,7 +80,7 @@ public class XMLMap implements Map<String, String>, Serializable {
     /** The Name of the root node (default = 'tcmj'). */
     private String xMLRootNodeName = "tcmj";
     /** The Name of the Roots child (default = 'xmlprop'). */
-    private String xMLEntryPoint = "xmlprop";
+    private String xMLEntryPoint /*= "xmlmap"*/;
     
     /** XML Document. */
     private Document document = null;
@@ -374,7 +378,6 @@ public class XMLMap implements Map<String, String>, Serializable {
      */
     public void readXML() {
 
-
         logger.debug("START reading: " + xMLFileHandle);
 
 
@@ -391,6 +394,7 @@ public class XMLMap implements Map<String, String>, Serializable {
                 DocumentBuilder builder = factory.newDocumentBuilder();
 
 
+
                 //TODO make global - do not read before save!!!
                 document = builder.parse(xMLFileHandle);
                 root = document.getDocumentElement();
@@ -398,42 +402,139 @@ public class XMLMap implements Map<String, String>, Serializable {
                 logger.error("Error reading XML: " + ex.getMessage());
             }
 
+            //Nur wenn es ein Wurzelelement gibt weiterlesen:
             if (root != null) {
 
-                for (Node uppernode = root.getFirstChild(); uppernode != null;
-                        uppernode = uppernode.getNextSibling()) {
 
-                    //<root>.<XMLEntryPoint>
-                    if ((uppernode.getNodeType() == Node.ELEMENT_NODE)) {
-
-                        if (uppernode.getNodeName().equals(getXMLEntryPoint())) {
-
-                            for (Node groupchild = uppernode.getFirstChild(); groupchild != null;
-                                    groupchild = groupchild.getNextSibling()) {
-
-
-                                if ((groupchild.getNodeType() == Node.ELEMENT_NODE)) {
-
-
-                                    String groupname = groupchild.getNodeName();
-
-                                    logger.debug("ELEMENT_NODE: " + groupname);
-
-
-
-                                    deeper(groupchild, groupname);
-
-                                }
-
-
-                            }
-                        }
+                //Falls ein EntryPoint gesetzt wurde, muss dieser
+                //gesucht werden und von dort an begonnen werden:
+                Node startNode;
+                if (getXMLEntryPoint()==null) {
+                    startNode = root.getFirstChild();
+                }else{
+                    try {
+                        logger.debug("Search an entry point...");
+                        startNode = searchNode(getXMLEntryPoint());
+                        //nimm den ersten knoten unter dem entrypoint
+                        startNode = startNode.getFirstChild();
+                    } catch (XPathExpressionException ex) {
+                        startNode = null;
+                        logger.error("XPath error: "+ex.getMessage());
                     }
+                }
+
+                
+                //lese vom start-node beginend...
+                for (Node uppernode = startNode; uppernode != null; uppernode = uppernode.getNextSibling()) {
+
+                    logger.debug("uppernode: " + uppernode);
+
+                    
+                    if ((uppernode.getNodeType() == Node.ELEMENT_NODE)) {
+                        //wenn es sich um ein Element handelt (kein Kommentar..)
+
+                        String nodename = uppernode.getNodeName();
+                        deeper(uppernode, nodename);
+                        
+//                        Node groupchild = uppernode.getFirstChild();
+//                        while (groupchild != null) {
+//                            if ((groupchild.getNodeType() == Node.ELEMENT_NODE)) {
+//                                String groupname = groupchild.getNodeName();
+//                                deeper(groupchild, groupname);
+//                            }
+//                            groupchild = groupchild.getNextSibling();
+//                        }
+//
+//                        //Initialisiere entweder mit root oder entrypoint:
+//                        Node groupchild;
+//                        if (getXMLEntryPoint() == null ) {
+//                            groupchild = root.getFirstChild();
+//                        }else{
+//                            groupchild = uppernode.getFirstChild();
+//                        }
+////
+
+//
+//                        //entweder es gibt keinen entrypoint oder es
+//                        //gibt einen und er ist gerade der gefundene (in der liste)
+//                        if ( getXMLEntryPoint() == null ||
+//                                uppernode.getNodeName().equals(getXMLEntryPoint())) {
+//
+//                            while(groupchild != null) {
+//
+//
+//
+//                                if ((groupchild.getNodeType() == Node.ELEMENT_NODE)) {
+//
+//
+//                                    String groupname = groupchild.getNodeName();
+//
+//                                    logger.debug("ELEMENT_NODE: " + groupname);
+//
+//
+//
+//                                    deeper(groupchild, groupname);
+//
+//                                }
+//
+//                                //nimm den nächsten sibling
+//                                groupchild = groupchild.getNextSibling();
+//                            }
+//
+//                        }
+                    }
+
                 }
             }
         }
 
     }
+
+    /** searches a xml node via xpath.
+     * @param nodename nodepath separated with the current path separator
+     * @todo candidate for a jaxp helper class.
+     */
+    private Node searchNode(String nodename) throws XPathExpressionException {
+
+        Node returnvalue = null;
+
+        // 1. Instantiate an XPathFactory.
+        javax.xml.xpath.XPathFactory factory =
+                javax.xml.xpath.XPathFactory.newInstance();
+
+        // 2. Use the XPathFactory to create a new XPath object
+        javax.xml.xpath.XPath xpath = factory.newXPath();
+
+        //2.1 create xpath expression:
+        //TODO create function to split
+        String xpathExp = getXMLRootNodeName().concat("/");
+        String[] keyparts = rexpattern.split(nodename);
+        for (int i = 0; i < keyparts.length; i++) {
+            if (i>0) {
+                xpathExp = xpathExp.concat("/");
+            }
+            xpathExp = xpathExp.concat(keyparts[i]);
+        }
+
+        logger.debug("searching xpath: "+xpathExp);
+
+        // 3. Compile an XPath string into an XPathExpression
+        javax.xml.xpath.XPathExpression expression = xpath.compile(xpathExp);
+
+        String xmlfile = getXMLFileHandle().getPath();
+        logger.debug("xml file name used as xpath inputsource: "+xmlfile);
+
+        // 4. Evaluate the XPath expression on an input document
+        Node result = (Node) expression.evaluate(new org.xml.sax.InputSource(xmlfile), XPathConstants.NODE);
+
+        logger.debug("result = "+result);
+
+        return result;
+
+        //return returnvalue;
+    }
+
+
 
     public String getAttribute(String key, String attribname) {
         
@@ -611,7 +712,7 @@ public class XMLMap implements Map<String, String>, Serializable {
         //Ermittle ob dieser Knoten ein Kind namens <xMLEntryPoint> hat:
         Node uppernode = root.getFirstChild();
 
-        while ((uppernode != null) && (!getXMLEntryPoint().equals(uppernode.getNodeName()))) {
+        while ((uppernode != null) && (!uppernode.getNodeName().equals(getXMLEntryPoint()))) {
             uppernode = uppernode.getNextSibling();
         }
 
@@ -628,9 +729,16 @@ public class XMLMap implements Map<String, String>, Serializable {
 
         }
 
-        //Element <xMLEntryPoint> anlegen (default=<xmlprop>)
-        uppernode = document.createElement(xMLEntryPoint);
-        root.appendChild(uppernode);
+        if (xMLEntryPoint == null) {
+            //benutze root als <xMLEntryPoint>
+            uppernode = root;
+        }else{
+            //Element <xMLEntryPoint> anlegen (default=<xmlprop>)
+            uppernode = document.createElement(xMLEntryPoint);
+            root.appendChild(uppernode);
+        }
+
+        
 
         //Daten durchlaufen...
         Iterator<XMLEntry> itData = data.values().iterator();
@@ -792,6 +900,7 @@ public class XMLMap implements Map<String, String>, Serializable {
             int initialsize = data.size() * 50; //(Anzahl Einträge x 50 Zeichen pro Zeile
             StringBuffer buffer = new StringBuffer(initialsize);
             String line = System.getProperty("line.separator");
+            buffer.append(line).append("----XMLMap----").append(line);
             Iterator itData = this.data.values().iterator();
             while (itData.hasNext()) {
 

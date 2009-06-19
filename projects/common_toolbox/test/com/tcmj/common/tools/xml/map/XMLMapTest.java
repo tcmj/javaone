@@ -41,20 +41,16 @@ public class XMLMapTest {
     public void beforeEachTest() {
         m();
 
-
         //2. Neue Instanz des XMLPropertyModels erzeugen:
         model = new XMLMap(file);
     }
 
     private void m() {
         logger.info("-------------------------------------------------------------------------------------------------------");
-
-
     }
 
     /**
      * Test of put method, of class com.tcmj.tools.xml.model.XMLMap.
-     *
      */
     @Test
     public void testPutGet() {
@@ -371,8 +367,8 @@ public class XMLMapTest {
      */
     @Test
     public void testGetChildnodename() {
-        assertNotNull(model.getXMLEntryPoint());
-        assertEquals("xmlprop", model.getXMLEntryPoint());
+        assertNull(model.getXMLEntryPoint());
+        
 
         model.setXMLEntryPoint("heinz");
         assertNotNull(model.getXMLEntryPoint());
@@ -389,7 +385,7 @@ public class XMLMapTest {
         assertEquals(".", model.getLevelSeparator());
 
         model.setLevelSeparator("-");
-        assertNotNull(model.getXMLEntryPoint());
+        assertNotNull(model.getLevelSeparator());
         assertEquals("-", model.getLevelSeparator());
 
         model.put("one-oo", "erster eintrag");
@@ -694,13 +690,22 @@ public class XMLMapTest {
     @Test
     public void testMultiNodes() throws Exception {
 
+        logger.info("testMultiNodes");
+
         XMLMap map = new XMLMap(new File(testdatapath + "filename.xml"));
+        
+        map.setXMLEntryPoint("xmlmap");
+
 
         map.readXML();
+
+        assertFalse("map.isEmpty", map.isEmpty());
 
         logger.info(map.showDataEntries(false, true));
 
         String[] lst = map.getListValue("o.boo.koo");
+
+        assertNotNull("ListValue not found", lst);
 
         logger.info("lst.length = " + lst.length);
         logger.info("lst.0 = " + lst[0]);
@@ -764,10 +769,13 @@ public class XMLMapTest {
      */
     @Test
     public void testGetAttribute() throws Exception {
+        logger.info("testGetAttribute");
+
 
         File file = new File(testdatapath + "testGetAttribute.xml");
 
         XMLMap xmap = new XMLMap(file);
+        xmap.setXMLEntryPoint("xmlmap");
         xmap.readXML();
 
 //        xmap.put("level1", "level1");
@@ -803,6 +811,7 @@ public class XMLMapTest {
      */
     @Test
     public void testSetAttribute() throws Exception {
+        logger.info("testSetAttribute");
 
         File file = new File(testdatapath + "testSetAttribute.xml");
 
@@ -836,7 +845,7 @@ public class XMLMapTest {
 
     @Test
     public void testConstructor() {
-
+        logger.info("testConstructor");
         XMLMap xmap = new XMLMap();
 
         File xfile = xmap.getXMLFileHandle();
@@ -846,4 +855,55 @@ public class XMLMapTest {
         assertEquals("XMLMap.xml", xfile.getName());
 
     }
+
+    @Test
+    public void testXMLEntrypointReading() throws Exception{
+        logger.info("testXMLEntrypoint");
+
+        //Create Test-XML-File:
+        File myfile = new File(testdatapath + "testXMLEntrypoint.xml");
+        if (myfile.exists()) {
+            myfile.delete();
+        }
+
+        XMLMap xmap = new XMLMap(myfile);
+        xmap.put("anderer.pre", "dieser Eintrag darf nicht beruerhrt werden!");
+        xmap.put("one.two.three.four.five", "4711");
+        xmap.put("irgendwas.post", "dieser Eintrag darf nicht beruerhrt werden!");
+        xmap.saveXML();
+
+        //1. No Entrypoint
+        xmap.readXML();
+        logger.info(xmap.showDataEntries(false, true));
+        assertEquals("1","4711", xmap.get("one.two.three.four.five"));
+
+        //2. Entrypoint = one
+        xmap.setXMLEntryPoint("one");
+        xmap.readXML();
+        logger.info(xmap.showDataEntries(false, true));
+        assertEquals("2","4711", xmap.get("two.three.four.five"));
+
+        //3. Entrypoint = one
+        xmap.setXMLEntryPoint("one.two");
+        xmap.readXML();
+        assertEquals("3","4711", xmap.get("three.four.five"));
+
+        //4. Entrypoint = one
+        xmap.setXMLEntryPoint("one.two.three");
+        xmap.readXML();
+        assertEquals("4","4711", xmap.get("four.five"));
+
+        //5. Entrypoint = one
+        xmap.setXMLEntryPoint("one.two.three.four");
+        xmap.readXML();
+        assertEquals("5","4711", xmap.get("five"));
+
+
+        logger.info(xmap.showDataEntries(false, true));
+
+
+    }
+
+
+
 }//eof
