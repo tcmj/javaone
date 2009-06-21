@@ -22,19 +22,23 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.regex.Pattern;
-import javax.xml.namespace.QName;
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import org.slf4j.Logger;
@@ -43,6 +47,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 /**
  * This class is a Map implementation for a XML-File.
@@ -378,7 +383,7 @@ public class XMLMap implements Map<String, String>, Serializable {
      */
     public void readXML() {
 
-        logger.debug("START reading: " + xMLFileHandle);
+        logger.trace("START readXML: " + xMLFileHandle);
 
 
         this.data.clear();
@@ -393,6 +398,7 @@ public class XMLMap implements Map<String, String>, Serializable {
                 DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
                 DocumentBuilder builder = factory.newDocumentBuilder();
 
+                logger.debug("isNamespaceAware: " + builder.isNamespaceAware());
 
 
                 //TODO make global - do not read before save!!!
@@ -417,9 +423,12 @@ public class XMLMap implements Map<String, String>, Serializable {
                         startNode = searchNode(getXMLEntryPoint());
                         //nimm den ersten knoten unter dem entrypoint
                         startNode = startNode.getFirstChild();
-                    } catch (XPathExpressionException ex) {
+                    } catch (XPathExpressionException xex) {
                         startNode = null;
-                        logger.error("XPath error: "+ex.getMessage());
+                        logger.error("XPath error: "+xex.getMessage());
+                    } catch (NullPointerException nex) {
+                        startNode = null;
+                        logger.error("XMLEntryPoint not found!");
                     }
                 }
 
@@ -427,7 +436,7 @@ public class XMLMap implements Map<String, String>, Serializable {
                 //lese vom start-node beginend...
                 for (Node uppernode = startNode; uppernode != null; uppernode = uppernode.getNextSibling()) {
 
-                    logger.debug("uppernode: " + uppernode);
+                    logger.trace("current node: " + uppernode);
 
                     
                     if ((uppernode.getNodeType() == Node.ELEMENT_NODE)) {
@@ -436,52 +445,7 @@ public class XMLMap implements Map<String, String>, Serializable {
                         String nodename = uppernode.getNodeName();
                         deeper(uppernode, nodename);
                         
-//                        Node groupchild = uppernode.getFirstChild();
-//                        while (groupchild != null) {
-//                            if ((groupchild.getNodeType() == Node.ELEMENT_NODE)) {
-//                                String groupname = groupchild.getNodeName();
-//                                deeper(groupchild, groupname);
-//                            }
-//                            groupchild = groupchild.getNextSibling();
-//                        }
-//
-//                        //Initialisiere entweder mit root oder entrypoint:
-//                        Node groupchild;
-//                        if (getXMLEntryPoint() == null ) {
-//                            groupchild = root.getFirstChild();
-//                        }else{
-//                            groupchild = uppernode.getFirstChild();
-//                        }
-////
 
-//
-//                        //entweder es gibt keinen entrypoint oder es
-//                        //gibt einen und er ist gerade der gefundene (in der liste)
-//                        if ( getXMLEntryPoint() == null ||
-//                                uppernode.getNodeName().equals(getXMLEntryPoint())) {
-//
-//                            while(groupchild != null) {
-//
-//
-//
-//                                if ((groupchild.getNodeType() == Node.ELEMENT_NODE)) {
-//
-//
-//                                    String groupname = groupchild.getNodeName();
-//
-//                                    logger.debug("ELEMENT_NODE: " + groupname);
-//
-//
-//
-//                                    deeper(groupchild, groupname);
-//
-//                                }
-//
-//                                //nimm den nächsten sibling
-//                                groupchild = groupchild.getNextSibling();
-//                            }
-//
-//                        }
                     }
 
                 }
@@ -586,7 +550,6 @@ public class XMLMap implements Map<String, String>, Serializable {
 
             if (value != null && !"".equals(value.trim())) {
 
-
                 XMLEntry entry = data.get(path);
 
                 if (entry == null) {
@@ -595,7 +558,6 @@ public class XMLMap implements Map<String, String>, Serializable {
                 } else {
                     entry.addValue(value);
                 }
- 
                 
                 parseAttributes(node, entry);
                 
@@ -608,7 +570,6 @@ public class XMLMap implements Map<String, String>, Serializable {
                 while (child != null) {
 
                     if (child.getNodeType() == Node.ELEMENT_NODE) {
-
                         
                         String extendedpath 
                                 = path.concat(getLevelSeparator()).concat(child.getNodeName());
@@ -656,7 +617,7 @@ public class XMLMap implements Map<String, String>, Serializable {
 
                 Node attnode = nnm.item(index);
 
-                logger.debug("reading attribute of element '" + node + "': " + attnode.getNodeName() + " = " + attnode.getNodeValue());
+                logger.trace("reading attribute of element '" + node + "': " + attnode.getNodeName() + " = " + attnode.getNodeValue());
 
                 entry.addAttribute(attnode.getNodeName(), attnode.getNodeValue());
 
@@ -1346,6 +1307,26 @@ public class XMLMap implements Map<String, String>, Serializable {
         
         return rebuilt;
     }
-    
+
+    private void validate() throws SAXException, IOException {
+        // create a SchemaFactory capable of understanding WXS schemas
+        SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+
+        // load a WXS schema, represented by a Schema instance
+        Source schemaFile = new StreamSource(new File("mySchema.xsd"));
+        Schema schema = factory.newSchema(schemaFile);
+
+        // create a Validator instance, which can be used to validate an instance document
+        Validator validator = schema.newValidator();
+        validator.validate(new DOMSource(document));
+    // validate the DOM tree
+//    try {
+//
+//    } catch (SAXException e) {
+//        // instance document is invalid!
+//    }
+
+    }
+
     
 }//end: class
