@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<i:tcmj>
-  <i:darth>
+<i:tcmj xmlns:i="urn:com.tcmj:xmlmap">
+    <darth>anotherdarth</darth>
+<i:darth>
     <i:one>
       <i:two>testdata\com.tcmj.common.tools.xml.map\XMLMapTestExtended_</i:two>
     </i:one>

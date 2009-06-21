@@ -103,9 +103,22 @@ public class XMLMapTestExtended {
     @Test
     public void schemaTest() throws Exception {
         XMLMap xmap = new XMLMap(new File(testdatapathOut + "schemaTest.xml"));
+        xmap.readXML();
+        System.out.println(xmap.showDataEntries(false, false));
+
+        assertNotNull("i:darth.i:one.i:two not available", xmap.get("i:darth.i:one.i:two"));
+        assertNotNull("darth", xmap.get("darth"));
+
         xmap.setXMLRootNodeName("i:tcmj");
         xmap.setXMLEntryPoint("i:darth");
-        xmap.put("i:one.i:two", testdatapathOut);
+        xmap.readXML();
+        System.out.println(xmap.showDataEntries(false, false));
+        assertNotNull("i:one.i:two not available", xmap.get("i:one.i:two"));
+
+
+        //        xmap.setXMLRootNodeName("tcmj");
+//        
+//        xmap.put("one.two", testdatapathOut);
         xmap.saveXML();
     }
 

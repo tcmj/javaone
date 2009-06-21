@@ -54,7 +54,8 @@ public class XMLMapTest {
      */
     @Test
     public void testPutGet() {
-
+        
+ 
         logger.info("testPutGet");
 
         String key = "one", value = "1st";
@@ -727,7 +728,7 @@ public class XMLMapTest {
         File file = new File(testdatapath + "ram.xml");
 
         String[] cases = new String[]{
-            ".", "-", "\\", ",", "*", "_", ":", "@", "/", "|", "=", "?",
+            ".", "-", "\\", ",", "*", "_", "$", "@", "/", "|", "=", "?",
             "...", "x", "-|-", "||", "+"};
 
         for (int i = 0; i < cases.length; i++) {

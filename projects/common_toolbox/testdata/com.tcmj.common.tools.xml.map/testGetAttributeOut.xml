@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <tcmj>
-<xmlprop>
+<xmlmap>
     <level1 myat="12" myotherat="435">value1</level1>
     <level2>
       <childlevel2 level="2">value2</childlevel2>
@@ -28,5 +28,5 @@
         <b go="possible">bbbbb</b>
       </a>
     </level7>
-  </xmlprop>
+  </xmlmap>
 </tcmj>

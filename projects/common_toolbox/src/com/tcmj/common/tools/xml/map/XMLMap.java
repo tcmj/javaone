@@ -24,6 +24,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javax.xml.XMLConstants;
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -87,7 +88,7 @@ public class XMLMap implements Map<String, String>, Serializable {
     /** The Name of the Roots child (default = 'xmlprop'). */
     private String xMLEntryPoint /*= "xmlmap"*/;
     
-    /** XML Document. */
+    /** JAXP XML Document. */
     private Document document = null;
 
 
@@ -396,13 +397,21 @@ public class XMLMap implements Map<String, String>, Serializable {
             try {
 
                 DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
+                /* Set namespaceAware to true to get a DOM Level 2 tree with nodes
+                containing namesapce information.  This is necessary because the
+                default value from JAXP 1.0 was defined to be false. */
+                factory.setNamespaceAware(true);
+
                 DocumentBuilder builder = factory.newDocumentBuilder();
+
 
                 logger.debug("isNamespaceAware: " + builder.isNamespaceAware());
 
 
                 //TODO make global - do not read before save!!!
                 document = builder.parse(xMLFileHandle);
+
                 root = document.getDocumentElement();
             } catch (Exception ex) {
                 logger.error("Error reading XML: " + ex.getMessage());
@@ -410,6 +419,7 @@ public class XMLMap implements Map<String, String>, Serializable {
 
             //Nur wenn es ein Wurzelelement gibt weiterlesen:
             if (root != null) {
+
 
 
                 //Falls ein EntryPoint gesetzt wurde, muss dieser
@@ -436,11 +446,11 @@ public class XMLMap implements Map<String, String>, Serializable {
                 //lese vom start-node beginend...
                 for (Node uppernode = startNode; uppernode != null; uppernode = uppernode.getNextSibling()) {
 
-                    logger.trace("current node: " + uppernode);
-
+                    
                     
                     if ((uppernode.getNodeType() == Node.ELEMENT_NODE)) {
                         //wenn es sich um ein Element handelt (kein Kommentar..)
+logger.debug("current node: LocalName=" + uppernode.getLocalName()+" NodeName="+uppernode.getNodeName()+" Prefix="+uppernode.getPrefix());
 
                         String nodename = uppernode.getNodeName();
                         deeper(uppernode, nodename);
@@ -460,8 +470,6 @@ public class XMLMap implements Map<String, String>, Serializable {
      */
     private Node searchNode(String nodename) throws XPathExpressionException {
 
-        Node returnvalue = null;
-
         // 1. Instantiate an XPathFactory.
         javax.xml.xpath.XPathFactory factory =
                 javax.xml.xpath.XPathFactory.newInstance();
@@ -469,9 +477,38 @@ public class XMLMap implements Map<String, String>, Serializable {
         // 2. Use the XPathFactory to create a new XPath object
         javax.xml.xpath.XPath xpath = factory.newXPath();
 
+
+        //Namespace-prefix-workaround
+        if (getXMLRootNodeName().contains(":")) {
+            String[] splits = getXMLRootNodeName().split(":");
+            //take the first prefix
+            final String prfix = splits[0];
+            logger.debug("prefix: "+prfix);
+            //search uri to the prefix
+            final String uri = document.lookupNamespaceURI(prfix);
+            logger.debug("uri: "+uri);
+            NamespaceContext nsc = new NamespaceContext( ) {
+
+                public String getNamespaceURI(String prefix) {
+                    return uri;
+                }
+
+                public String getPrefix(String namespaceURI) {
+                    return prfix;
+                }
+
+                public Iterator getPrefixes(String namespaceURI) {
+                    throw new UnsupportedOperationException("Not supported yet.");
+                }
+            };
+            xpath.setNamespaceContext(nsc);
+        }
+
+        
+
         //2.1 create xpath expression:
         //TODO create function to split
-        String xpathExp = getXMLRootNodeName().concat("/");
+        String xpathExp = "//".concat(getXMLRootNodeName()).concat("/");
         String[] keyparts = rexpattern.split(nodename);
         for (int i = 0; i < keyparts.length; i++) {
             if (i>0) {
@@ -495,7 +532,6 @@ public class XMLMap implements Map<String, String>, Serializable {
 
         return result;
 
-        //return returnvalue;
     }
 
 
@@ -652,16 +688,28 @@ public class XMLMap implements Map<String, String>, Serializable {
             throws FileNotFoundException, TransformerConfigurationException,
             UnsupportedEncodingException, TransformerException, IOException, ParserConfigurationException {
 
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-
+        
 
         Element root = null;
 
 
         if (document == null) {
+
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            /* Set namespaceAware to true to get a DOM Level 2 tree with nodes
+            containing namesapce information.  This is necessary because the
+            default value from JAXP 1.0 was defined to be false. */
+            factory.setNamespaceAware(true);
+
+
+            DocumentBuilder builder = factory.newDocumentBuilder();
+
+
+
             document = builder.newDocument();
+
             root = document.createElement(xMLRootNodeName);
+
             document.appendChild(root);
         } else {
             root = document.getDocumentElement();
@@ -677,7 +725,6 @@ public class XMLMap implements Map<String, String>, Serializable {
             uppernode = uppernode.getNextSibling();
         }
 
-        //<tcmj><xmlprop>
         if (uppernode != null) { //wenn er ein Kind namens <xMLEntryPoint> hat...
             Node prevnode = uppernode.getPreviousSibling();
 
@@ -1186,6 +1233,12 @@ public class XMLMap implements Map<String, String>, Serializable {
      * @param separator
      */
     public final void setLevelSeparator(String separator) {
+
+        if (separator== null ||
+                separator.contains(":")) {
+            throw new UnsupportedOperationException("Not allowed level separator: "+separator);
+        }
+
         levelSeparator = separator;
         rexpattern = Pattern.compile( mask(separator) );
     }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <tcmj>
-<xmlprop>
+<xmlmap>
     <o>
       <boo>
         <koo>aaa</koo>
@@ -22,5 +22,5 @@
       <email>abc@web.de</email>
     </lst>
     <level5 att5="attribute of 5"/>
-  </xmlprop>
+  </xmlmap>
 </tcmj>
