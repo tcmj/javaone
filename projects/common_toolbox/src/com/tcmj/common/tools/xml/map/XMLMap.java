@@ -18,28 +18,23 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Pattern;
-import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import org.slf4j.Logger;
@@ -48,7 +43,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
 /**
  * This class is a Map implementation for a XML-File.
@@ -73,59 +67,46 @@ public class XMLMap implements Map<String, String>, Serializable {
 
     /** Universal version identifier. */
     private static final long serialVersionUID = -4723949967478064084L;
-
     /** slf4j Logging framework. */
     private static final transient Logger logger = LoggerFactory.getLogger(XMLMap.class);
-    
-    
     /** The Data backed by a Map. */
     private Map<String, XMLEntry> data;
-
     /** The File handle of a XML-File. (does not have to exist). */
     private File xMLFileHandle;
     /** The Name of the root node (default = 'tcmj'). */
     private String xMLRootNodeName = "tcmj";
     /** The Name of the Roots child (default = 'xmlprop'). */
     private String xMLEntryPoint /*= "xmlmap"*/;
-    
     /** JAXP XML Document. */
     private Document document = null;
-
-
-    
     /** Separator to concat levels to each other. Default = '.'  */
     private String levelSeparator;
-
     /** compiled pattern to split the keys. */
     private Pattern rexpattern;
-    
+
     /**
      * Creates a new instance of XMLMap.
      * @throws XMLMapException Exception if the Filehandle is null
      */
     public XMLMap() {
-        this(new File(XMLMap.class.getSimpleName()+".xml"));
+        this(new File(XMLMap.class.getSimpleName() + ".xml"));
     }
 
     /**
      * Creates a new instance of XMLMap.
      * @param xml File handle to a XML File (does not have to exist).
      */
-    public XMLMap(final File xml){
+    public XMLMap(final File xml) {
 
         if (xml == null) {
             throw new XMLMapException("XML File handle cannot be null!");
         }
-        
-        //this.data = new java.util.TreeMap<String, XMLEntry>();
-//        this.data = new java.util.HashMap<String, XMLEntry>();
-        this.data = new java.util.LinkedHashMap<String, XMLEntry>();
 
+        this.data = new LinkedHashMap<String, XMLEntry>();
         this.xMLFileHandle = xml;
 
-
         setLevelSeparator(".");
-    
+
     }
 
     /**
@@ -135,11 +116,10 @@ public class XMLMap implements Map<String, String>, Serializable {
      * @param value Value (Text)
      */
     public String put(String key, String value) {
-
         if (key == null) {
             throw new XMLMapException("Null not accepted as key!");
         }
-        
+
         validateEntry(key);
 
         XMLEntry oldentry = data.put(key, new XMLEntry(key, value));
@@ -147,7 +127,6 @@ public class XMLMap implements Map<String, String>, Serializable {
         return (oldentry == null) ? null : oldentry.getValue();
     }
 
-    
     /**
      * Takes care about that every key has only one value on the lowest level.<br>
      * not allowed:<br> &lt;one&gt;12&lt;two&gt;55&lt;/two&gt;&lt;/one&gt;<br>
@@ -169,9 +148,8 @@ public class XMLMap implements Map<String, String>, Serializable {
          * put("oben","11");
          * put("oben.unten","22");  
          */
-       
+
         String[] keyparts = rexpattern.split(keytocheck);
-     
 
         String keypart = null;
         for (int x = 0; x < keyparts.length; x++) {
@@ -237,7 +215,6 @@ public class XMLMap implements Map<String, String>, Serializable {
             return true;
         } else {
             //..wenn nicht muss genau ermittelt werden:
-
             int firstsep_key1 = key1.indexOf(getLevelSeparator());
             int firstsep_key2 = key2.indexOf(getLevelSeparator());
 
@@ -287,22 +264,17 @@ public class XMLMap implements Map<String, String>, Serializable {
      * To update the value (text) use {@link put(String,String,String)}
      * with the specific key<BR>
      * To delete the object also use this method with null in the value parameter<BR>
-     *
      * @param key Keyname on which a java object shall be attached.
      * @param obj any java class instance
      */
-    public void putObject(String key, Object obj){
-
+    public void putObject(String key, Object obj) {
         XMLEntry entry = data.get(key);
-
         if (entry == null) {
             put(key, null, obj);
         } else {
             entry.setObject(obj);
         }
-
     }
-
 
     /**
      * Gets the Value of a specific key.
@@ -320,15 +292,12 @@ public class XMLMap implements Map<String, String>, Serializable {
      * @param key Key Name
      * @param values Value (Text)
      */
-    public void putListValue(String key, String[] values){
-
-            XMLEntry entry = new XMLEntry(key, values[0]);
-            data.put(key, entry);
-
-            for (int i = 1; i < values.length; i++) {
-                entry.addValue(values[i]);
-            }
-
+    public void putListValue(String key, String[] values) {
+        XMLEntry entry = new XMLEntry(key, values[0]);
+        data.put(key, entry);
+        for (int i = 1; i < values.length; i++) {
+            entry.addValue(values[i]);
+        }
     }
 
     /**
@@ -353,17 +322,14 @@ public class XMLMap implements Map<String, String>, Serializable {
         Object obj = null;
         while (itd.hasNext()) {
             Map.Entry mapen = (Map.Entry) itd.next();
-
             XMLEntry xmlentry = (XMLEntry) mapen.getValue();
-
             if (value.equals(xmlentry.getValue())) {
-                
-                if(obj==null) { //first occurence
+
+                if (obj == null) { //first occurence
                     obj = xmlentry.getObject();
-                }else{
+                } else {
                     throw new XMLMapException("Value exists more than once! Cannot perform search by value!");
-                } 
-                
+                }
             }
         }
         return obj;
@@ -384,14 +350,11 @@ public class XMLMap implements Map<String, String>, Serializable {
      */
     public void readXML() {
 
-        logger.trace("START readXML: " + xMLFileHandle);
-
-
         this.data.clear();
 
         if (xMLFileHandle.exists()) {
+            logger.trace("start readXML: " + xMLFileHandle);
 
-//            Document document = null;
             Element root = null;
 
             try {
@@ -405,10 +368,6 @@ public class XMLMap implements Map<String, String>, Serializable {
 
                 DocumentBuilder builder = factory.newDocumentBuilder();
 
-
-                logger.debug("isNamespaceAware: " + builder.isNamespaceAware());
-
-
                 //TODO make global - do not read before save!!!
                 document = builder.parse(xMLFileHandle);
 
@@ -420,14 +379,12 @@ public class XMLMap implements Map<String, String>, Serializable {
             //Nur wenn es ein Wurzelelement gibt weiterlesen:
             if (root != null) {
 
-
-
                 //Falls ein EntryPoint gesetzt wurde, muss dieser
                 //gesucht werden und von dort an begonnen werden:
                 Node startNode;
-                if (getXMLEntryPoint()==null) {
+                if (getXMLEntryPoint() == null) {
                     startNode = root.getFirstChild();
-                }else{
+                } else {
                     try {
                         logger.debug("Search an entry point...");
                         startNode = searchNode(getXMLEntryPoint());
@@ -435,26 +392,26 @@ public class XMLMap implements Map<String, String>, Serializable {
                         startNode = startNode.getFirstChild();
                     } catch (XPathExpressionException xex) {
                         startNode = null;
-                        logger.error("XPath error: "+xex.getMessage());
+                        logger.error("XPath error: " + xex.getMessage());
                     } catch (NullPointerException nex) {
                         startNode = null;
                         logger.error("XMLEntryPoint not found!");
                     }
                 }
 
-                
+
                 //lese vom start-node beginend...
                 for (Node uppernode = startNode; uppernode != null; uppernode = uppernode.getNextSibling()) {
 
-                    
-                    
+
+
                     if ((uppernode.getNodeType() == Node.ELEMENT_NODE)) {
                         //wenn es sich um ein Element handelt (kein Kommentar..)
-logger.debug("current node: LocalName=" + uppernode.getLocalName()+" NodeName="+uppernode.getNodeName()+" Prefix="+uppernode.getPrefix());
+                        logger.debug("current node: LocalName=" + uppernode.getLocalName() + " NodeName=" + uppernode.getNodeName() + " Prefix=" + uppernode.getPrefix());
 
                         String nodename = uppernode.getNodeName();
                         deeper(uppernode, nodename);
-                        
+
 
                     }
 
@@ -483,11 +440,11 @@ logger.debug("current node: LocalName=" + uppernode.getLocalName()+" NodeName="+
             String[] splits = getXMLRootNodeName().split(":");
             //take the first prefix
             final String prfix = splits[0];
-            logger.debug("prefix: "+prfix);
+            logger.debug("prefix: " + prfix);
             //search uri to the prefix
             final String uri = document.lookupNamespaceURI(prfix);
-            logger.debug("uri: "+uri);
-            NamespaceContext nsc = new NamespaceContext( ) {
+            logger.debug("uri: " + uri);
+            NamespaceContext nsc = new NamespaceContext() {
 
                 public String getNamespaceURI(String prefix) {
                     return uri;
@@ -504,75 +461,65 @@ logger.debug("current node: LocalName=" + uppernode.getLocalName()+" NodeName="+
             xpath.setNamespaceContext(nsc);
         }
 
-        
+
 
         //2.1 create xpath expression:
         //TODO create function to split
         String xpathExp = "//".concat(getXMLRootNodeName()).concat("/");
         String[] keyparts = rexpattern.split(nodename);
         for (int i = 0; i < keyparts.length; i++) {
-            if (i>0) {
+            if (i > 0) {
                 xpathExp = xpathExp.concat("/");
             }
             xpathExp = xpathExp.concat(keyparts[i]);
         }
 
-        logger.debug("searching xpath: "+xpathExp);
+        logger.debug("searching xpath: " + xpathExp);
 
         // 3. Compile an XPath string into an XPathExpression
         javax.xml.xpath.XPathExpression expression = xpath.compile(xpathExp);
 
         String xmlfile = getXMLFileHandle().getPath();
-        logger.debug("xml file name used as xpath inputsource: "+xmlfile);
 
         // 4. Evaluate the XPath expression on an input document
         Node result = (Node) expression.evaluate(new org.xml.sax.InputSource(xmlfile), XPathConstants.NODE);
 
-        logger.debug("result = "+result);
+        logger.debug("result = " + result);
 
         return result;
 
     }
 
-
-
     public String getAttribute(String key, String attribname) {
-        
+
         XMLEntry entry = data.get(key);
-        
-        if(entry==null) {
-            throw new XMLMapException("Entry not found for key: "+key);
+
+        if (entry == null) {
+            throw new XMLMapException("Entry not found for key: " + key);
         }
-        
+
         Map<String, String> allattribs = entry.getAttributes();
-        if(allattribs==null) {
-            throw new XMLMapException("No Attributes found for key: "+key);
+        if (allattribs == null) {
+            throw new XMLMapException("No Attributes found for key: " + key);
         }
         String attribvalue = allattribs.get(attribname);
-        
+
         return attribvalue;
-        
-        
-        
     }
 
     public void setAttribute(String key, String attribname, String value) {
-        
+
         XMLEntry entry = data.get(key);
-        
-        if(entry==null) {
-            throw new XMLMapException("Entry not found for key: "+key);
+
+        if (entry == null) {
+            throw new XMLMapException("Entry not found for key: " + key);
         }
-        
+
         entry.addAttribute(attribname, value);
-         
-        
-        
+
+
     }
-    
-    
-    
-    
+
     /** Iterates recursive throug the XML Nodes.
      * @param parent Parent Node
      */
@@ -594,25 +541,23 @@ logger.debug("current node: LocalName=" + uppernode.getLocalName()+" NodeName="+
                 } else {
                     entry.addValue(value);
                 }
-                
+
                 parseAttributes(node, entry);
-                
-                
+
                 return;
             } else {
-                
-                logger.debug("going deeper above "+path+"..."+value);
-                
+
+                logger.trace("going deeper above " + path + "..." + value);
+
                 while (child != null) {
 
                     if (child.getNodeType() == Node.ELEMENT_NODE) {
-                        
-                        String extendedpath 
-                                = path.concat(getLevelSeparator()).concat(child.getNodeName());
+
+                        String extendedpath = path.concat(getLevelSeparator()).concat(child.getNodeName());
 
                         deeper(child, extendedpath);
                     } else if (child.getNodeType() == Node.CDATA_SECTION_NODE) {
-                        logger.debug("CDATA_SECTION_NODE = " + child.getNodeValue());
+                        logger.trace("CDATA_SECTION_NODE = " + child.getNodeValue());
                         XMLEntry entry = data.get(path);
 
                         if (entry == null) {
@@ -626,23 +571,20 @@ logger.debug("current node: LocalName=" + uppernode.getLocalName()+" NodeName="+
 
                     }
 
-
                     child = child.getNextSibling();
                 }
             }
         } else {
-            
-            logger.debug("!!!! no childs: "+path); 
+
+            logger.trace("!!!! no childs: " + path);
             XMLEntry entry = new XMLEntry(path, node.getNodeValue());
             parseAttributes(node, entry);
             this.data.put(path, entry);
-            
+
             return;
         }
     }
-    
-    
-    
+
     private void parseAttributes(Node node, XMLEntry entry) {
 
         if (node.hasAttributes()) {
@@ -660,7 +602,6 @@ logger.debug("current node: LocalName=" + uppernode.getLocalName()+" NodeName="+
             }
         }
     }
-
 
     /**
      * Saves the current Entries to file. <BR>
@@ -681,17 +622,11 @@ logger.debug("current node: LocalName=" + uppernode.getLocalName()+" NodeName="+
 
     }
 
-
-
-    
     private void saveXML(File outputfile)
             throws FileNotFoundException, TransformerConfigurationException,
             UnsupportedEncodingException, TransformerException, IOException, ParserConfigurationException {
 
-        
-
         Element root = null;
-
 
         if (document == null) {
 
@@ -701,10 +636,7 @@ logger.debug("current node: LocalName=" + uppernode.getLocalName()+" NodeName="+
             default value from JAXP 1.0 was defined to be false. */
             factory.setNamespaceAware(true);
 
-
             DocumentBuilder builder = factory.newDocumentBuilder();
-
-
 
             document = builder.newDocument();
 
@@ -714,8 +646,6 @@ logger.debug("current node: LocalName=" + uppernode.getLocalName()+" NodeName="+
         } else {
             root = document.getDocumentElement();
         }
-
-
 
 
         //Ermittle ob dieser Knoten ein Kind namens <xMLEntryPoint> hat:
@@ -740,28 +670,24 @@ logger.debug("current node: LocalName=" + uppernode.getLocalName()+" NodeName="+
         if (xMLEntryPoint == null) {
             //benutze root als <xMLEntryPoint>
             uppernode = root;
-        }else{
+        } else {
             //Element <xMLEntryPoint> anlegen (default=<xmlprop>)
             uppernode = document.createElement(xMLEntryPoint);
             root.appendChild(uppernode);
         }
 
-        
-
         //Daten durchlaufen...
         Iterator<XMLEntry> itData = data.values().iterator();
 
-        while(itData.hasNext()) {
+        while (itData.hasNext()) {
 
             XMLEntry xmlentry = itData.next();
-
 
             //Variable fuer die unterste Ebene:
             Node actualnode = uppernode, prevnode = null;
 
             //Key zerteilen:
             String[] keyparts = rexpattern.split(xmlentry.getKey());
-
 
             String keypart = null;
 
@@ -805,14 +731,14 @@ logger.debug("current node: LocalName=" + uppernode.getLocalName()+" NodeName="+
             //Value oder Values anlegen:
             if (xmlentry.getValue() != null) {
 
-                
+
                 if (xmlentry.getXmlNodeType() == Node.CDATA_SECTION_NODE) {
                     actualnode.appendChild(document.createCDATASection(xmlentry.getValue()));
                 } else {
                     actualnode.appendChild(document.createTextNode(xmlentry.getValue()));
                 }
-                
-                
+
+
             } else {
 
                 String[] values = xmlentry.getListValue();
@@ -913,20 +839,20 @@ logger.debug("current node: LocalName=" + uppernode.getLocalName()+" NodeName="+
             while (itData.hasNext()) {
 
                 XMLEntry entry = (XMLEntry) itData.next();
-                
+
                 buffer.append(String.valueOf(entry));
 
                 if (showobjects) {
                     String obj = String.valueOf(entry.getObject());
                     buffer.append(" O:[".concat(obj).concat("]"));
                 }
-                
+
                 if (attributes) {
                     Map map = entry.getAttributes();
-                    if(map!=null){
-                        buffer.append(" A:["+map.entrySet()+"]");
-                    } 
-                    
+                    if (map != null) {
+                        buffer.append(" A:[" + map.entrySet() + "]");
+                    }
+
                 }
 
                 buffer.append(line);
@@ -939,6 +865,7 @@ logger.debug("current node: LocalName=" + uppernode.getLocalName()+" NodeName="+
      * Exception which was thrown on Class specific Errors
      */
     public static class XMLMapException extends RuntimeException {
+
         private static final long serialVersionUID = 5244742674279170273L;
 
         /**
@@ -992,31 +919,27 @@ logger.debug("current node: LocalName=" + uppernode.getLocalName()+" NodeName="+
         this.xMLEntryPoint = childnode;
     }
 
-
     /**
      * Entry of the XML Document.
      * contains key, value as String
      * @author tcmj - Thomas Deutsch - tdeut
      */
     static final class XMLEntry implements Map.Entry<String, String>, Serializable {
+
         private static final long serialVersionUID = -3974837921466840353L;
         private static final int TYPE_SINGLE = 0x0;
         private static final int TYPE_MULTI = 0x1;
         private int type = TYPE_SINGLE;
-
         private int xmlNodeType;
-        
-        /** Key */
+        /** Key. */
         private final String key;
-        /** Value */
+        /** Value. */
         private String[] value;
-        /** Java Object */
+        /** Java Object. */
         private Object[] object;
-
-        /** Attributes */
+        /** Attributes. */
         private Map<String, String> attributes;
-        
-        
+
         /**
          * Constructor 1.
          * @param key keyname
@@ -1053,11 +976,9 @@ logger.debug("current node: LocalName=" + uppernode.getLocalName()+" NodeName="+
          * @return Value
          */
         public String getValue() {
-
             if (type == TYPE_SINGLE) {
                 return this.value[0];
             }
-
             return null;
         }
 
@@ -1102,14 +1023,13 @@ logger.debug("current node: LocalName=" + uppernode.getLocalName()+" NodeName="+
             if (type == TYPE_SINGLE) {
                 this.object[0] = obj;
             }
-
         }
 
         public String setValue(String val) {
             String old = this.value[0];
             if (type == TYPE_SINGLE) {
                 this.value[0] = val;
-            }else{
+            } else {
                 throw new UnsupportedOperationException("not allowed for single type");
             }
             return old;
@@ -1136,29 +1056,22 @@ logger.debug("current node: LocalName=" + uppernode.getLocalName()+" NodeName="+
         }
 
         public void addAttribute(String name, String value) {
-
             if (this.attributes == null) {
                 this.attributes = new HashMap();
             }
             this.attributes.put(name, value);
-
         }
-        
-        
+
         public Map<String, String> getAttributes() {
             return this.attributes;
         }
-        
-        
-        
 
         @Override
         public int hashCode() {
-            return (key==null   ? 0 : key.hashCode()) ^
-                   (value==null ? 0 : value.hashCode());
+            return (key == null ? 0 : key.hashCode()) ^
+                    (value == null ? 0 : value.hashCode());
         }
-        
-        
+
         @Override
         public boolean equals(Object no2) {
 
@@ -1185,18 +1098,13 @@ logger.debug("current node: LocalName=" + uppernode.getLocalName()+" NodeName="+
                                         return false;
                                     }
                                 }
-
                                 return true;
                             }
-
                         }
-
                     } else {
                         return false;
                     }
-
                 } else {
-
                     String obj2 = (String) no2;
                     return this.value[0].equals(obj2);
                 }
@@ -1233,14 +1141,12 @@ logger.debug("current node: LocalName=" + uppernode.getLocalName()+" NodeName="+
      * @param separator
      */
     public final void setLevelSeparator(String separator) {
-
-        if (separator== null ||
+        if (separator == null ||
                 separator.contains(":")) {
-            throw new UnsupportedOperationException("Not allowed level separator: "+separator);
+            throw new UnsupportedOperationException("Not allowed level separator: " + separator);
         }
-
         levelSeparator = separator;
-        rexpattern = Pattern.compile( mask(separator) );
+        rexpattern = Pattern.compile(mask(separator));
     }
 
     /**
@@ -1262,7 +1168,7 @@ logger.debug("current node: LocalName=" + uppernode.getLocalName()+" NodeName="+
     public int size() {
         return this.data.size();
     }
-    
+
     public boolean isEmpty() {
         return (size() == 0);
     }
@@ -1272,7 +1178,6 @@ logger.debug("current node: LocalName=" + uppernode.getLocalName()+" NodeName="+
     }
 
     public boolean containsValue(Object object) {
-
         Iterator<XMLEntry> itDataValues = this.data.values().iterator();
         while (itDataValues.hasNext()) {
 
@@ -1282,10 +1187,9 @@ logger.debug("current node: LocalName=" + uppernode.getLocalName()+" NodeName="+
                 return true;
             }
         }
-
         return false;
     }
-    
+
     /**
      * Gets the Value of a specific key.
      * @param key full path to look for
@@ -1295,21 +1199,16 @@ logger.debug("current node: LocalName=" + uppernode.getLocalName()+" NodeName="+
         XMLEntry entry = data.get(key);
         return entry == null ? null : entry.getValue();
     }
-    
 
     public Set<String> keySet() {
         return this.data.keySet();
     }
 
     public Collection<String> values() {
-
         Set<String> setValues = new LinkedHashSet<String>();
-
         for (XMLEntry elem : this.data.values()) {
-
             setValues.add(elem.getValue());
         }
-
         return setValues;
     }
 
@@ -1328,58 +1227,34 @@ logger.debug("current node: LocalName=" + uppernode.getLocalName()+" NodeName="+
     }
 
     public void putAll(Map stringmap) {
-
         Iterator<Map.Entry<String, String>> itentryset = stringmap.entrySet().iterator();
         while (itentryset.hasNext()) {
             Map.Entry<String, String> xmlentry = itentryset.next();
             put(xmlentry.getKey(), xmlentry.getValue());
         }
     }
-    
-    
-    private static final String mask (final String value) {
+
+    private static final String mask(final String value) {
         String rebuilt = value;
-        if (value.contains(".")){
+        if (value.contains(".")) {
             rebuilt = value.replaceAll("\\.", "\\\\.");
         }
-        if (value.contains("*")){
+        if (value.contains("*")) {
             rebuilt = value.replaceAll("\\*", "\\\\*");
         }
-        if (value.contains("|")){
+        if (value.contains("|")) {
             rebuilt = value.replaceAll("\\|", "\\\\|");
         }
-        if (value.contains("?")){
+        if (value.contains("?")) {
             rebuilt = value.replaceAll("\\?", "\\\\?");
         }
-        if (value.contains("+")){
+        if (value.contains("+")) {
             rebuilt = value.replaceAll("\\+", "\\\\+");
         }
-        if (value.contains("\\")){
+        if (value.contains("\\")) {
             rebuilt = value.replaceAll("\\\\", "\\\\\\\\");
         }
-        
+
         return rebuilt;
     }
-
-    private void validate() throws SAXException, IOException {
-        // create a SchemaFactory capable of understanding WXS schemas
-        SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-
-        // load a WXS schema, represented by a Schema instance
-        Source schemaFile = new StreamSource(new File("mySchema.xsd"));
-        Schema schema = factory.newSchema(schemaFile);
-
-        // create a Validator instance, which can be used to validate an instance document
-        Validator validator = schema.newValidator();
-        validator.validate(new DOMSource(document));
-    // validate the DOM tree
-//    try {
-//
-//    } catch (SAXException e) {
-//        // instance document is invalid!
-//    }
-
-    }
-
-    
 }//end: class
