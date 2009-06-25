@@ -17,68 +17,62 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-/** * Database Connectivity!
- * Es werden folgende Datenbanktypen unterstützt:<br>
- * <code><ul><li>sun.jdbc.odbc.JdbcOdbcDriver<br>
- * <li>oracle.jdbc.jdbcdriver.OracleDriver   <br>
- * <li>net.sourceforge.jtds.jdbc.Driver  <br>
- * <li>org.gjt.mm.mysql.Driver</ul></code><br>
+/** Database Connectivity!
+ * You can use any JDBC driver but there is a special support to:<br>
+ * <code><ul><li>ODBC</li>
+ * <li>Oracle</li>
+ * <li>Microsoft SQL Server via JTDS</li>
+ * <li>MySQl</li></ul></code><br>
  * <pre>
- * <i><b>//Deklaration und Initialisierung:</b></i>
- * tcmj.database.quick.DBQuickConnect dbcon = new tcmj.database.quick.DBQuickConnect();
- * <i><b>//Datenbank-Treiber uerber Konstante waehlen:</b></i>
- * dbcon.setDriverClass(dbcon._ORACLE);
- * <i><b>//Datenbankspezifische URL zusammenbauen</b></i>
- * String url = dbcon.createURL("PRIMA", "DEVORA", "1521", dbcon._ORACLE);
- * <i><b>//Verbindung aufbauen</b></i>
- * dbcon.connecturl(url, "privuser1", "privuser1");
- * <i><b>//Select-Statement absetzen</b></i>
+ * <i><b>//Declaration:</b></i>
+ * DBQuickConnect dbcon = new DBQuickConnect();
+ * <i><b>//Choose your database driver:</b></i>
+ * dbcon.setDriver(DBQuickConnect.Driver.ORACLE);
+ * <i><b>//Construct your URL:</b></i>
+ * String url = dbcon.createURL("PRIMA", "DEVORA", "1521");
+ * <i><b>//Connect:</b></i>
+ * dbcon.connect(url, "userxy", "password123");
+ * <i><b>//Select-Statement:</b></i>
  * ResultSet rs = dbcon.sqlSelect("SELECT A,B FROM XYZ");
- * <i><b>//Ergebnismenge durchlaufen und auslesen:</b></i>
+ * <i><b>//Loop through the result:</b></i>
  * while(rs.next()){
- *       String zelle = rs.getString(1);   <i>//Spalte: A</i>
+ *       String cell = rs.getString(1);   <i>//column: 1</i>
  * }
- * <i><b>//ResultSet-Objekt recyclen (wichtig!!!)</b></i>
+ * <i><b>//!!Important!! close ResultSet !!Import!!)</b></i>
  * dbcon.closeResultSet(rs);
+ * <i><b>//Close connection</b></i>
+ * dbcon.closeConnection();
  * </pre><br><br>
- * <p>Copyright: Copyright (c) 2003</p>
- * <p>Organisation: tcmj</p>
+ * <p>Copyright: Copyright (c) 2003 - 2009 by tcmj</p>
  * @author Thomas Deutsch
- * @version 3.0
+ * @version 3.1
  * @JUnit Test available!
  */
 public class DBQuickConnect extends Observable {
 
     /** slf4j Logging framework. */
     private static final transient Logger logger = LoggerFactory.getLogger(DBQuickConnect.class);
-
-    /**Schaltet den DebugWriter ein/aus. */
+    /** debugmode on/off. */
     private boolean debug = false;
-    
-    /**JDBC Treiber der mit der Class.forName() Methode geladen wird. */
+    /** JDBC driver. */
     protected String jdbcdriver;
-    /**Interne Nummer des gewählten Treibers. */
+    /** Internal driver. */
     protected Driver internalDriver = Driver.NOTSELECTED;
-    /**URL der Datenbankverbindung. */
+    /** URL. */
     protected String url;
-    /**Datenbank Benutzername (ID). */
+    /** Database username. */
     protected String user;
-    /**Passwort des Datenbank Benutzers. */
+    /** Password. */
     private String pass;
-    /**Java Connection Objekt. */
+    /** Java Connection Object. */
     protected Connection connection;
-    
     /**Die Klasse 'StmtCache' stellt eine verkettete Liste zur Verfügung.,
      * um nicht mehr verwendete Statement-Objekte zur Wiederverwendung
      * bereitzuhalten.<br>Dies betrifft normale java.sql.Statement - Objekte.*/
     private StmtCache mSCache;
-
-
     private PstStmtWatcher pstWatcher;
-
     
-    /**Array, welches die Namen der Datenbanktreiberklassen und Datenbank-URLs beinhaltet. */
+    /**Databasedriverclasses and URLs. */
     private static final String[][] DRV_AND_URLS = {
         {
             "sun.jdbc.odbc.JdbcOdbcDriver",
@@ -99,25 +93,19 @@ public class DBQuickConnect extends Observable {
             "jdbc:derby:"
         }
     };
+    private static final int DRIVERS = 0,  URLS = 1;
 
-    private static final int DRIVERS = 0, URLS = 1;
+    public enum Driver {
+        NOTSELECTED,
+        ODBC, ORACLE, MSSQL, MYSQL, HSQLDB,
+        JAVADB_NETWORK, JAVADB_EMBEDDED
+    };
 
-    
-
-    public enum Driver { NOTSELECTED,
-    ODBC, ORACLE, MSSQL, MYSQL, HSQLDB,
-    JAVADB_NETWORK, JAVADB_EMBEDDED };
-    
-
-    /**Standardkonstruktor.
+    /**Standardconstructor.
      */
     public DBQuickConnect() {
     }
 
-    
-
-
-    
     /**Setzt die zu verwendende interne Datenbanktreiberklasse.
      * Für den Parameter sollten die Klassenvariablen verwendet werden:<br>
      * <code>ODBC<br>ORACLE<br>MSSQL<br>MYSQL<br></code>
@@ -126,7 +114,7 @@ public class DBQuickConnect extends Observable {
      * @throws InstantiationException
      * @throws IllegalAccessException
      */
-    public void setDriverClass(Driver driverclass)
+    public void setDriver(Driver driverclass)
             throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         this.internalDriver = driverclass;
         String drivername = getDriverClassName(driverclass);
@@ -135,25 +123,16 @@ public class DBQuickConnect extends Observable {
 
     private static int mapDrvNums(Driver drvnum) {
         switch (drvnum) {
-            case ODBC:
-                return 0;
-            case ORACLE:
-                return 1;
-            case MSSQL:
-                return 2;
-            case MYSQL:
-                return 3;
-            case HSQLDB:
-                return 4;
-            case JAVADB_NETWORK:
-                return 5;
-            case JAVADB_EMBEDDED:
-                return 6;
-            default:
-                return -1;
+            case ODBC:   return 0;
+            case ORACLE: return 1;
+            case MSSQL:  return 2;
+            case MYSQL:  return 3;
+            case HSQLDB: return 4;
+            case JAVADB_NETWORK:  return 5;
+            case JAVADB_EMBEDDED: return 6;
+            default: return -1;
         }
     }
-    
 
     /**Setzt die zu verwendende Datenbanktreiberklasse als Klassenpfad.
      * <b>um alternative Treiber zu verwenden</b>
@@ -161,20 +140,14 @@ public class DBQuickConnect extends Observable {
      */
     public void setDriverClass(String driverclass)
             throws IllegalAccessException, ClassNotFoundException, InstantiationException {
-
         this.internalDriver = Driver.NOTSELECTED; //Interne Treibernummer ausschalten
-
         registerDriver(driverclass);
-
     }
 
     private void registerDriver(String driverclass)
             throws IllegalAccessException, ClassNotFoundException, InstantiationException {
-        
         Class.forName(driverclass).newInstance();
-
         this.jdbcdriver = driverclass;       //neuen Treiber eintragen;
-
     }
 
     /**Verbindet mit der übergebenen URL.
@@ -191,10 +164,8 @@ public class DBQuickConnect extends Observable {
         this.user = pUser;
         this.pass = pPass;
 
-
         connection = DriverManager.getConnection(url, user, pass);
         logger.debug("Connection established: " + connection);
-
 
         //Falls es noch einen gefuellten Cache gibt, dann werden alle
         //StatementObjekte ordnungsgemaess geschlossen (.close())
@@ -212,7 +183,6 @@ public class DBQuickConnect extends Observable {
 
         setChanged();
         notifyObservers(connection);
-
 
         return (connection != null);
     }
@@ -233,7 +203,6 @@ public class DBQuickConnect extends Observable {
         if (drivernumber == Driver.NOTSELECTED) {
             throw new UnsupportedOperationException("Driver not set!");
         }
-
 
         //String cone = URLS[mapDrvNums(drivernumber)];
         String cone = DRV_AND_URLS[URLS][mapDrvNums(drivernumber)];
@@ -276,9 +245,7 @@ public class DBQuickConnect extends Observable {
      * @return Gibt den fertigen URL zurueck.
      */
     public String createURL(String pDB_Alias_SID, String pHost, String pPort) {
-
         return DBQuickConnect.createURL(pDB_Alias_SID, pHost, pPort, getDriver());
-
     }
 
     /**Recycelt über das ResultSet das Statement Objekt <b>Statement-Pool!</b>.<br>
@@ -300,7 +267,6 @@ public class DBQuickConnect extends Observable {
         }
     }
 
-    
     /**SELECT Operation.
      * @param pSQL SQL Select-Query
      * @return ResultSet
@@ -311,8 +277,6 @@ public class DBQuickConnect extends Observable {
         return stat.executeQuery(pSQL);
     }
 
-
-    
     /**<b>Datenbank&auml;nderungen</b> die kein ResultSet zur&uuml;ckgeben, sondern
      * die Anzahl der betroffenen Datens&auml;tze.<br>
      * <ul><li>INSERT INTO</li><li>UPDATE</li><li>DELETE FROM</li></ul>
@@ -334,8 +298,6 @@ public class DBQuickConnect extends Observable {
         return result;
     }
 
-
-    
     /**Parametrisiertes Statement.
      * @param pSQL SQL Code mit Fragezeichen als Platzhalter.
      * @return Prepared Statement Objekt.
@@ -346,13 +308,11 @@ public class DBQuickConnect extends Observable {
         return pstWatcher.getPreparedStatement(pSQL);
     }
 
-    
     public void closePreparedStatement(PreparedStatement pst) throws SQLException {
         //close a PreparedStatement object:
         pstWatcher.closePreparedStatement(pst);
     }
-    
-    
+
     /**Fetchsize anpassen.
      * @param pResultset ResultSet-Objekt
      * @param pFetchSize Neue Grösse
@@ -363,7 +323,6 @@ public class DBQuickConnect extends Observable {
         pResultset.setFetchSize(pFetchSize); //am Resultset einstellen
         s.setFetchSize(pFetchSize);          //am Statement einstellen
     }
-
 
     /** Calls close() on the connection object and on all open statement objects.
      */
@@ -382,14 +341,13 @@ public class DBQuickConnect extends Observable {
                 pstWatcher.closeall();
                 pstWatcher = null;
             }
-            
+
             //Verbindung trennne
             if (connection != null) {
                 connection.close();
                 connection = null;
             }
 
-            
             notifyObservers(connection);
             logger.debug("Connection closed: " + getDriver());
 
@@ -406,7 +364,6 @@ public class DBQuickConnect extends Observable {
         return getDriverClassName(getDriver());
     }
 
-
     /**Rückgabe eines Arrays aller geladenen Treibernamen (Strings).
      * @return DriverManager.getDrivers()...getClass().getName()
      */
@@ -418,13 +375,10 @@ public class DBQuickConnect extends Observable {
         return drivers;
     }
 
-    
     public boolean isClosed() throws SQLException {
-        return (connection!=null && connection.isClosed());
+        return (connection != null && connection.isClosed());
     }
 
-
-    
     /** setLogWriter() speichert das PrintWriter-Objekt in einer privaten Variable
      * @param pw PrintWriter
      * @example setDriverManagerLogWriter(new PrintWriter(System.out));
@@ -432,10 +386,6 @@ public class DBQuickConnect extends Observable {
     public static void setDriverManagerLogWriter(PrintWriter pw) {
         DriverManager.setLogWriter(pw);
     }
-
-
-    
-   
 
     /**Schaltet den DebugModus ein oder aus.
      * @param truefalse an/aus
@@ -447,17 +397,12 @@ public class DBQuickConnect extends Observable {
         }
     }
 
-
-   
-
-    
     /** Returns the java.sql.Connection object.
      * @return java.sql.Connection object.
      */
     public Connection getConnection() {
         return connection;
     }
-    
 
     /** Gibt die aktuelle DriverNummber zurück.
      * @return Ganzzahl
@@ -466,17 +411,14 @@ public class DBQuickConnect extends Observable {
         return internalDriver;
     }
 
-    
     /**Die toString-Methode wurde überschrieben.
      * @return  Treiber/URL/User
      */
     @Override
     public String toString() {
-        return "DBQuickConnect@"+Integer.toHexString(hashCode())+" URL=" + this.url;
+        return "DBQuickConnect@" + Integer.toHexString(hashCode()) + " URL=" + this.url;
     }
 
-
-    
     /**Gibt die derzeitige URL zurück.
      * @return Connectionstring
      */
@@ -484,8 +426,6 @@ public class DBQuickConnect extends Observable {
         return url;
     }
 
-
-    
     /**Gibt den Benutzer zurück.
      * @return Benutzernamen
      */
@@ -493,19 +433,15 @@ public class DBQuickConnect extends Observable {
         return user;
     }
 
-
-    
     /**Transaktions Modus setzen.
-     * Einschalten / Ausschalten des Autocommit modus.
+     * connection.setAutoCommit(value);
      * @param OnOff Ein Aus.
      * @throws SQLException Error
      */
-    public void setAutoCommit(boolean OnOff) throws java.sql.SQLException {
-        connection.setAutoCommit(OnOff);
+    public void setAutoCommit(boolean value) throws java.sql.SQLException {
+        connection.setAutoCommit(value);
     }
 
-
-    
     /** Startet eine Datenbanktransaktion.
      *  Setzt den AutoCommit-Modus auf false und ruft die Methode
      *  CommitTransaction() auf um vorherige Änderungen zu übermitteln.
@@ -516,8 +452,6 @@ public class DBQuickConnect extends Observable {
         connection.commit();
     }
 
-
-    
     /** Speichert eine Datenbanktransaktion.
      *  Ruft die Methode CommitTransaction() auf um die Änderungen
      *  festzuschreiben und setzt dann den AutoCommit-Modus auf true.a
@@ -528,8 +462,6 @@ public class DBQuickConnect extends Observable {
         connection.setAutoCommit(true);
     }
 
-
-    
     /** Macht eine Datenbanktransaktion rueckgaengig.
      *  Ruft die die Funktion RollBackTransaction()
      *  auf und setzt dann den AutoCommit-Modus auf true;
@@ -539,11 +471,6 @@ public class DBQuickConnect extends Observable {
         connection.rollback();
         connection.setAutoCommit(true);
     }
-
-
-    
-
-
     /** Regulärer Ausdruck zum ersetzen von Hochkommata. */
     private static final Pattern patternA = Pattern.compile("'");
 
@@ -556,7 +483,6 @@ public class DBQuickConnect extends Observable {
     public static String replaceQuotes(String value) {
         String erg = patternA.matcher(value).replaceAll("''");
         return erg;
-
     }
 
     /**Gibt das unverschlüsselte Passwort zurück.
@@ -566,13 +492,7 @@ public class DBQuickConnect extends Observable {
         return pass;
     }
 
-    /**
-     * Setzt das Passwort
-     * @param pass Passwort
-     */
-    public void setPassword(String pass) {
-        this.pass = pass;
-    }
+    
 
     /** Gibt Informationen ueber den Cache zurueck.
      * @return 'created=2  reused=34  released=36/36   (ratio: 1700%)''
@@ -582,24 +502,21 @@ public class DBQuickConnect extends Observable {
         int stmt_created = mSCache.getCountCreated();
         int stmt_used = mSCache.getCountReused();
         int stmt_closed = mSCache.getCountReleased();
-        
+
         int pstmt_created = pstWatcher.getCountCreated();
         int pstmt_closed = pstWatcher.getCountClosed();
 
 //        String restr =  "Statements " +stmt_closed + "/(" +
 //                stmt_created +"+" + stmt_used +")" +
 //                    "  PreparedStatements " +  pstmt_closed+ "/" +pstmt_created;
-        String restr =  "Statements closed: " +stmt_closed + " of total " +
-                (stmt_created+stmt_used)+" (created " +
-                stmt_created +", reused " + stmt_used +")" +
-                    "  PreparedStatements closed: " +  pstmt_closed+ " of total " +pstmt_created;
+        String restr = "Statements closed: " + stmt_closed + " of total " +
+                (stmt_created + stmt_used) + " (created " +
+                stmt_created + ", reused " + stmt_used + ")" +
+                "  PreparedStatements closed: " + pstmt_closed + " of total " + pstmt_created;
 
         return restr;
 //        return mSCache.getReleaseInfo();
     }
-
-
-
 
     public class StmtCache {
 
@@ -625,7 +542,7 @@ public class DBQuickConnect extends Observable {
                 count_created++;
 
                 if (debug && st != null) {
-                    logger.debug("creating an new Statement " + Integer.toHexString(st.hashCode()));
+                    logger.trace("creating an new Statement " + Integer.toHexString(st.hashCode()));
                 }
                 return st;
 
@@ -635,7 +552,7 @@ public class DBQuickConnect extends Observable {
                 this.count_reused++;
 
                 if (debug && st != null) {
-                    logger.debug("using a cached Statement " + Integer.toHexString(st.hashCode()) +
+                    logger.trace("using a cached Statement " + Integer.toHexString(st.hashCode()) +
                             " (" + cache.size() + " left)");
                 }
                 return st;
@@ -651,15 +568,12 @@ public class DBQuickConnect extends Observable {
                 throw new SQLException("Statement " + statement + " has already been released! Do not release it twice!");
             }
 
-
             if (debug && statement != null) {
-                logger.debug("releasing Statement " + Integer.toHexString(statement.hashCode()) +
+                logger.trace("releasing Statement " + Integer.toHexString(statement.hashCode()) +
                         " (cachesize = " + cache.size() + ")");
             }
 
         }
-
-        
 
         public void closeall() throws java.sql.SQLException {
             java.util.Iterator it = cache.iterator();
@@ -667,7 +581,6 @@ public class DBQuickConnect extends Observable {
                 java.sql.Statement stmt = (java.sql.Statement) it.next();
 
                 try {
-
                     if (debug) {
                         logger.debug("closing Statement " + stmt);
                     }
@@ -681,7 +594,6 @@ public class DBQuickConnect extends Observable {
                 }
             }
             cache.clear();
-
 
         }
 
@@ -728,81 +640,68 @@ public class DBQuickConnect extends Observable {
 
         @Override
         public String toString() {
-            return "StmtCache@"+Integer.toHexString(hashCode());
+            return "StmtCache@" + Integer.toHexString(hashCode());
         }
-
-
-
     }//class StmtCache
 
+    public class PstStmtWatcher {
 
-public class PstStmtWatcher {
+        private Connection con;
+        private Set<PreparedStatement> pstObjectSet;
+        private int count_created;
+        private int count_closed;
+        private boolean debug = false;
 
-    private Connection con;
-    private Set<PreparedStatement> pstObjectSet;
-    private int count_created;
-    private int count_closed;
-    private boolean debug = false;
-
-    public PstStmtWatcher(Connection con) {
-        this.con = con;
-        this.pstObjectSet = new HashSet();
-        this.count_created = 0;
-        this.count_closed = 0;
-    }
-
-    public PreparedStatement getPreparedStatement(String sql) throws SQLException {
-
-        PreparedStatement st = con.prepareStatement(sql);
-        pstObjectSet.add(st);
-        count_created++;
-
-        if (debug && st != null) {
-            logger.debug("creating an new PreparedStatement " + Integer.toHexString(st.hashCode()));
+        public PstStmtWatcher(Connection con) {
+            this.con = con;
+            this.pstObjectSet = new HashSet();
+            this.count_created = 0;
+            this.count_closed = 0;
         }
-        return st;
 
-    }
+        public PreparedStatement getPreparedStatement(String sql) throws SQLException {
 
-    public void closePreparedStatement(PreparedStatement statement) throws SQLException {
-        logger.debug("closing PreparedStatement " + statement);
+            PreparedStatement st = con.prepareStatement(sql);
+            pstObjectSet.add(st);
+            count_created++;
 
-        pstObjectSet.remove(statement);
-
-        statement.close();
-
-        count_closed++;
-
-
-    }
-
-    public void closeall() {
-
-        for (PreparedStatement prepStmt : pstObjectSet) {
-
-            try {
-
-                if (!prepStmt.isClosed()) {
-                    if (debug) {
-                        logger.debug("closing PreparedStatement " + prepStmt);
-                    }
-                    prepStmt.close();
-                    count_closed++;
-                }
-
-
-
-            } catch (Exception e) {
-                if (debug) {
-                    logger.debug("error closing PreparedStatement " +
-                            prepStmt+": "+e.getMessage());
-                }
+            if (debug && st != null) {
+                logger.debug("creating an new PreparedStatement " + Integer.toHexString(st.hashCode()));
             }
+            return st;
 
         }
+
+        public void closePreparedStatement(PreparedStatement statement) throws SQLException {
+            logger.debug("closing PreparedStatement " + statement);
+            pstObjectSet.remove(statement);
+            statement.close();
+            count_closed++;
+        }
+
+        public void closeall() {
+
+            for (PreparedStatement prepStmt : pstObjectSet) {
+
+                try {
+                    if (!prepStmt.isClosed()) {
+                        if (debug) {
+                            logger.debug("closing PreparedStatement " + prepStmt);
+                        }
+                        prepStmt.close();
+                        count_closed++;
+                    }
+                } catch (Exception e) {
+                    if (debug) {
+                        logger.debug("error closing PreparedStatement " +
+                                prepStmt + ": " + e.getMessage());
+                    }
+                }
+
+            }
 //        pstObjectSet.clear();
 
-    }
+        }
 
         /**
          * Getter for property debug.
@@ -834,13 +733,7 @@ public class PstStmtWatcher {
 
         @Override
         public String toString() {
-            return "PstStmtWatcher@"+Integer.toHexString(hashCode());
+            return "PstStmtWatcher@" + Integer.toHexString(hashCode());
         }
-
-
-
     }//class PstStmtWatcher
-
-
-
 }

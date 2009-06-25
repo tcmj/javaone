@@ -6,13 +6,12 @@ package com.tcmj.common.jdbc.connect;
 
 import com.tcmj.common.jdbc.connect.DBQuickConnect.Driver;
 import com.tcmj.common.tools.xml.map.XMLMap;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Observable;
 import java.util.Observer;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,31 +26,41 @@ public class DBQuickConnectTest {
     /** slf4j Logging framework. */
     private static final transient Logger logger = LoggerFactory.getLogger(XMLMap.class);
 
+    private String mdburl =
+    "jdbc:odbc:Driver={Microsoft Access Driver (*.mdb)};" +
+            "DBQ=.\\testdata\\com.tcmj.common.jdbc.connect\\DBQuickConnectTest.mdb";
+
+    private DBQuickConnect ginstance;
+
     public DBQuickConnectTest() {
     }
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
+    @Before
+    public void setUp() throws Exception {
+        ginstance = new DBQuickConnect();
+        ginstance.setDriver(DBQuickConnect.Driver.ODBC);
+        ginstance.connect(mdburl, "", "");
+
     }
 
-    @AfterClass
-    public static void tearDownClass() throws Exception {
+    @After
+    public void tearDown() throws Exception {
+        ginstance.closeConnection();
     }
 
     /**
-     * Test of setDriverClass method, of class DBQuickConnect.
+     * Test of setDriver method, of class DBQuickConnect.
      */
     @Test
     public void testSetDriverClass_DBQuickConnectDriver() throws Exception {
         System.out.println("setDriverClass");
         DBQuickConnect instance = new DBQuickConnect();
-        instance.setDriverClass(DBQuickConnect.Driver.ODBC);
+        instance.setDriver(DBQuickConnect.Driver.ODBC);
         assertEquals(DBQuickConnect.Driver.ODBC, instance.getDriver());
-
     }
 
     /**
-     * Test of setDriverClass method, of class DBQuickConnect.
+     * Test of setDriver method, of class DBQuickConnect.
      */
     @Test
     public void testSetDriverClass_String() throws Exception {
@@ -61,25 +70,7 @@ public class DBQuickConnectTest {
         assertEquals(DBQuickConnect.Driver.NOTSELECTED, instance.getDriver());
     }
 
-    /**
-     * Test of connect method, of class DBQuickConnect.
-     */
-    @Test
-    public void testConnect() throws Exception {
-        System.out.println("connect");
-
-        String pUser = "";
-        String pPass = "";
-        DBQuickConnect instance = new DBQuickConnect();
-
-        instance.setDriverClass(DBQuickConnect.Driver.ODBC);
-        String pDBurl = instance.createURL("test", null, null);
-
-        boolean expResult = true;
-        boolean result = instance.connect(pDBurl, pUser, pPass);
-        assertEquals(expResult, result);
-
-    }
+    
 
     /**
      * Test of createURL method, of class DBQuickConnect.
@@ -99,7 +90,7 @@ public class DBQuickConnectTest {
         assertTrue(exceptionThrown);
 
 
-        instance.setDriverClass(DBQuickConnect.Driver.ODBC);
+        instance.setDriver(DBQuickConnect.Driver.ODBC);
 
         String result = instance.createURL("db", null, null);
 
@@ -114,11 +105,9 @@ public class DBQuickConnectTest {
     @Test
     public void testCloseResultSet() throws Exception {
         System.out.println("closeResultSet");
-        ResultSet pResultset = null;
-        DBQuickConnect instance = new DBQuickConnect();
-        instance.closeResultSet(pResultset);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        ResultSet pResultset = ginstance.sqlSelect("select * from contacts");
+        ginstance.closeResultSet(pResultset);
+//        assertTrue("ResultSet not closed", pResultset.isClosed());
     }
 
     /**
@@ -127,13 +116,15 @@ public class DBQuickConnectTest {
     @Test
     public void testSqlSelect() throws Exception {
         System.out.println("sqlSelect");
-        String pSQL = "";
-        DBQuickConnect instance = new DBQuickConnect();
-        ResultSet expResult = null;
-        ResultSet result = instance.sqlSelect(pSQL);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        ResultSet rs = ginstance.sqlSelect("select count(*) from contacts");
+        int amount;
+        if (rs.next()) {
+           amount  = rs.getInt(1);
+        }else {
+           amount  = -1;
+        }
+        assertTrue((amount!=-1));
+        ginstance.closeResultSet(rs);
     }
 
     /**
@@ -142,13 +133,8 @@ public class DBQuickConnectTest {
     @Test
     public void testSqlExecution() throws Exception {
         System.out.println("sqlExecution");
-        String pSQL = "";
-        DBQuickConnect instance = new DBQuickConnect();
-        int expResult = 0;
-        int result = instance.sqlExecution(pSQL);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        int amount =ginstance.sqlExecution("update contacts set firstname = 'John' where lastname = 'Wayne'");
+        assertTrue((amount!=0));
     }
 
     /**
@@ -157,53 +143,28 @@ public class DBQuickConnectTest {
     @Test
     public void testPstPrepareStatement() throws Exception {
         System.out.println("pstPrepareStatement");
-        String pSQL = "";
-        DBQuickConnect instance = new DBQuickConnect();
-        PreparedStatement expResult = null;
-        PreparedStatement result = instance.pstPrepareStatement(pSQL);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        String pSQL = "select * from contacts where lastname = ?";
+        
+        PreparedStatement pst = ginstance.pstPrepareStatement(pSQL);
+
+        pst.setString(1, "Love");
+
+        ResultSet rs = pst.executeQuery();
+
+        rs.next();
+        
+        assertEquals("Foxxy", rs.getString("firstname"));
+
+        ginstance.closeResultSet(rs);
+        ginstance.closePreparedStatement(pst);
+
+
     }
 
-    /**
-     * Test of setStmtFetchSize method, of class DBQuickConnect.
-     */
-    @Test
-    public void testSetStmtFetchSize() throws Exception {
-        System.out.println("setStmtFetchSize");
-        ResultSet pResultset = null;
-        int pFetchSize = 0;
-        DBQuickConnect instance = new DBQuickConnect();
-        instance.setStmtFetchSize(pResultset, pFetchSize);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
+    
 
-    /**
-     * Test of closeConnection method, of class DBQuickConnect.
-     */
-    @Test
-    public void testCloseConnection() {
-        System.out.println("closeConnection");
-        DBQuickConnect instance = new DBQuickConnect();
-        instance.closeConnection();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
+    
 
-    /**
-     * Test of setDebug method, of class DBQuickConnect.
-     */
-    @Test
-    public void testSetDebug_boolean() {
-        System.out.println("setDebug");
-        boolean truefalse = false;
-        DBQuickConnect instance = new DBQuickConnect();
-        instance.setDebug(truefalse);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
 
     /**
      * Test of getConnection method, of class DBQuickConnect.
@@ -212,25 +173,21 @@ public class DBQuickConnectTest {
     public void testGetConnection() {
         System.out.println("getConnection");
         DBQuickConnect instance = new DBQuickConnect();
-        Connection expResult = null;
-        Connection result = instance.getConnection();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertNull(instance.getConnection());
+        assertNotNull(ginstance.getConnection());
     }
 
     /**
      * Test of getDriver method, of class DBQuickConnect.
      */
     @Test
-    public void testGetDriver() {
+    public void testGetDriver() throws Exception{
         System.out.println("getDriver");
         DBQuickConnect instance = new DBQuickConnect();
-        Driver expResult = null;
-        Driver result = instance.getDriver();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        Driver expResult = Driver.NOTSELECTED;
+        assertEquals(expResult, instance.getDriver());
+        instance.setDriver(Driver.ODBC);
+        assertEquals(Driver.ODBC, instance.getDriver());
     }
 
     /**
@@ -240,11 +197,9 @@ public class DBQuickConnectTest {
     public void testToString() {
         System.out.println("toString");
         DBQuickConnect instance = new DBQuickConnect();
-        String expResult = "";
-        String result = instance.toString();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        String result = ginstance.toString();
+        System.out.println(result);
+        assertNotNull(result);
     }
 
     /**
@@ -254,11 +209,8 @@ public class DBQuickConnectTest {
     public void testGetUrl() {
         System.out.println("getUrl");
         DBQuickConnect instance = new DBQuickConnect();
-        String expResult = "";
-        String result = instance.getUrl();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertNull(instance.getUrl());
+        assertNotNull(ginstance.getUrl());
     }
 
     /**
@@ -267,62 +219,28 @@ public class DBQuickConnectTest {
     @Test
     public void testGetUser() {
         System.out.println("getUser");
-        DBQuickConnect instance = new DBQuickConnect();
         String expResult = "";
-        String result = instance.getUser();
+        String result = ginstance.getUser();
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
 
-    /**
-     * Test of setAutoCommit method, of class DBQuickConnect.
-     */
-    @Test
-    public void testSetAutoCommit() throws Exception {
-        System.out.println("setAutoCommit");
-        boolean OnOff = false;
-        DBQuickConnect instance = new DBQuickConnect();
-        instance.setAutoCommit(OnOff);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
+    
 
     /**
      * Test of startTransaction method, of class DBQuickConnect.
      */
     @Test
-    public void testStartTransaction() throws Exception {
-        System.out.println("startTransaction");
-        DBQuickConnect instance = new DBQuickConnect();
-        instance.startTransaction();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testTransaction() throws Exception {
+        System.out.println("Transaction");
+        ginstance.startTransaction();
+        ginstance.saveTransaction();
+        ginstance.startTransaction();
+        ginstance.undoTransaction();
     }
 
-    /**
-     * Test of saveTransaction method, of class DBQuickConnect.
-     */
-    @Test
-    public void testSaveTransaction() throws Exception {
-        System.out.println("saveTransaction");
-        DBQuickConnect instance = new DBQuickConnect();
-        instance.saveTransaction();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
+    
 
-    /**
-     * Test of undoTransaction method, of class DBQuickConnect.
-     */
-    @Test
-    public void testUndoTransaction() throws Exception {
-        System.out.println("undoTransaction");
-        DBQuickConnect instance = new DBQuickConnect();
-        instance.undoTransaction();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
+    
 
     /**
      * Test of replaceQuotes method, of class DBQuickConnect.
@@ -330,12 +248,10 @@ public class DBQuickConnectTest {
     @Test
     public void testReplaceQuotes() {
         System.out.println("replaceQuotes");
-        String value = "";
-        String expResult = "";
+        String value = "tcmj's shop";
+        String expResult = "tcmj''s shop";
         String result = DBQuickConnect.replaceQuotes(value);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
 
     /**
@@ -344,26 +260,12 @@ public class DBQuickConnectTest {
     @Test
     public void testGetPassword() {
         System.out.println("getPassword");
-        DBQuickConnect instance = new DBQuickConnect();
         String expResult = "";
-        String result = instance.getPassword();
+        String result = ginstance.getPassword();
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
 
-    /**
-     * Test of setPassword method, of class DBQuickConnect.
-     */
-    @Test
-    public void testSetPassword() {
-        System.out.println("setPassword");
-        String pass = "";
-        DBQuickConnect instance = new DBQuickConnect();
-        instance.setPassword(pass);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
+    
 
     /**
      * Test of getReleaseInfo method, of class DBQuickConnect.
@@ -371,12 +273,9 @@ public class DBQuickConnectTest {
     @Test
     public void testGetReleaseInfo() {
         System.out.println("getReleaseInfo");
-        DBQuickConnect instance = new DBQuickConnect();
-        String expResult = "";
-        String result = instance.getReleaseInfo();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        String result = ginstance.getReleaseInfo();
+        System.out.println(result);
+        assertNotNull( result);
     }
 
     /**
@@ -387,28 +286,24 @@ public class DBQuickConnectTest {
         System.out.println("Observer");
 
 
-        DBQuickConnect instance = new DBQuickConnect();
-        assertEquals(0, instance.countObservers());
+        assertEquals(0, ginstance.countObservers());
         ObserverImpl obse = createObserver();
-        instance.addObserver(obse);
-        assertEquals(1, instance.countObservers());
+        ginstance.addObserver(obse);
+        assertEquals(1, ginstance.countObservers());
 
 
 
-        instance.setDriverClass(DBQuickConnect.Driver.ODBC);
+        ginstance.setDriver(DBQuickConnect.Driver.ODBC);
         assertEquals(0, obse.getCount());
-        String pDBurl = instance.createURL("test", null, null);
-        instance.connect(pDBurl, "", "");
+        String pDBurl = ginstance.createURL("test", null, null);
+
+        assertEquals(0, obse.getCount());
+
+        ginstance.deleteObserver(obse);
+
+        assertEquals(0, ginstance.countObservers());
 
 
-        assertEquals(1, obse.getCount());
-
-        instance.deleteObserver(obse);
-
-        assertEquals(0, instance.countObservers());
-
-
-        instance.closeConnection();
 
 
     }

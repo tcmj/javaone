@@ -111,7 +111,7 @@ public class DBQuickConnectTestOnline {
 
     private DBQuickConnect connect() throws Exception {
         DBQuickConnect instance = new DBQuickConnect();
-        instance.setDriverClass(DRIVER);
+        instance.setDriver(DRIVER);
         String pDBurl = instance.createURL(DB, HOST, PORT);
         instance.connect(pDBurl, USER, PWD);
         assertEquals(false, instance.isClosed());
