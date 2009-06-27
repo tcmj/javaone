@@ -10,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Iterator;
 import java.util.Observable;
 import java.util.Set;
 import java.util.Stack;
@@ -69,8 +70,8 @@ public class DBQuickConnect extends Observable {
     /**Die Klasse 'StmtCache' stellt eine verkettete Liste zur Verfügung.,
      * um nicht mehr verwendete Statement-Objekte zur Wiederverwendung
      * bereitzuhalten.<br>Dies betrifft normale java.sql.Statement - Objekte.*/
-    private StmtCache mSCache;
-    private PstStmtWatcher pstWatcher;
+    protected StmtCache mSCache;
+    protected PstStmtWatcher pstWatcher;
     
     /**Databasedriverclasses and URLs. */
     private static final String[][] DRV_AND_URLS = {
@@ -305,7 +306,7 @@ public class DBQuickConnect extends Observable {
      */
     public PreparedStatement pstPrepareStatement(String pSQL) throws SQLException {
         //create a new PreparedStatement object:
-        return pstWatcher.getPreparedStatement(pSQL);
+        return pstWatcher.getPreparedStatement(pSQL, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, connection.getHoldability());
     }
 
     public void closePreparedStatement(PreparedStatement pst) throws SQLException {
@@ -521,7 +522,7 @@ public class DBQuickConnect extends Observable {
     public class StmtCache {
 
         private Connection con;
-        private Stack cache;
+        private Stack<Statement> cache;
         private int count_reused;
         private int count_created;
         private int count_released;
@@ -542,7 +543,7 @@ public class DBQuickConnect extends Observable {
                 count_created++;
 
                 if (debug && st != null) {
-                    logger.trace("creating an new Statement " + Integer.toHexString(st.hashCode()));
+                    logger.trace("creating a new Statement() " + Integer.toHexString(st.hashCode()));
                 }
                 return st;
 
@@ -552,13 +553,68 @@ public class DBQuickConnect extends Observable {
                 this.count_reused++;
 
                 if (debug && st != null) {
-                    logger.trace("using a cached Statement " + Integer.toHexString(st.hashCode()) +
+                    logger.trace("using a cached Statement() " + Integer.toHexString(st.hashCode()) +
                             " (" + cache.size() + " left)");
                 }
                 return st;
 
             }
         }
+
+        public Statement getStatement(int resultSetType, int resultSetConcurrency,
+                int resultSetHoldability) throws SQLException {
+            if (cache.isEmpty()) {
+
+                Statement st = con.createStatement(resultSetType, resultSetConcurrency, resultSetHoldability);
+                count_created++;
+
+                if (debug && st != null) {
+                    logger.trace("creating a new Statement(emptycache) " + Integer.toHexString(st.hashCode()));
+                }
+                return st;
+
+            } else {
+
+                //search if a stmt exists with the needed behavour:
+                Statement statement = null;
+                for (Iterator<Statement> it = cache.iterator(); it.hasNext();) {
+                    statement = it.next();
+
+                    int resultsettype = statement.getResultSetType();
+                    int resultsetconc = statement.getResultSetConcurrency();
+                    int resultsethold = statement.getResultSetHoldability();
+
+                    if (resultsettype == resultSetType &&
+                            resultsetconc == resultSetConcurrency &&
+                            resultsethold == resultSetHoldability) {
+
+                        this.count_reused++;
+
+                        it.remove();
+
+                        if (debug && statement != null) {
+                            logger.trace("using a cached Statement(match) " + Integer.toHexString(statement.hashCode()) +
+                                    " (" + cache.size() + " left)");
+                        }
+
+                        return statement;
+                    }
+
+                }
+                //nothing suitable found...
+                if (statement == null) {
+                    statement = con.createStatement(resultSetType, resultSetConcurrency, resultSetHoldability);
+                    count_created++;
+
+                    if (debug && statement != null) {
+                        logger.trace("creating a new Statement(nsfound) " + Integer.toHexString(statement.hashCode()));
+                    }
+
+                }
+                return statement;
+            }
+        }
+
 
         public void releaseStatement(Statement statement) throws SQLException {
             if (!cache.contains(statement)) {
@@ -659,16 +715,56 @@ public class DBQuickConnect extends Observable {
             this.count_closed = 0;
         }
 
-        public PreparedStatement getPreparedStatement(String sql) throws SQLException {
+        public PreparedStatement getPreparedStatement(String sql, int resultSetType,
+				       int resultSetConcurrency, int resultSetHoldability) throws SQLException {
 
-            PreparedStatement st = con.prepareStatement(sql);
-            pstObjectSet.add(st);
+            PreparedStatement pstmt = con.prepareStatement(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
+            pstObjectSet.add(pstmt);
             count_created++;
 
-            if (debug && st != null) {
-                logger.debug("creating an new PreparedStatement " + Integer.toHexString(st.hashCode()));
+            if (debug && pstmt != null) {
+                logger.debug("creating an new PreparedStatement " + Integer.toHexString(pstmt.hashCode()));
             }
-            return st;
+            return pstmt;
+
+        }
+
+        public PreparedStatement getPreparedStatement(String sql, int autoGeneratedKeys) throws SQLException {
+
+            PreparedStatement pstmt = con.prepareStatement(sql, autoGeneratedKeys);
+            pstObjectSet.add(pstmt);
+            count_created++;
+
+            if (debug && pstmt != null) {
+                logger.debug("creating an new AGK-PreparedStatement " + Integer.toHexString(pstmt.hashCode()));
+            }
+            return pstmt;
+
+        }
+
+        public PreparedStatement getPreparedStatement(String sql, int columnIndexes[]) throws SQLException {
+
+            PreparedStatement pstmt = con.prepareStatement(sql, columnIndexes);
+            pstObjectSet.add(pstmt);
+            count_created++;
+
+            if (debug && pstmt != null) {
+                logger.debug("creating an new AGK[]-PreparedStatement " + Integer.toHexString(pstmt.hashCode()));
+            }
+            return pstmt;
+
+        }
+
+        public PreparedStatement getPreparedStatement(String sql, String columnNames[]) throws SQLException {
+
+            PreparedStatement pstmt = con.prepareStatement(sql, columnNames);
+            pstObjectSet.add(pstmt);
+            count_created++;
+
+            if (debug && pstmt != null) {
+                logger.debug("creating an new AGK[]-PreparedStatement " + Integer.toHexString(pstmt.hashCode()));
+            }
+            return pstmt;
 
         }
 
@@ -684,13 +780,13 @@ public class DBQuickConnect extends Observable {
             for (PreparedStatement prepStmt : pstObjectSet) {
 
                 try {
-                    if (!prepStmt.isClosed()) {
+//                    if (!prepStmt.isClosed()) {
                         if (debug) {
                             logger.debug("closing PreparedStatement " + prepStmt);
                         }
                         prepStmt.close();
                         count_closed++;
-                    }
+//                    }
                 } catch (Exception e) {
                     if (debug) {
                         logger.debug("error closing PreparedStatement " +
