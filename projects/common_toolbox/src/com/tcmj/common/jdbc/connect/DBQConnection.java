@@ -59,13 +59,19 @@ import org.slf4j.LoggerFactory;
 public class DBQConnection extends Observable implements Connection {
 
     /** slf4j Logging framework. */
-    private static final transient Logger logger = LoggerFactory.getLogger(DBQuickConnect.class);
+    private static final transient Logger logger = LoggerFactory.getLogger(DBQConnection.class);
 
     /** debugmode on/off. default = false.*/
     private boolean debug;
 
     /** internal driver. default = NOTSELECTED */
-    protected Driver internalDriver = Driver.NOTSELECTED;
+    protected Driver drivertype = Driver.NOTSELECTED;
+
+    /** jdbc driver class name. */
+    private String jdbcDriver;
+
+    /** jdbc url. */
+    private String jdbcURL;
 
     /** database username. */
     private String user;
@@ -134,14 +140,15 @@ public class DBQConnection extends Observable implements Connection {
             throw new IllegalArgumentException("The CUSTOM-Driver has to be used with setCustomDriver(String)!");
         } else {
             Class.forName(driver.getDriverClassName()).newInstance();
-            this.internalDriver = driver;
+            this.drivertype = driver;
+            this.jdbcDriver = driver.getDriverClassName();
         }
     }
 
     /** Getter for the current Driver (enum).
      * @return one of the predefined Driver enum values      */
     public Driver getDriver() {
-        return internalDriver;
+        return drivertype;
     }
 
     /**Configures the Driver.CUSTOM enum with userdefined value.<br>
@@ -151,25 +158,25 @@ public class DBQConnection extends Observable implements Connection {
      */
     public void setDriver(String customDriver)
             throws IllegalAccessException, ClassNotFoundException, InstantiationException {
-        Driver.CUSTOM.setDriverClassName(customDriver);
-        this.internalDriver = Driver.CUSTOM;
-        Class.forName(Driver.CUSTOM.getDriverClassName()).newInstance();
+        this.jdbcDriver = customDriver;
+        this.drivertype = Driver.CUSTOM;
+        Class.forName(this.jdbcDriver).newInstance();
     }
 
     /** Getter for the current used driver class name.
      * @return jdbc driver class as string  - and null if Driver.NOTSELECTED*/
     public String getDriverClass() {
-        return this.internalDriver.getDriverClassName();
+        return this.jdbcDriver;
     }
 
     /** setter for the jdbc URL used to connect to your database. <br>
      * <b>use the createURL() method to get help building your URL</b>
      * @param myurl full qualified URL */
     public void setURL(String myurl) {
-        if (this.internalDriver == Driver.NOTSELECTED) {
+        if (this.drivertype == Driver.NOTSELECTED) {
             throw new UnsupportedOperationException("Please specify a Driver first!");
         } else {
-            this.internalDriver.setUrl(myurl);
+            this.jdbcURL = myurl;
         }
     }
 
@@ -179,7 +186,7 @@ public class DBQConnection extends Observable implements Connection {
      * part of the URL (which is not usable for connecting).
      * @return jdbc url - and null if no driver was selected */
     public String getUrl() {
-        return this.internalDriver.getUrl();
+        return this.jdbcURL;
     }
 
     /** @see Driver#createURL(String,String,String). */
@@ -205,7 +212,7 @@ public class DBQConnection extends Observable implements Connection {
         this.setUser(pUser);
         this.setPassword(pPass);
 
-        if (Driver.NOTSELECTED == this.internalDriver) {
+        if (Driver.NOTSELECTED == this.drivertype) {
             throw new IllegalArgumentException("JDBC-Driver not set!");
         }
 
@@ -219,7 +226,7 @@ public class DBQConnection extends Observable implements Connection {
             connection = DriverManager.getConnection(getUrl(), pUser, pPass);
         }
 
-        logger.debug(this.internalDriver + "-Connection established! (" + connection + ")");
+        logger.debug(this.drivertype + "-Connection established! (" + connection + ")");
         logger.info("JDBC connection successfully opened: '" + getUrl() + "' with user '" + pUser + "'");
 
 
@@ -231,12 +238,12 @@ public class DBQConnection extends Observable implements Connection {
         //Create a new statement cache:
         mSCache = new StatementCache(connection);
         mSCache.setDebug(debug);    //pass-through of the debug mode:
-        logger.trace(this.internalDriver + "-StatementCache created! (" + mSCache + ")");
+        logger.trace(this.drivertype + "-StatementCache created! (" + mSCache + ")");
 
         //create a new watcher for PreparedStatement objects:
         pstWatcher = new PreparedStmtWatcher(connection);
         pstWatcher.setDebug(debug); //pass-through of the debug mode:
-        logger.trace(this.internalDriver + "-PreparedtStatementWatcher created! (" + pstWatcher + ")");
+        logger.trace(this.drivertype + "-PreparedtStatementWatcher created! (" + pstWatcher + ")");
 
         //Observer-Handling:
         setChanged();
@@ -345,7 +352,7 @@ public class DBQConnection extends Observable implements Connection {
             //Last but not least - close the database connection:
             if (connection != null) {
                 connection.close();
-                logger.debug(this.internalDriver + "-Connection closed! (" + connection + ")");
+                logger.debug(this.drivertype + "-Connection closed! (" + connection + ")");
 
                 connection = null;
             }

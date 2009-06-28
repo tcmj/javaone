@@ -34,15 +34,15 @@ public enum Driver {
         return urlprefix;
     }
 
-    /** eg.: Driver.CUSTOM.setDriverClassName("com.xy.Driver") */
-    public void setDriverClassName(String driver) {
-        this.driver = driver;
-    }
-
-    /** eg.: Driver.CUSTOM.setUrl("jdbc:ooo:xxx") */
-    public void setUrl(String urlprefix) {
-        this.urlprefix = urlprefix;
-    }
+//    /** eg.: Driver.CUSTOM.setDriverClassName("com.xy.Driver") */
+//    public void setDriverClassName(String driver) {
+//        this.driver = driver;
+//    }
+//
+//    /** eg.: Driver.CUSTOM.setUrl("jdbc:ooo:xxx") */
+//    public void setUrl(String urlprefix) {
+//        this.urlprefix = urlprefix;
+//    }
 
     /**Helper to create an URL for your jdbc connection depending of the Driver.<br>
      * Examples:<br>

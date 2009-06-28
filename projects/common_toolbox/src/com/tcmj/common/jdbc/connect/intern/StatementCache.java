@@ -45,7 +45,7 @@ public class StatementCache {
             count_created++;
 
             if (debug && st != null) {
-                logger.trace("creating a new Statement() " + Integer.toHexString(st.hashCode()));
+                logger.debug("creating a new Statement() " + Integer.toHexString(st.hashCode()));
             }
             return st;
 
@@ -55,7 +55,7 @@ public class StatementCache {
             this.count_reused++;
 
             if (debug && st != null) {
-                logger.trace("using a cached Statement() " + Integer.toHexString(st.hashCode()) +
+                logger.debug("using a cached Statement() " + Integer.toHexString(st.hashCode()) +
                         " (" + cache.size() + " left)");
             }
             return st;
@@ -71,7 +71,7 @@ public class StatementCache {
             count_created++;
 
             if (debug && st != null) {
-                logger.trace("creating a new Statement(emptycache) " + Integer.toHexString(st.hashCode()));
+                logger.debug("creating a new Statement(emptycache) " + Integer.toHexString(st.hashCode()));
             }
             return st;
 
@@ -95,7 +95,7 @@ public class StatementCache {
                     it.remove();
 
                     if (debug && statement != null) {
-                        logger.trace("using a cached Statement(match) " + Integer.toHexString(statement.hashCode()) +
+                        logger.debug("using a cached Statement(match) " + Integer.toHexString(statement.hashCode()) +
                                 " (" + cache.size() + " left)");
                     }
 
@@ -109,7 +109,7 @@ public class StatementCache {
                 count_created++;
 
                 if (debug && statement != null) {
-                    logger.trace("creating a new Statement(nsfound) " + Integer.toHexString(statement.hashCode()));
+                    logger.debug("creating a new Statement(nsfound) " + Integer.toHexString(statement.hashCode()));
                 }
 
             }
@@ -126,7 +126,7 @@ public class StatementCache {
         }
 
         if (debug && statement != null) {
-            logger.trace("releasing Statement " + Integer.toHexString(statement.hashCode()) +
+            logger.debug("releasing Statement " + Integer.toHexString(statement.hashCode()) +
                     " (cachesize = " + cache.size() + ")");
         }
 
