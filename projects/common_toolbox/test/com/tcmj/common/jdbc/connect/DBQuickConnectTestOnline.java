@@ -18,27 +18,26 @@ import org.slf4j.LoggerFactory;
 import static org.junit.Assert.*;
 
 /**
- * DBQuickConnectTest.
+ * DBQConnectionTest.
  * @author Administrator
  */
 public class DBQuickConnectTestOnline {
 
     /** slf4j Logging framework. */
     private static final transient Logger logger = LoggerFactory.getLogger(XMLMap.class);
-    private static final DBQuickConnect.Driver DRIVER = DBQuickConnect.Driver.JAVADB_NETWORK;
-    private static final String DB = "tcmj";
+    private static final Driver DRIVER = Driver.ACCESS_MDB;
+    private static final String DB = ".\\testdata\\com.tcmj.common.jdbc.connect\\DBQConnectionTest.mdb";
     private static final String HOST = "localhost";
     //    private static final String HOST = "192.168.178.25";
     private static final String PORT = "1527";
     private static final String USER = "tcmj";
     private static final String PWD = "tcmj";
 
-    public DBQuickConnectTestOnline() {
-    }
+
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-//    DBQuickConnect.setDriverManagerLogWriter(new PrintWriter(System.out));
+//    DBQConnection.setDriverManagerLogWriter(new PrintWriter(System.out));
     }
 
     @AfterClass
@@ -52,7 +51,7 @@ public class DBQuickConnectTestOnline {
     }
 
     /**
-     * Test of connect method, of class DBQuickConnect.
+     * Test of connect method, of class DBQConnection.
      * @throws Exception
      */
     @Test
@@ -60,7 +59,7 @@ public class DBQuickConnectTestOnline {
         System.out.println("testSelectAndExecute");
 
 
-        DBQuickConnect db = connect();
+        DBQConnection db = connect();
         System.out.println("D" + db.getInfoFull());
         DatabaseMetaData meta = db.getConnection().getMetaData();
         System.out.println("Server name: " + meta.getDatabaseProductName());
@@ -81,15 +80,17 @@ public class DBQuickConnectTestOnline {
         createTestData(db, 20);
         System.out.println("C" + db.getInfoFull());
 
+        System.out.println("C" + db.getUrl());
 
-        ResultSet rs = db.sqlSelect("select * from TCMJ.CONTACTS");
+
+        ResultSet rs = db.sqlSelect("select * from CONTACTS");
         while (rs.next()) {
 //            System.out.println("Name: " + rs.getString(4) + " " + rs.getString(2));
 
-            ResultSet rs2 = db.sqlSelect("select * from TCMJ.CONTACTS");
+            ResultSet rs2 = db.sqlSelect("select * from CONTACTS");
             while (rs2.next()) {
 
-                ResultSet rs3 = db.sqlSelect("select * from TCMJ.CONTACTS");
+                ResultSet rs3 = db.sqlSelect("select * from CONTACTS");
                 while (rs3.next()) {
                 }
                 db.closeResultSet(rs3);
@@ -102,23 +103,22 @@ public class DBQuickConnectTestOnline {
         }
         db.closeResultSet(rs);
 
-
         System.out.println(db.getInfoFull());
 
 
         db.closeConnection();
     }
 
-    private DBQuickConnect connect() throws Exception {
-        DBQuickConnect instance = new DBQuickConnect();
-        instance.setDriver(DRIVER);
+    private DBQConnection connect() throws Exception {
+        DBQConnection instance = new DBQConnection(DRIVER);
         String pDBurl = instance.createURL(DB, HOST, PORT);
-        instance.connect(pDBurl, USER, PWD);
+        instance.setURL(pDBurl);
+        instance.connect();
         assertEquals(false, instance.isClosed());
         return instance;
     }
 
-    private void createTestTable(DBQuickConnect db) throws SQLException {
+    private void createTestTable(DBQConnection db) throws SQLException {
 
         String sql = "CREATE TABLE CONTACTS ( " +
                 "    ID INTEGER not null primary key, " +
@@ -128,7 +128,7 @@ public class DBQuickConnectTestOnline {
                 "    NICKNAME VARCHAR(50), " +
                 "    DISPLAY_FORMAT SMALLINT, " +
                 "    MAIL_FORMAT SMALLINT, " +
-                "    EMAIL_ADDRESS VARCHAR(500) " +
+                "    EMAIL_ADDRESS VARCHAR(50) " +
                 ") ";
 
         try {
@@ -139,7 +139,7 @@ public class DBQuickConnectTestOnline {
 
     }
 
-    private void dropTestTable(DBQuickConnect db) throws SQLException {
+    private void dropTestTable(DBQConnection db) throws SQLException {
 
         String sql = "drop table CONTACTS";
 
@@ -151,14 +151,14 @@ public class DBQuickConnectTestOnline {
 
     }
 
-    private void createTestData(DBQuickConnect db, int amount) throws SQLException {
+    private void createTestData(DBQConnection db, int amount) throws SQLException {
         String psql = "insert into CONTACTS (ID,FIRST_NAME,LAST_NAME," +
                 "TITLE,NICKNAME,DISPLAY_FORMAT,MAIL_FORMAT,EMAIL_ADDRESS) " +
                 "values (?,?,?,?,?,?,?,?) ";
 
 
         try {
-            PreparedStatement pst = db.pstPrepareStatement(psql);
+            PreparedStatement pst = db.prepareStatement(psql);
             assertNotNull(pst);
             System.out.println("N" + db.getInfoFull());
 

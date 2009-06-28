@@ -5,7 +5,7 @@
 
 package com.tcmj.common;
 
-import com.tcmj.common.jdbc.connect.DBQuickConnectTest;
+import com.tcmj.common.jdbc.connect.DBQConnectionTest;
 import com.tcmj.common.jdbc.connect.DBQuickConnectTestOnline;
 import com.tcmj.common.tools.helper.date.DateHelperTest;
 import com.tcmj.common.tools.text.RandomStringsTest;
@@ -20,7 +20,7 @@ import org.junit.runners.Suite.SuiteClasses;
  * @author Administrator
  */
 @RunWith(Suite.class)
-@SuiteClasses({DBQuickConnectTest.class, DBQuickConnectTestOnline.class, XMLMapTest.class, XMLMapTestExtended.class, RandomStringsTest.class, DateHelperTest.class})
+@SuiteClasses({DBQConnectionTest.class, DBQuickConnectTestOnline.class, XMLMapTest.class, XMLMapTestExtended.class, RandomStringsTest.class, DateHelperTest.class})
 public class TestSuite {
 
     /**
