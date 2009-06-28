@@ -53,213 +53,297 @@ public class DBQuickConnect extends Observable {
 
     /** slf4j Logging framework. */
     private static final transient Logger logger = LoggerFactory.getLogger(DBQuickConnect.class);
-    /** debugmode on/off. */
-    private boolean debug = false;
-    /** JDBC driver. */
-    protected String jdbcdriver;
-    /** Internal driver. */
+
+    /** debugmode on/off. default = false.*/
+    private boolean debug;
+
+    /** internal driver. default = NOTSELECTED */
     protected Driver internalDriver = Driver.NOTSELECTED;
-    /** URL. */
+
+    /** jdbc driver class. */
+    protected String jdbcdriver;
+
+    /** jdbc URL. */
     protected String url;
-    /** Database username. */
+
+    /** database username. */
     protected String user;
-    /** Password. */
+
+    /** database users password. */
     private String pass;
-    /** Java Connection Object. */
+
+    /** Java Connection object. */
     protected Connection connection;
-    /**Die Klasse 'StmtCache' stellt eine verkettete Liste zur Verfügung.,
-     * um nicht mehr verwendete Statement-Objekte zur Wiederverwendung
-     * bereitzuhalten.<br>Dies betrifft normale java.sql.Statement - Objekte.*/
+
+    /** Statement cache.<br>contains instances of java.sql.Statement. */
     protected StmtCache mSCache;
+
+    /** PreparedStatement Watcher. */
     protected PstStmtWatcher pstWatcher;
-    
-    /**Databasedriverclasses and URLs. */
-    private static final String[][] DRV_AND_URLS = {
-        {
-            "sun.jdbc.odbc.JdbcOdbcDriver",
-            "oracle.jdbc.driver.OracleDriver",
-            "net.sourceforge.jtds.jdbc.Driver",
-            "org.gjt.mm.mysql.Driver",
-            "org.hsqldb.jdbcDriver",
-            "org.apache.derby.jdbc.ClientDriver",
-            "org.apache.derby.jdbc.EmbeddedDriver"
-        },
-        {
-            "jdbc:odbc:",
-            "jdbc:oracle:thin:@",
-            "jdbc:jtds:sqlserver://",
-            "jdbc:mysql://",
-            "jdbc:hsqldb:",
-            "jdbc:derby://",
-            "jdbc:derby:"
-        }
-    };
-    private static final int DRIVERS = 0,  URLS = 1;
 
     public enum Driver {
-        NOTSELECTED,
-        ODBC, ORACLE, MSSQL, MYSQL, HSQLDB,
-        JAVADB_NETWORK, JAVADB_EMBEDDED
+
+        NOTSELECTED(null, null),
+        CUSTOM(null, null),
+        ODBC("sun.jdbc.odbc.JdbcOdbcDriver", "jdbc:odbc:"),
+        ACCESS_MDB("sun.jdbc.odbc.JdbcOdbcDriver", "jdbc:odbc:Driver={Microsoft Access Driver (*.mdb)};DBQ="),
+        ORACLE("oracle.jdbc.driver.OracleDriver", "jdbc:oracle:thin:@"),
+        MSSQL("net.sourceforge.jtds.jdbc.Driver", "jdbc:jtds:sqlserver://"),
+        MYSQL("org.gjt.mm.mysql.Driver", "jdbc:mysql://"),
+        HSQLDB("org.hsqldb.jdbcDriver", "jdbc:hsqldb:"),
+        JAVADB_NETWORK("org.apache.derby.jdbc.ClientDriver", "jdbc:derby://"),
+        JAVADB_EMBEDDED("org.apache.derby.jdbc.EmbeddedDriver", "jdbc:derby:");
+
+        private String driver;
+
+        private String urlprefix;
+
+        Driver(String drv, String url) {
+            this.driver = drv;
+            this.urlprefix = url;
+        }
+
+        public String getDriverClassName() {
+            return driver;
+        }
+
+        public String getUrl() {
+            return urlprefix;
+        }
+
+        /** eg.: Driver.CUSTOM.setDriverClassName("com.xy.Driver") */
+        public void setDriverClassName(String driver) {
+            this.driver = driver;
+        }
+
+        public void setUrl(String urlprefix) {
+            this.urlprefix = urlprefix;
+        }
+
     };
 
-    /**Standardconstructor.
-     */
+    /**Standardconstructor. */
     public DBQuickConnect() {
+        super();
     }
 
-    /**Setzt die zu verwendende interne Datenbanktreiberklasse.
-     * Für den Parameter sollten die Klassenvariablen verwendet werden:<br>
-     * <code>ODBC<br>ORACLE<br>MSSQL<br>MYSQL<br></code>
-     * @param driverclass Klassen der Datenbanktreiber als String
+    public DBQuickConnect(boolean debug, String jdbcdriver, String url, String user, String pass, Connection connection, StmtCache mSCache, PstStmtWatcher pstWatcher) {
+        this.debug = debug;
+        this.jdbcdriver = jdbcdriver;
+        this.url = url;
+        this.user = user;
+        this.pass = pass;
+        this.connection = connection;
+        this.mSCache = mSCache;
+        this.pstWatcher = pstWatcher;
+    }
+
+    /**Set the datenbase driver class used to connect.
+     * <b>do not use Driver.NOTSELECTED!<(b>
+     * <b>do not use Driver.CUSTOM - use setDriver(String) instead!<(b>
+     * @param driverclass use the Driver enum for this parameter
+     * @see Driver
      * @throws ClassNotFoundException
      * @throws InstantiationException
      * @throws IllegalAccessException
      */
-    public void setDriver(Driver driverclass)
+    public void setDriver(Driver driver)
             throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-        this.internalDriver = driverclass;
-        String drivername = getDriverClassName(driverclass);
-        registerDriver(drivername);
-    }
-
-    private static int mapDrvNums(Driver drvnum) {
-        switch (drvnum) {
-            case ODBC:   return 0;
-            case ORACLE: return 1;
-            case MSSQL:  return 2;
-            case MYSQL:  return 3;
-            case HSQLDB: return 4;
-            case JAVADB_NETWORK:  return 5;
-            case JAVADB_EMBEDDED: return 6;
-            default: return -1;
+        if (Driver.NOTSELECTED == driver) {
+            throw new IllegalArgumentException("NOTSELECTED cannot be used as Driver !");
+        } else if (Driver.CUSTOM == driver) {
+            throw new IllegalArgumentException("The CUSTOM-Driver has to be used with setCustomDriver(String)!");
+        } else {
+            Class.forName(driver.getDriverClassName()).newInstance();
+            this.internalDriver = driver;
         }
     }
 
-    /**Setzt die zu verwendende Datenbanktreiberklasse als Klassenpfad.
-     * <b>um alternative Treiber zu verwenden</b>
-     * @param driverclass Klassen der Datenbanktreiber als String
+    /** Getter for the current Driver (enum).
+     * @return one of the predefined Driver enum values      */
+    public Driver getDriver() {
+        return internalDriver;
+    }
+
+    /**Configures the Driver.CUSTOM enum with userdefined value.<br>
+     * Also calls the class.forname method to register the driver.<br>
+     * <b>After calling this methd you have to use the setURL method!</b>
+     * @param customDriver classname of your jdbc driver as string
      */
-    public void setDriverClass(String driverclass)
+    public void setDriver(String customDriver)
             throws IllegalAccessException, ClassNotFoundException, InstantiationException {
-        this.internalDriver = Driver.NOTSELECTED; //Interne Treibernummer ausschalten
-        registerDriver(driverclass);
+        Driver.CUSTOM.setDriverClassName(customDriver);
+        this.internalDriver = Driver.CUSTOM;
+        Class.forName(Driver.CUSTOM.getDriverClassName()).newInstance();
     }
 
-    private void registerDriver(String driverclass)
-            throws IllegalAccessException, ClassNotFoundException, InstantiationException {
-        Class.forName(driverclass).newInstance();
-        this.jdbcdriver = driverclass;       //neuen Treiber eintragen;
+    /** Getter for the current used driver class name.
+     * @return jdbc driver class as string  - and null if Driver.NOTSELECTED*/
+    public String getDriverClass() {
+        return this.internalDriver.getDriverClassName();
     }
 
-    /**Verbindet mit der übergebenen URL.
-     * Die URL kann mit der Funktion <b>createURL</b> erzeugt werden.
-     * @param pDBurl JDBC URL
-     * @param pUser  Datenbankbenutzer
-     * @param pPass  Passwort des Datenbankbenutzers
-     * @return true/false on success/failure
-     * @throws java.sql.SQLException 
-     */
-    public boolean connect(String pDBurl, String pUser, String pPass)
-            throws java.sql.SQLException {
-        this.url = pDBurl;
-        this.user = pUser;
-        this.pass = pPass;
-
-        connection = DriverManager.getConnection(url, user, pass);
-        logger.debug("Connection established: " + connection);
-
-        //Falls es noch einen gefuellten Cache gibt, dann werden alle
-        //StatementObjekte ordnungsgemaess geschlossen (.close())
-        if (mSCache != null) {
-            mSCache.closeall();
+    /** setter for the jdbc URL used to connect to your database. <br>
+     * <b>use the createURL() method to get help building your URL</b>
+     * @param myurl full qualified URL */
+    public void setURL(String myurl) {
+        if (this.internalDriver == Driver.NOTSELECTED) {
+            throw new UnsupportedOperationException("Please specify a Driver first!");
+        } else {
+            this.internalDriver.setUrl(myurl);
         }
-        //Neuen Cache erzeugen (die StmtObj. gehoeren zu genau einer Connection)
-        mSCache = new StmtCache(connection); //Statementchache init
-        mSCache.setDebug(debug);
-        logger.debug("StatementCache created: " + mSCache);
-
-        pstWatcher = new PstStmtWatcher(connection);
-        pstWatcher.setDebug(debug);
-        logger.debug("PstStmtWatcher created: " + pstWatcher);
-
-        setChanged();
-        notifyObservers(connection);
-
-        return (connection != null);
     }
 
-    /**Erstellt die URL fuer die Verbindung.
-     * Fuer ODBC wird nur der erste Parameter ausgewertet.<br>
-     * Fuer Oracle/Microsof werden alle Parameter ausgewertet.<br>
-     * Fuer MySQL wird nur der Datenbankname und der Rechnername ausgewertet.<br>
-     * @param pDB_Alias_SID - DatenbankName oder ODBC-Alias oder Oracle-SID.
-     * @param pHost RechnerName des DatenbankServers.
-     * @param pPort Port auf dem der DatenbankServer zu erreichen ist.
-     * @param drivernumber Treibernamen-Konstante der Klasse DBConnect.
-     * @return Gibt den fertigen URL zurueck.
-     */
-    private static String createURL(String pDB_Alias_SID, String pHost,
-            String pPort, Driver drivernumber) {
-
-        if (drivernumber == Driver.NOTSELECTED) {
-            throw new UnsupportedOperationException("Driver not set!");
-        }
-
-        //String cone = URLS[mapDrvNums(drivernumber)];
-        String cone = DRV_AND_URLS[URLS][mapDrvNums(drivernumber)];
-
-        switch (drivernumber) {
-            case ODBC:
-                cone = cone.concat(pDB_Alias_SID);
-                break;
-            case ORACLE:
-                cone = cone.concat(pHost + ":" + pPort + ":" + pDB_Alias_SID);
-                break;
-            case MSSQL:
-                cone = cone.concat(pHost + ":" + pPort + "/" + pDB_Alias_SID);
-                break;
-            case MYSQL:
-                cone = cone.concat(pHost + "/" + pDB_Alias_SID);
-                break;
-            case HSQLDB:
-                cone = cone.concat(pDB_Alias_SID + "/" + pHost);
-                break;
-            case JAVADB_NETWORK:
-                cone = cone.concat(pHost + ":" + pPort + "/" + pDB_Alias_SID);
-                break;
-            case JAVADB_EMBEDDED:
-                cone = cone.concat(pDB_Alias_SID);
-                break;
-            default:
-                throw new UnsupportedOperationException("Unknown Driver!");
-        }
-        return cone;
+    /** getter for the current used url.
+     * <b>if you didn't call the setURL(String) function in combination with
+     * the createURL(String,String,String) method you will only get a template
+     * part of the URL (which is not usable for connecting).
+     * @return jdbc url - and null if no driver was selected */
+    public String getUrl() {
+        return this.internalDriver.getUrl();
     }
 
-    /**Erstellt die URL fuer die Verbindung.
-     * Fuer ODBC wird nur der erste Parameter ausgewertet.<br>
-     * Fuer Oracle/Microsof werden alle Parameter ausgewertet.<br>
-     * Fuer MySQL wird nur der Datenbankname und der Rechnername ausgewertet.<br>
-     * @param pDB_Alias_SID - DatenbankName oder ODBC-Alias oder Oracle-SID.
-     * @param pHost RechnerName des DatenbankServers.
-     * @param pPort Port auf dem der DatenbankServer zu erreichen ist.
-     * @return Gibt den fertigen URL zurueck.
+    /**Helper to create an URL for your jdbc connection depending of the Driver.<br>
+     * Examples:<br>
+     * Driver.NOTSELECTED: -not supported-<br>
+     * Driver.CUSTOM: -not supported-<br>
+     * Driver.ODBC: createURL(odbcname,null,null)<br>
+     * Driver.ACCESS_MDB: createURL(".\dbpath\Accesfile.mdb")<br>
+     * Driver.ORACLE: createURL(SID,OraHost,1521)<br>
+     * Driver.MSSQL: createURL(DBName,HostName,1433)<br>
+     * Driver.MYSQL: createURL(DBName,HostName,null)<br>
+     * Driver.HSQLDB: createURL(DBName,HostName,null)<br>
+     * Driver.JAVADB_NETWORK: createURL(DBName,HostName,Port)<br>
+     * Driver.JAVADB_EMBEDDED: createURL(DBName,null,null)<br>
+     * @param pDB_Alias_SID - DBName or ODBC-Alias or Oracle-SID.
+     * @param pHost HostName of the database server.
+     * @param pPort Port of the database server.
+     * @return ready to use URL which can pe passed to the setURL(String) method.
      */
     public String createURL(String pDB_Alias_SID, String pHost, String pPort) {
         return DBQuickConnect.createURL(pDB_Alias_SID, pHost, pPort, getDriver());
     }
 
-    /**Recycelt über das ResultSet das Statement Objekt <b>Statement-Pool!</b>.<br>
-     * Holt &uuml;ber das &uuml;bergebene das ResultSet-Objekt das Statementobjekt und
-     * stellt es in die verkettete Liste {@link #mSCache}
-     * @param pResultset Ergebnismenge (wird automatisch geschlossen!)
-     * @throws SQLException
+    /** @see createURL(String,String,String). */
+    private static String createURL(String pDB_Alias_SID,
+            String pHost, String pPort, Driver pDriver) {
+
+        if (pDriver == Driver.NOTSELECTED) {
+            throw new IllegalArgumentException("Driver not set!");
+        } else if (pDriver == Driver.CUSTOM) {
+            throw new IllegalArgumentException("Cannot construct a CUSTOM Driver!");
+        } else {
+
+            String url = pDriver.getUrl();
+
+            switch (pDriver) {
+                case ODBC:
+                case ACCESS_MDB:
+                    url = url.concat(pDB_Alias_SID);
+                    break;
+                case ORACLE:
+                    url = url.concat(pHost + ":" + pPort + ":" + pDB_Alias_SID);
+                    break;
+                case MSSQL:
+                    url = url.concat(pHost + ":" + pPort + "/" + pDB_Alias_SID);
+                    break;
+                case MYSQL:
+                    url = url.concat(pHost + "/" + pDB_Alias_SID);
+                    break;
+                case HSQLDB:
+                    url = url.concat(pDB_Alias_SID + "/" + pHost);
+                    break;
+                case JAVADB_NETWORK:
+                    url = url.concat(pHost + ":" + pPort + "/" + pDB_Alias_SID);
+                    break;
+                case JAVADB_EMBEDDED:
+                    url = url.concat(pDB_Alias_SID);
+                    break;
+                default:
+                    throw new UnsupportedOperationException("Unknown Driver!");
+            }
+            return url;
+        }
+    }
+
+    /** Connects to the specified database.
+     * if you use the predefined Drivers from the Driver enum you should have to use
+     * the <b>createURL</b> method to insert the missing parts like hostname,
+     * databasename and so on.
+     * @param pDBurl JDBC URL
+     * @param pUser database user (stored in a global field)
+     * @param pPass password of the database user (stored in a global field)
+     * @return true/false on success/failure (mostly true or an exception is thrown)
+     * @throws java.sql.SQLException any
+     */
+    public boolean connect(String pUser, String pPass) throws java.sql.SQLException {
+        this.user = pUser;
+        this.pass = pPass;
+
+        if (Driver.NOTSELECTED == this.internalDriver) {
+            throw new IllegalArgumentException("JDBC-Driver not set!");
+        }
+
+        String myurl = getUrl();
+        if (myurl == null) {
+            throw new UnsupportedOperationException("JDBC-URL is not set!");
+        }
+
+        if (pUser == null && pPass == null) {
+            connection = DriverManager.getConnection(getUrl());
+        } else {
+            connection = DriverManager.getConnection(getUrl(), pUser, pPass);
+        }
+
+        logger.debug(this.internalDriver + "-Connection established! (" + connection + ")");
+        logger.info("JDBC connection successfully opened to '" + url + "' with user '" + pUser + "'");
+
+
+        //Close previous statement objects if exists:
+        if (mSCache != null) {
+            mSCache.closeall();
+        }
+
+        //Create a new statement cache:
+        mSCache = new StmtCache(connection);
+        mSCache.setDebug(debug);    //pass-through of the debug mode:
+        logger.debug(this.internalDriver + "-StatementCache created! (" + mSCache + ")");
+
+
+        //create a new watcher for PreparedStatement objects:
+        pstWatcher = new PstStmtWatcher(connection);
+        pstWatcher.setDebug(debug); //pass-through of the debug mode:
+        logger.debug(this.internalDriver + "-PreparedtStatementWatcher created! (" + pstWatcher + ")");
+
+
+        //Observer-Handling:
+        setChanged();
+        notifyObservers(this);
+
+        return isClosed();
+    }
+
+    /**<b>DDL</b>Select SQL Operation.
+     * @param pSQL SQL Select-Query
+     * @return ResultSet which can be looped through
+     * @throws SQLException any database errors
+     */
+    public ResultSet sqlSelect(String pSQL) throws SQLException {
+        Statement stat = mSCache.getStatement();
+        return stat.executeQuery(pSQL);
+    }
+
+    /**
+     * Close the passed ResultSet object. The underlying Statement object will
+     * be put into the StatementCache {@link #mSCache} for reuseability.
+     * @param pResultset to be closed
+     * @throws SQLException any
      */
     public void closeResultSet(ResultSet pResultset) throws java.sql.SQLException {
         if (pResultset != null) {
             Statement stmt = pResultset.getStatement();
 
-            //Keine Prepared Statements in den Cache!
+            //Don't put Prepared Statements into the Cache!
             if (!(stmt instanceof java.sql.PreparedStatement)) {
                 mSCache.releaseStatement(stmt);
             }
@@ -268,104 +352,102 @@ public class DBQuickConnect extends Observable {
         }
     }
 
-    /**SELECT Operation.
-     * @param pSQL SQL Select-Query
-     * @return ResultSet
-     * @throws SQLException
-     */
-    public ResultSet sqlSelect(String pSQL) throws SQLException {
-        Statement stat = mSCache.getStatement();
-        return stat.executeQuery(pSQL);
-    }
-
-    /**<b>Datenbank&auml;nderungen</b> die kein ResultSet zur&uuml;ckgeben, sondern
-     * die Anzahl der betroffenen Datens&auml;tze.<br>
-     * <ul><li>INSERT INTO</li><li>UPDATE</li><li>DELETE FROM</li></ul>
-     * @param pSQL SQL Statement (ohne abschlie&szlig;endes Semikolon ';').
-     * @return (int) Anzahl der ge&auml;nderten Datens&auml;tze oder -1 bei Error
-     * @throws SQLException 
+    /**<b>DML</b> Insert-, Update- and Delete- SQL operations.<br>
+     * <ul><li>INSERT INTO table (columns) values (a,b,c)</li>
+     * <li>UPDATE table SET column = value WHERE...</li>
+     * <li>DELETE FROM table WHERE...</li></ul>
+     * @param pSQL SQL Statement (do not put a ';' at the end!).
+     * @return amount of changed data rows (-1 on errors))
+     * @throws SQLException any
      */
     public int sqlExecution(String pSQL) throws SQLException {
-        //Statementobjekt aus dem Cache holen bzw. neu anlegen:
+        //obtain a Statement object (cached or newly created):
         Statement mStat = mSCache.getStatement();
 
-        //Das Uebergebene SQL-Statement ausfuehren:
+        //Execution:
         int result = mStat.executeUpdate(pSQL);
 
-        //Das nicht mehr benoetigte Statementobjekt zurueck in den Cache schreiben:
+        //release resources:
         mSCache.releaseStatement(mStat);
 
-        //Das Ergebnis (Anzahl) zurueckgeben:
+        //return the amount of changed rows:
         return result;
     }
 
-    /**Parametrisiertes Statement.
-     * @param pSQL SQL Code mit Fragezeichen als Platzhalter.
-     * @return Prepared Statement Objekt.
-     * @throws SQLException beim Senden des Prototyps an die Datenbank.
+    /**Create a new PreparedStatement object.<br>
+     * <b>Using this method you can access further statistics about cleaning up resources </b>
+     * @param pSQL DML or DDL Sql statement with '?' as parameter placeholders.
+     * @return Prepared Statement Object. (forward-only, connections default-holdability)
+     * @throws SQLException maybe on errors during preparation.
      */
     public PreparedStatement pstPrepareStatement(String pSQL) throws SQLException {
-        //create a new PreparedStatement object:
         return pstWatcher.getPreparedStatement(pSQL, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, connection.getHoldability());
     }
 
+    /**Closes a PreparedStatement object.<br>
+     * <b>Using this method you can access further statistics about cleaning up resources </b>
+     * @param pst Prepared Statement Object
+     * @throws SQLException on errors during closing.
+     */
     public void closePreparedStatement(PreparedStatement pst) throws SQLException {
-        //close a PreparedStatement object:
         pstWatcher.closePreparedStatement(pst);
     }
 
-    /**Fetchsize anpassen.
+    /**Sets the fetch size of rows retrieved by the database.<br>
+     * <b>The fetch size will be set on the ResultSet and on the Statement</b>
      * @param pResultset ResultSet-Objekt
-     * @param pFetchSize Neue Grösse
-     * @throws SQLException 
+     * @param pFetchSize new amount
+     * @throws SQLException should be caught (expecially for odbc drivers)
      */
     public void setStmtFetchSize(ResultSet pResultset, int pFetchSize) throws SQLException {
-        Statement s = pResultset.getStatement();
+        Statement stmt = pResultset.getStatement();
         pResultset.setFetchSize(pFetchSize); //am Resultset einstellen
-        s.setFetchSize(pFetchSize);          //am Statement einstellen
+        stmt.setFetchSize(pFetchSize);          //am Statement einstellen
     }
 
     /** Calls close() on the connection object and on all open statement objects.
      */
     public void closeConnection() {
-        try {
-            setChanged();
 
-            //Linked List leeren
+        try {
+            //Close Statement cache:
             if (mSCache != null) {
                 mSCache.closeall();
                 mSCache = null;
             }
+        } catch (Exception e) {
+            logger.debug("Exception closing StatementCache", e);
+        }
 
-            //Linked List leeren
+        try {
+            //Close PreparedStatement Watcher:
             if (pstWatcher != null) {
                 pstWatcher.closeall();
                 pstWatcher = null;
             }
+        } catch (Exception e) {
+            logger.debug("Exception closing PreparedStatementWatcher", e);
+        }
 
-            //Verbindung trennne
+        try {
+            //Last but not least - close the database connection:
             if (connection != null) {
                 connection.close();
                 connection = null;
             }
-
-            notifyObservers(connection);
-            logger.debug("Connection closed: " + getDriver());
-
-        } catch (SQLException ex) {
-            notifyObservers(ex);
+            logger.debug(this.internalDriver + "-Connection closed: " + getDriver());
+        } catch (SQLException e) {
+            logger.debug("Exception closing PreparedStatementWatcher", e);
         }
+
+
+        //ObserverHandling:
+        setChanged();
+        notifyObservers(this);
+
     }
 
-    private static final String getDriverClassName(Driver pDrvNo) {
-        return DRV_AND_URLS[DRIVERS][mapDrvNums(pDrvNo)];
-    }
-
-    public String getDriverClass() {
-        return getDriverClassName(getDriver());
-    }
-
-    /**Rückgabe eines Arrays aller geladenen Treibernamen (Strings).
+    /**Returns all currently loaded Drivers through the DriverManager (Strings).
      * @return DriverManager.getDrivers()...getClass().getName()
      */
     public Collection getAllLoadedDrivers() {
@@ -376,8 +458,11 @@ public class DBQuickConnect extends Observable {
         return drivers;
     }
 
+    /** Getter if the connection object is null or closed.
+     * @return true or false
+     */
     public boolean isClosed() throws SQLException {
-        return (connection != null && connection.isClosed());
+        return (connection == null) || (connection.isClosed());
     }
 
     /** setLogWriter() speichert das PrintWriter-Objekt in einer privaten Variable
@@ -388,8 +473,11 @@ public class DBQuickConnect extends Observable {
         DriverManager.setLogWriter(pw);
     }
 
-    /**Schaltet den DebugModus ein oder aus.
-     * @param truefalse an/aus
+    /**set debug mode. <br>
+     * do this before calling connect because
+     * this property will also passed through into
+     * the statement cache class.
+     * @param truefalse on/off
      */
     public void setDebug(boolean truefalse) {
         this.debug = truefalse;
@@ -405,45 +493,31 @@ public class DBQuickConnect extends Observable {
         return connection;
     }
 
-    /** Gibt die aktuelle DriverNummber zurück.
-     * @return Ganzzahl
-     */
-    public Driver getDriver() {
-        return internalDriver;
-    }
-
-    /**Die toString-Methode wurde überschrieben.
-     * @return  Treiber/URL/User
+    /**String-Representation.
+     * @return Classname/Hashcode/URL
      */
     @Override
     public String toString() {
         return "DBQuickConnect@" + Integer.toHexString(hashCode()) + " URL=" + this.url;
     }
 
-    /**Gibt die derzeitige URL zurück.
-     * @return Connectionstring
-     */
-    public String getUrl() {
-        return url;
-    }
-
-    /**Gibt den Benutzer zurück.
-     * @return Benutzernamen
+    /**DB Username.
+     * @return user
      */
     public String getUser() {
         return user;
     }
 
-    /**Transaktions Modus setzen.
+    /**Transaction Mode.
      * connection.setAutoCommit(value);
-     * @param OnOff Ein Aus.
+     * @param OnOff 
      * @throws SQLException Error
      */
     public void setAutoCommit(boolean value) throws java.sql.SQLException {
         connection.setAutoCommit(value);
     }
 
-    /** Startet eine Datenbanktransaktion.
+    /** Starts a Databasetransaction.
      *  Setzt den AutoCommit-Modus auf false und ruft die Methode
      *  CommitTransaction() auf um vorherige Änderungen zu übermitteln.
      ** @throws SQLException bei Datenbankfehler.
@@ -472,6 +546,7 @@ public class DBQuickConnect extends Observable {
         connection.rollback();
         connection.setAutoCommit(true);
     }
+
     /** Regulärer Ausdruck zum ersetzen von Hochkommata. */
     private static final Pattern patternA = Pattern.compile("'");
 
@@ -492,8 +567,6 @@ public class DBQuickConnect extends Observable {
     public String getPassword() {
         return pass;
     }
-
-    
 
     /** Gibt Informationen ueber den Cache zurueck.
      * @return 'created=2  reused=34  released=36/36   (ratio: 1700%)''
@@ -522,10 +595,15 @@ public class DBQuickConnect extends Observable {
     public class StmtCache {
 
         private Connection con;
+
         private Stack<Statement> cache;
+
         private int count_reused;
+
         private int count_created;
+
         private int count_released;
+
         private boolean debug = false;
 
         public StmtCache(Connection con) {
@@ -615,7 +693,6 @@ public class DBQuickConnect extends Observable {
             }
         }
 
-
         public void releaseStatement(Statement statement) throws SQLException {
             if (!cache.contains(statement)) {
                 cache.add(statement);
@@ -631,7 +708,7 @@ public class DBQuickConnect extends Observable {
 
         }
 
-        public void closeall() throws java.sql.SQLException {
+        public void closeall() {
             java.util.Iterator it = cache.iterator();
             while (it.hasNext()) {
                 java.sql.Statement stmt = (java.sql.Statement) it.next();
@@ -698,14 +775,19 @@ public class DBQuickConnect extends Observable {
         public String toString() {
             return "StmtCache@" + Integer.toHexString(hashCode());
         }
+
     }//class StmtCache
 
     public class PstStmtWatcher {
 
         private Connection con;
+
         private Set<PreparedStatement> pstObjectSet;
+
         private int count_created;
+
         private int count_closed;
+
         private boolean debug = false;
 
         public PstStmtWatcher(Connection con) {
@@ -716,7 +798,7 @@ public class DBQuickConnect extends Observable {
         }
 
         public PreparedStatement getPreparedStatement(String sql, int resultSetType,
-				       int resultSetConcurrency, int resultSetHoldability) throws SQLException {
+                int resultSetConcurrency, int resultSetHoldability) throws SQLException {
 
             PreparedStatement pstmt = con.prepareStatement(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
             pstObjectSet.add(pstmt);
@@ -781,11 +863,11 @@ public class DBQuickConnect extends Observable {
 
                 try {
 //                    if (!prepStmt.isClosed()) {
-                        if (debug) {
-                            logger.debug("closing PreparedStatement " + prepStmt);
-                        }
-                        prepStmt.close();
-                        count_closed++;
+                    if (debug) {
+                        logger.debug("closing PreparedStatement " + prepStmt);
+                    }
+                    prepStmt.close();
+                    count_closed++;
 //                    }
                 } catch (Exception e) {
                     if (debug) {
@@ -831,5 +913,6 @@ public class DBQuickConnect extends Observable {
         public String toString() {
             return "PstStmtWatcher@" + Integer.toHexString(hashCode());
         }
+
     }//class PstStmtWatcher
 }
