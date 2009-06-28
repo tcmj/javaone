@@ -5,7 +5,6 @@
 package com.tcmj.common.jdbc.connect;
 
 import com.tcmj.common.jdbc.connect.DBQuickConnect.Driver;
-import com.tcmj.common.tools.xml.map.XMLMap;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Observable;
@@ -13,34 +12,29 @@ import java.util.Observer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import static org.junit.Assert.*;
 
 /**
  * DBQuickConnectTest.
  * @author Administrator
  */
-public class DBQuickConnectTest {
-
-    /** slf4j Logging framework. */
-    private static final transient Logger logger = LoggerFactory.getLogger(XMLMap.class);
+public class DBQConnectTest {
 
     private String mdburl =
-    "jdbc:odbc:Driver={Microsoft Access Driver (*.mdb)};" +
+            "jdbc:odbc:Driver={Microsoft Access Driver (*.mdb)};" +
             "DBQ=.\\testdata\\com.tcmj.common.jdbc.connect\\DBQuickConnectTest.mdb";
 
     private DBQuickConnect ginstance;
 
-    public DBQuickConnectTest() {
+    public DBQConnectTest() {
     }
 
     @Before
     public void setUp() throws Exception {
-        ginstance = new DBQuickConnect();
-        ginstance.setDriver(DBQuickConnect.Driver.ODBC);
-        ginstance.connect(mdburl, "", "");
-
+        System.out.println("-----------------------------------------------------------------");
+        ginstance = new DBQuickConnect(DBQuickConnect.Driver.ACCESS_MDB);
+        ginstance.setURL(mdburl);
+        ginstance.connect();
     }
 
     @After
@@ -63,14 +57,12 @@ public class DBQuickConnectTest {
      * Test of setDriver method, of class DBQuickConnect.
      */
     @Test
-    public void testSetDriverClass_String() throws Exception {
+    public void testSetDriver_String() throws Exception {
         System.out.println("setDriverClass");
         DBQuickConnect instance = new DBQuickConnect();
-        instance.setDriverClass("sun.jdbc.odbc.JdbcOdbcDriver");
-        assertEquals(DBQuickConnect.Driver.NOTSELECTED, instance.getDriver());
+        instance.setDriver("sun.jdbc.odbc.JdbcOdbcDriver");
+        assertEquals(DBQuickConnect.Driver.CUSTOM, instance.getDriver());
     }
-
-    
 
     /**
      * Test of createURL method, of class DBQuickConnect.
@@ -84,11 +76,10 @@ public class DBQuickConnectTest {
         try {
             String result = instance.createURL("db", "host", "port");
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            System.err.println(e.getMessage());
             exceptionThrown = true;
         }
         assertTrue(exceptionThrown);
-
 
         instance.setDriver(DBQuickConnect.Driver.ODBC);
 
@@ -119,11 +110,11 @@ public class DBQuickConnectTest {
         ResultSet rs = ginstance.sqlSelect("select count(*) from contacts");
         int amount;
         if (rs.next()) {
-           amount  = rs.getInt(1);
-        }else {
-           amount  = -1;
+            amount = rs.getInt(1);
+        } else {
+            amount = -1;
         }
-        assertTrue((amount!=-1));
+        assertTrue((amount != -1));
         ginstance.closeResultSet(rs);
     }
 
@@ -133,8 +124,8 @@ public class DBQuickConnectTest {
     @Test
     public void testSqlExecution() throws Exception {
         System.out.println("sqlExecution");
-        int amount =ginstance.sqlExecution("update contacts set firstname = 'John' where lastname = 'Wayne'");
-        assertTrue((amount!=0));
+        int amount = ginstance.sqlExecution("update contacts set firstname = 'John' where lastname = 'Wayne'");
+        assertTrue((amount != 0));
     }
 
     /**
@@ -144,7 +135,7 @@ public class DBQuickConnectTest {
     public void testPstPrepareStatement() throws Exception {
         System.out.println("pstPrepareStatement");
         String pSQL = "select * from contacts where lastname = ?";
-        
+
         PreparedStatement pst = ginstance.pstPrepareStatement(pSQL);
 
         pst.setString(1, "Love");
@@ -152,7 +143,7 @@ public class DBQuickConnectTest {
         ResultSet rs = pst.executeQuery();
 
         rs.next();
-        
+
         assertEquals("Foxxy", rs.getString("firstname"));
 
         ginstance.closeResultSet(rs);
@@ -160,11 +151,6 @@ public class DBQuickConnectTest {
 
 
     }
-
-    
-
-    
-
 
     /**
      * Test of getConnection method, of class DBQuickConnect.
@@ -181,7 +167,7 @@ public class DBQuickConnectTest {
      * Test of getDriver method, of class DBQuickConnect.
      */
     @Test
-    public void testGetDriver() throws Exception{
+    public void testGetDriver() throws Exception {
         System.out.println("getDriver");
         DBQuickConnect instance = new DBQuickConnect();
         Driver expResult = Driver.NOTSELECTED;
@@ -219,12 +205,11 @@ public class DBQuickConnectTest {
     @Test
     public void testGetUser() {
         System.out.println("getUser");
-        String expResult = "";
-        String result = ginstance.getUser();
-        assertEquals(expResult, result);
+        DBQuickConnect instance = new DBQuickConnect();
+        assertEquals(null, instance.getUser());
+        instance.setUser("warren");
+        assertEquals("warren", instance.getUser());
     }
-
-    
 
     /**
      * Test of startTransaction method, of class DBQuickConnect.
@@ -237,10 +222,6 @@ public class DBQuickConnectTest {
         ginstance.startTransaction();
         ginstance.undoTransaction();
     }
-
-    
-
-    
 
     /**
      * Test of replaceQuotes method, of class DBQuickConnect.
@@ -260,22 +241,21 @@ public class DBQuickConnectTest {
     @Test
     public void testGetPassword() {
         System.out.println("getPassword");
-        String expResult = "";
-        String result = ginstance.getPassword();
-        assertEquals(expResult, result);
+        DBQuickConnect instance = new DBQuickConnect();
+        assertEquals(null, instance.getPassword());
+        instance.setPassword("as$!");
+        assertEquals("as$!", instance.getPassword());
     }
 
-    
-
     /**
-     * Test of getReleaseInfo method, of class DBQuickConnect.
+     * Test of getInfoFull method, of class DBQuickConnect.
      */
     @Test
     public void testGetReleaseInfo() {
         System.out.println("getReleaseInfo");
-        String result = ginstance.getReleaseInfo();
+        String result = ginstance.getInfoFull();
         System.out.println(result);
-        assertNotNull( result);
+        assertNotNull(result);
     }
 
     /**
@@ -284,24 +264,28 @@ public class DBQuickConnectTest {
     @Test
     public void testObserver() throws Exception {
         System.out.println("Observer");
-
-
-        assertEquals(0, ginstance.countObservers());
+        DBQuickConnect instance = new DBQuickConnect(DBQuickConnect.Driver.ACCESS_MDB);
+        assertEquals(0, instance.countObservers());
         ObserverImpl obse = createObserver();
-        ginstance.addObserver(obse);
-        assertEquals(1, ginstance.countObservers());
+        instance.addObserver(obse);
+        assertEquals(1, instance.countObservers());
+
+        instance.setURL(mdburl);
+
+        
+        instance.connect();
+        instance.connect();
+        instance.connect();
 
 
 
-        ginstance.setDriver(DBQuickConnect.Driver.ODBC);
-        assertEquals(0, obse.getCount());
-        String pDBurl = ginstance.createURL("test", null, null);
+        instance.deleteObserver(obse);
 
-        assertEquals(0, obse.getCount());
+        assertEquals("messages retrieved", 3, obse.getCount());
 
-        ginstance.deleteObserver(obse);
+        instance.deleteObserver(obse);
 
-        assertEquals(0, ginstance.countObservers());
+        assertEquals(0, instance.countObservers());
 
 
 
@@ -316,6 +300,7 @@ public class DBQuickConnectTest {
 
         public ObserverImpl() {
         }
+
         private int count = 0;
 
         public void update(Observable beobachtbarer, Object text) {
@@ -329,5 +314,7 @@ public class DBQuickConnectTest {
         public int getCount() {
             return count;
         }
+
     }
+
 }

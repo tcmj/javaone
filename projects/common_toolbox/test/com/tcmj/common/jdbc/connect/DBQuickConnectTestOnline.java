@@ -61,7 +61,7 @@ public class DBQuickConnectTestOnline {
 
 
         DBQuickConnect db = connect();
-        System.out.println("D" + db.getReleaseInfo());
+        System.out.println("D" + db.getInfoFull());
         DatabaseMetaData meta = db.getConnection().getMetaData();
         System.out.println("Server name: " + meta.getDatabaseProductName());
         System.out.println("Server version: " + meta.getDatabaseProductVersion());
@@ -73,13 +73,13 @@ public class DBQuickConnectTestOnline {
 
 
         dropTestTable(db);
-        System.out.println("B" + db.getReleaseInfo());
+        System.out.println("B" + db.getInfoFull());
 
         createTestTable(db);
-        System.out.println("Q" + db.getReleaseInfo());
+        System.out.println("Q" + db.getInfoFull());
 
         createTestData(db, 20);
-        System.out.println("C" + db.getReleaseInfo());
+        System.out.println("C" + db.getInfoFull());
 
 
         ResultSet rs = db.sqlSelect("select * from TCMJ.CONTACTS");
@@ -103,7 +103,7 @@ public class DBQuickConnectTestOnline {
         db.closeResultSet(rs);
 
 
-        System.out.println(db.getReleaseInfo());
+        System.out.println(db.getInfoFull());
 
 
         db.closeConnection();
@@ -160,7 +160,7 @@ public class DBQuickConnectTestOnline {
         try {
             PreparedStatement pst = db.pstPrepareStatement(psql);
             assertNotNull(pst);
-            System.out.println("N" + db.getReleaseInfo());
+            System.out.println("N" + db.getInfoFull());
 
             for (int i = 1; i <= amount; i++) {
 
