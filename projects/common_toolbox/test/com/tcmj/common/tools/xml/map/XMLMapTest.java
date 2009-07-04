@@ -728,7 +728,7 @@ public class XMLMapTest {
         File file = new File(testdatapath + "ram.xml");
 
         String[] cases = new String[]{
-            ".", "-", "\\", ",", "*", "_", "$", "@", "/", "|", "=", "?",
+            ".", "-", "\\", ",", "*", "_", "ooo", "@", "/", "|", "=", "?",
             "...", "x", "-|-", "||", "+"};
 
         for (int i = 0; i < cases.length; i++) {
