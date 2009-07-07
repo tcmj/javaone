@@ -58,7 +58,7 @@ public class XMLTool {
                     return prefix;
                 }
 
-                public Iterator getPrefixes(String namespaceURI) {
+                public Iterator<?> getPrefixes(String namespaceURI) {
                     throw new UnsupportedOperationException("Not supported yet.");
                 }
             };

@@ -32,7 +32,7 @@ public class StatementCache {
 
     public StatementCache(Connection con) {
         this.con = con;
-        this.cache = new Stack();
+        this.cache = new Stack<Statement>();
         this.count_reused = 0;
         this.count_created = 0;
         this.count_released = 0;
@@ -133,9 +133,9 @@ public class StatementCache {
     }
 
     public void closeall() {
-        java.util.Iterator it = cache.iterator();
+        java.util.Iterator<Statement> it = cache.iterator();
         while (it.hasNext()) {
-            java.sql.Statement stmt = (java.sql.Statement) it.next();
+            java.sql.Statement stmt = it.next();
 
             try {
                 if (debug) {

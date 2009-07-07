@@ -11,7 +11,6 @@ package com.tcmj.common.tools.helper.date;
 import com.tcmj.common.tools.helper.date.DateHelper;
 import java.util.Date;
 import static junit.framework.Assert.*;
-import org.junit.Before;
 import org.junit.Test;
 
 

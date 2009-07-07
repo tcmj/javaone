@@ -143,12 +143,12 @@ public class DBQConnectionTest {
 
         boolean exceptionThrown = false;
         try {
-            String result = instance.createURL("db", "host", "port");
+            instance.createURL("db", "host", "port");
         } catch (Exception e) {
             System.err.println(e.getMessage());
             exceptionThrown = true;
         }
-        assertTrue(exceptionThrown);
+        assertTrue("Exception because of missing driver",exceptionThrown);
 
         instance.setDriver(Driver.ODBC);
 
@@ -251,7 +251,6 @@ public class DBQConnectionTest {
     @Test
     public void testToString() {
         System.out.println("toString");
-        DBQConnection instance = new DBQConnection();
         String result = ginstance.toString();
         System.out.println(result);
         assertNotNull(result);

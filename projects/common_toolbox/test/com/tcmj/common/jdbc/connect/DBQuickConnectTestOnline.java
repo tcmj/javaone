@@ -28,10 +28,7 @@ public class DBQuickConnectTestOnline {
     private static final Driver DRIVER = Driver.ACCESS_MDB;
     private static final String DB = ".\\testdata\\com.tcmj.common.jdbc.connect\\DBQConnectionTest.mdb";
     private static final String HOST = "localhost";
-    //    private static final String HOST = "192.168.178.25";
-    private static final String PORT = "1527";
-    private static final String USER = "tcmj";
-    private static final String PWD = "tcmj";
+    private static final String PORT = null;
 
 
 

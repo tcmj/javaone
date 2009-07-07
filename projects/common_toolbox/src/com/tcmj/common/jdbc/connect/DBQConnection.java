@@ -33,23 +33,23 @@ import org.slf4j.LoggerFactory;
  * <li>MySQl</li></ul></code><br>
  * <pre>
  * <i><b>//Declaration:</b></i>
- * DBQConnection dbcon = new DBQConnection();
+ * DBQConnection connection = new DBQConnection();
  * <i><b>//Choose your database driver:</b></i>
- * dbcon.setDriver(Driver.ORACLE);
+ * connection.setDriver(Driver.ORACLE);
  * <i><b>//Construct your URL:</b></i>
- * String url = dbcon.createURL("PRIMA", "DEVORA", "1521");
+ * String url = connection.createURL("PRIMA", "DEVORA", "1521");
  * <i><b>//Connect:</b></i>
- * dbcon.connect(url, "userxy", "password123");
+ * connection.connect(url, "userxy", "password123");
  * <i><b>//Select-Statement:</b></i>
- * ResultSet rs = dbcon.sqlSelect("SELECT A,B FROM XYZ");
+ * ResultSet rs = connection.sqlSelect("SELECT A,B FROM XYZ");
  * <i><b>//Loop through the result:</b></i>
  * while(rs.next()){
  *       String cell = rs.getString(1);   <i>//column: 1</i>
  * }
  * <i><b>//!!Important!! close ResultSet !!Import!!)</b></i>
- * dbcon.closeResultSet(rs);
+ * connection.closeResultSet(rs);
  * <i><b>//Close connection</b></i>
- * dbcon.closeConnection();
+ * connection.closeConnection();
  * </pre><br><br>
  * <p>Copyright: Copyright (c) 2003 - 2009 by tcmj</p>
  * @author Thomas Deutsch
@@ -61,7 +61,7 @@ public class DBQConnection extends Observable implements Connection {
     /** slf4j Logging framework. */
     private static final transient Logger logger = LoggerFactory.getLogger(DBQConnection.class);
 
-    /** debugmode on/off. default = false.*/
+    /** debug mode on/off. default = false.*/
     private boolean debug;
 
     /** internal driver. default = NOTSELECTED */
@@ -88,10 +88,20 @@ public class DBQConnection extends Observable implements Connection {
     /** PreparedStatement Watcher. */
     protected PreparedStmtWatcher pstWatcher;
 
+    /** Constructor. */
     public DBQConnection() {
         super();
     }
 
+    /** Constructor.
+     * @param jdbcdriver eg.: com.oracle.OracleDriver
+     * @param url use createURL(String,String,String)
+     * @param user database user name
+     * @param pass password of the database user
+     * @throws IllegalAccessException {@inheritDoc} 
+     * @throws ClassNotFoundException if the jdbc driver is not in the classpath
+     * @throws InstantiationException {@inheritDoc}
+     */
     public DBQConnection(String jdbcdriver, String url, String user, String pass)
             throws IllegalAccessException, ClassNotFoundException, InstantiationException {
         super();
@@ -123,7 +133,7 @@ public class DBQConnection extends Observable implements Connection {
         setPassword(pass);
     }
 
-    /**Set the datenbase driver class used to connect.
+    /**Set the database driver class used to connect.
      * <b>do not use Driver.NOTSELECTED!<(b>
      * <b>do not use Driver.CUSTOM - use setDriver(String) instead!<(b>
      * @param driverclass use the Driver enum for this parameter
@@ -370,15 +380,15 @@ public class DBQConnection extends Observable implements Connection {
     /**Returns all currently loaded Drivers through the DriverManager (Strings).
      * @return DriverManager.getDrivers()...getClass().getName()
      */
-    public Collection getAllLoadedDrivers() {
-        Collection drivers = new HashSet();
-        for (Enumeration e = DriverManager.getDrivers(); e.hasMoreElements();) {
-            drivers.add(e.nextElement().getClass().getName());
+    public Collection<String> getAllLoadedDrivers() {
+        Collection<String> drivers = new HashSet<String>();
+        for (Enumeration<java.sql.Driver> enm = DriverManager.getDrivers(); enm.hasMoreElements();) {
+            drivers.add(enm.nextElement().getClass().getName());
         }
         return drivers;
     }
 
-    /** setLogWriter() speichert das PrintWriter-Objekt in einer privaten Variable
+    /** can be used to get further debugging informations. 
      * @param pw PrintWriter
      * @example setDriverManagerLogWriter(new PrintWriter(System.out));
      * */

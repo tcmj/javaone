@@ -16,6 +16,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
+
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import static junit.framework.Assert.*;
@@ -544,7 +546,7 @@ public class XMLMapTest {
     public void testEntrySet() {
         logger.info("entrySet");
 
-        Collection entries = model.entrySet();
+        Collection<Entry<String,String>> entries = model.entrySet();
 
         assertNotNull(entries);
     }
@@ -556,7 +558,7 @@ public class XMLMapTest {
     public void testPutAll() {
         logger.info("putAll");
 
-        Map map = new HashMap();
+        Map<String, String> map = new HashMap<String, String>();
 
         map.put("mykey1", "myvalue1");
         map.put("mykey2", "myvalue2");
@@ -602,7 +604,7 @@ public class XMLMapTest {
         assertEquals(3, model.size());
 
         logger.info("\t5");
-        model.putObject("mwst", new java.util.HashSet());
+        model.putObject("mwst", new java.util.Date());
 
         assertNotNull("mwst soll nicht null sein!", model.getObject("mwst"));
 
@@ -658,7 +660,7 @@ public class XMLMapTest {
 
     @Test
     public void testMap() throws Exception {
-        Map map = new XMLMap();
+        Map<String, String> map = new XMLMap();
 
         map.put("key1", "irgendwas1");
         map.put("key10", "irgendwas2");

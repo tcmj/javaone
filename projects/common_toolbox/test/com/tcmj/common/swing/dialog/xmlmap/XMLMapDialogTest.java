@@ -5,6 +5,9 @@ package com.tcmj.common.swing.dialog.xmlmap;
 import com.tcmj.common.swing.dialog.xmlmap.XMLMapDialog;
 import com.tcmj.common.tools.xml.map.XMLMap;
 import java.io.File;
+
+import javax.swing.WindowConstants;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -68,7 +71,7 @@ File file = new File(testdatapath + "BREBootStrap.xml");
         //Der User kann selber seine Properties anpassen mit Hilfe der Klasse
         //    XMLMapDialog:
         XMLMapDialog pan = new XMLMapDialog(null, true);
-        pan.setDefaultCloseOperation(pan.DISPOSE_ON_CLOSE);
+        pan.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         pan.setDataModel(mo);
         pan.show();
 

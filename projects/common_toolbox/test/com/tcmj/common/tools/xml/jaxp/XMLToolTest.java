@@ -5,7 +5,6 @@
 package com.tcmj.common.tools.xml.jaxp;
 
 import java.io.File;
-import java.io.InputStreamReader;
 import java.io.StringReader;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;

@@ -21,7 +21,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javax.xml.namespace.NamespaceContext;
@@ -318,14 +317,14 @@ public class XMLMap implements Map<String, String>, Serializable {
      * @return Java Object - cast it (eg. Date date = (Date)getObject(...))
      */
     public Object getObjectByValue(String value) {
-        Iterator itd = data.entrySet().iterator();
+        Iterator<Entry<String,XMLEntry>> itd = data.entrySet().iterator();
         Object obj = null;
         while (itd.hasNext()) {
-            Map.Entry mapen = (Map.Entry) itd.next();
-            XMLEntry xmlentry = (XMLEntry) mapen.getValue();
+            Map.Entry<String,XMLEntry> mapen = itd.next();
+            XMLEntry xmlentry = mapen.getValue();
             if (value.equals(xmlentry.getValue())) {
 
-                if (obj == null) { //first occurence
+                if (obj == null) { //first occurrence
                     obj = xmlentry.getObject();
                 } else {
                     throw new XMLMapException("Value exists more than once! Cannot perform search by value!");
@@ -454,7 +453,7 @@ public class XMLMap implements Map<String, String>, Serializable {
                     return prfix;
                 }
 
-                public Iterator getPrefixes(String namespaceURI) {
+                public Iterator<?> getPrefixes(String namespaceURI) {
                     throw new UnsupportedOperationException("Not supported yet.");
                 }
             };
@@ -835,10 +834,10 @@ public class XMLMap implements Map<String, String>, Serializable {
             StringBuffer buffer = new StringBuffer(initialsize);
             String line = System.getProperty("line.separator");
             buffer.append(line).append("----XMLMap----").append(line);
-            Iterator itData = this.data.values().iterator();
+            Iterator<XMLEntry> itData = this.data.values().iterator();
             while (itData.hasNext()) {
 
-                XMLEntry entry = (XMLEntry) itData.next();
+                XMLEntry entry = itData.next();
 
                 buffer.append(String.valueOf(entry));
 
@@ -848,7 +847,7 @@ public class XMLMap implements Map<String, String>, Serializable {
                 }
 
                 if (attributes) {
-                    Map map = entry.getAttributes();
+                    Map<String,String> map = entry.getAttributes();
                     if (map != null) {
                         buffer.append(" A:[" + map.entrySet() + "]");
                     }
@@ -1057,7 +1056,7 @@ public class XMLMap implements Map<String, String>, Serializable {
 
         public void addAttribute(String name, String value) {
             if (this.attributes == null) {
-                this.attributes = new HashMap();
+                this.attributes = new HashMap<String, String>();
             }
             this.attributes.put(name, value);
         }
@@ -1226,11 +1225,10 @@ public class XMLMap implements Map<String, String>, Serializable {
         return setEntries;
     }
 
-    public void putAll(Map stringmap) {
-        Iterator<Map.Entry<String, String>> itentryset = stringmap.entrySet().iterator();
-        while (itentryset.hasNext()) {
-            Map.Entry<String, String> xmlentry = itentryset.next();
-            put(xmlentry.getKey(), xmlentry.getValue());
+    public void putAll(Map<? extends String,? extends String> stringmap) {
+    	for (Iterator<? extends Map.Entry<? extends String, ? extends String>> itentryset = stringmap.entrySet().iterator(); itentryset.hasNext(); ) {
+            Map.Entry<? extends String, ? extends String> entry = itentryset.next();
+            put(entry.getKey(), entry.getValue());
         }
     }
 

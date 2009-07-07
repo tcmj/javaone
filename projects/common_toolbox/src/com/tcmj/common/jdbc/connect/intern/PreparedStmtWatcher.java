@@ -33,7 +33,7 @@ public class PreparedStmtWatcher {
 
     public PreparedStmtWatcher(Connection con) {
         this.con = con;
-        this.pstObjectSet = new HashSet();
+        this.pstObjectSet = new HashSet<PreparedStatement>();
         this.count_created = 0;
         this.count_closed = 0;
     }
