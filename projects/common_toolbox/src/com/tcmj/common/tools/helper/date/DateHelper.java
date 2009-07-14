@@ -7,9 +7,11 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Stack;
 
 /**
  * Helper for time and date operations.
+ * <p>This class uses a static calendar pool</p>
  * <p> use following import in your classes <br>import static com.tcmj.common.tools.helper.date.DateHelper.*;</p>
  * @author tdeut - Thomas Deutsch
  * @JUnit Test available!
@@ -31,6 +33,8 @@ public final class DateHelper {
     private static final DateFormat DFYYYYMMDDHHMM =
             new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
+    /** Calendar-Pool. */
+    private static final Stack<Calendar> calpool = new Stack<Calendar>();
 
     /** Singleton. */
     private DateHelper() {
@@ -91,9 +95,10 @@ public final class DateHelper {
      * @return a date object
      */
     public static Date date(int pYear, int pMonth, int pDay, int pHour, int pMinute, int pSecond) {
-        Calendar calendar = Calendar.getInstance();
+        Calendar calendar = getCalendar();
         calendar.set(pYear, pMonth - 1, pDay, pHour, pMinute, pSecond);
         calendar.set(Calendar.MILLISECOND, 0);
+        releaseCalendar(calendar);
         return calendar.getTime();
     }
 
@@ -137,6 +142,7 @@ public final class DateHelper {
      */
     public static long removeTime(Date pSource) {
         Calendar calendar = removeTime(pSource, ONE_DAY);
+        releaseCalendar(calendar);
         return calendar.getTimeInMillis();
     }
 
@@ -148,7 +154,7 @@ public final class DateHelper {
      * @return a java long time value
      */
     private static Calendar removeTime(Date pSource, long pUnit) {
-        Calendar calendar = Calendar.getInstance();
+        Calendar calendar = getCalendar();
         calendar.setTime(pSource);
         if (pUnit >= ONE_SECOND) {
             calendar.set(Calendar.MILLISECOND, 0);
@@ -184,7 +190,7 @@ public final class DateHelper {
      * @return a new date object with the merged time and date informations
      */
     public static Date copyTime(Date pSourcedate, Date pTargetdate) {
-        Calendar calendar = Calendar.getInstance();
+        Calendar calendar = getCalendar();
 
         calendar.setTime(pSourcedate);          //read time information from pSource
         int hour_start = calendar.get(Calendar.HOUR_OF_DAY);
@@ -197,7 +203,7 @@ public final class DateHelper {
         calendar.set(Calendar.MINUTE, minute_start);
         calendar.set(Calendar.SECOND, sec_start);
         calendar.set(Calendar.MILLISECOND, msec_start);
-
+        releaseCalendar(calendar);
         return calendar.getTime();
     }
 
@@ -243,12 +249,12 @@ public final class DateHelper {
 
         int dstOffsetStart = calendar.get(Calendar.DST_OFFSET) + calendar.get(Calendar.ZONE_OFFSET);
         long lnStart = calendar.getTimeInMillis();
-
+releaseCalendar(calendar);
         calendar = removeTime(pEnd, pUnit);
 
         int dstOffsetEnd = calendar.get(Calendar.DST_OFFSET) + calendar.get(Calendar.ZONE_OFFSET);
         long lnFinish = calendar.getTimeInMillis();
-
+releaseCalendar(calendar);
         //correcture needed if pStart and finish are in different timezones (CET/CEST):
         if (dstOffsetStart == dstOffsetEnd) {
             return (lnFinish - lnStart) / pUnit;
@@ -296,12 +302,13 @@ public final class DateHelper {
      * @return a java long time value
      */
     public static long setTime(Date pSource, int hours24, int minutes, int seconds, int milis) {
-        Calendar calendar = Calendar.getInstance();
+        Calendar calendar = getCalendar();
         calendar.setTime(pSource);
         calendar.set(Calendar.HOUR_OF_DAY, hours24);
         calendar.set(Calendar.MINUTE, minutes);
         calendar.set(Calendar.SECOND, seconds);
         calendar.set(Calendar.MILLISECOND, milis);
+        releaseCalendar(calendar);
         return calendar.getTimeInMillis();
     }
 
@@ -319,4 +326,37 @@ public final class DateHelper {
     public static Date setTimeAsDate(Date pSource, int hours24, int minutes, int seconds, int milis) {
         return new Date(setTime(pSource, hours24, minutes, seconds, milis));
     }
+
+
+    /** Rounds a java date to hours.
+     * rounds up if seconds >= 30 and rounds down if < 30.
+     * @param date 2009-04-04 23:23:43
+     * @return 2009-04-04 23:24:00
+     */
+    public static Date roundDate(Date date) {
+        long lngTime = date.getTime();
+        lngTime = (lngTime + (ONE_MINUTE/2)) / ONE_MINUTE * ONE_MINUTE;
+        return new Date(lngTime);
+    }
+
+
+    /** Method to retrieve a pooled calendar. */
+    private static final Calendar getCalendar(){
+        if (calpool.empty()) {
+            return Calendar.getInstance();
+        }else{
+            return calpool.pop();
+        }
+    }
+
+    /** Releases a unused calendar. */
+    private static final void releaseCalendar(Calendar cal){
+        if (calpool.contains(cal)) {
+            throw new UnsupportedOperationException("Calendar released twice!");
+        }
+        calpool.push(cal);
+    }
+
+
+
 }//pEnd:class
