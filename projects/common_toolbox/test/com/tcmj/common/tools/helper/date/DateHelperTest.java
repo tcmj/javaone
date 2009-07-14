@@ -8,7 +8,6 @@
 package com.tcmj.common.tools.helper.date;
 
 
-import com.tcmj.common.tools.helper.date.DateHelper;
 import java.util.Date;
 import static junit.framework.Assert.*;
 import org.junit.Test;
@@ -319,5 +318,38 @@ public class DateHelperTest {
         assertEquals("formatDateTime 2", "2009-09-11 13:59", DateHelper.formatDateTime(date2));
 
     }
+
+
+    @Test
+    public void testRoundDate() {
+        System.out.println("roundDate");
+        //round the time information (13:59:00) to the target
+        Date given = DateHelper.date(2009,12,10, 0, 0,0);
+        Date expected  = DateHelper.date(2009,12,10, 0, 0,0);
+        Date result = DateHelper.roundDate(given);
+        System.out.println("given="+ (given)+" result="+ (result));
+        assertEquals("case 1",expected,result);
+
+        given = DateHelper.date(2009,12,10, 13, 59,50);
+        expected  = DateHelper.date(2009,12,10, 14,0,0);
+        result = DateHelper.roundDate(given);
+        System.out.println("given="+ (given)+" result="+ (result));
+        assertEquals("case 2",expected,result);
+        
+        given =     DateHelper.date(2009,12,10, 13,59,30);
+        expected  = DateHelper.date(2009,12,10, 14,0,0);
+        result = DateHelper.roundDate(given);
+        System.out.println("given="+ (given)+" result="+ (result));
+        assertEquals("case 3",expected,result);
+
+        given = DateHelper.date(2009,12,10, 13, 59,29);
+        expected  = DateHelper.date(2009,12,10, 13,59,0);
+        result = DateHelper.roundDate(given);
+        System.out.println("given="+ (given)+" result="+ (result));
+        assertEquals("case 4",expected,result);
+    }
+
+
+
 
 }
