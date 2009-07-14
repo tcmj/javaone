@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.tcmj.common.tools.text;
 
 import java.util.Random;
@@ -24,45 +20,45 @@ public class RandomStrings extends Random {
      * Alle Ziffern des Hexadezimal-Systems.
      */
     private static final char HEXCHARS[] = {
-        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
     /**
-     * Alle Ziffern des Alphabets (gross und klein)
+     * Alle Ziffern des Alphabets (gross und klein).
      */
     private static final char STRCHARS[] = {
         'a', 'A', 'b', 'B', 'c', 'C', 'd', 'D', 'e', 'E', 'f', 'F', 'g', 'G', 'h', 'H', 'i', 'I',
         'j', 'J', 'k', 'K', 'l', 'L', 'm', 'M', 'n', 'N', 'o', 'O', 'p', 'P', 'q', 'Q', 'r', 'R',
-        's', 'S', 't', 'T', 'u', 'U', 'v', 'V', 'w', 'W', 'x', 'X', 'y', 'Y', 'z', 'Z' };
+        's', 'S', 't', 'T', 'u', 'U', 'v', 'V', 'w', 'W', 'x', 'X', 'y', 'Y', 'z', 'Z'};
     /**
-     * Alle Kleinbuchstaben
+     * Alle Kleinbuchstaben.
      */
     private static final char SCHARS[] = {
         'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
         'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
-        's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
+        's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
     /**
-     * alle Grossbuchstaben
+     * alle Grossbuchstaben.
      */
     private static final char BCHARS[] = {
         'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
         'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
-        'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
+        'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
     /**
-     * Buchstaben zur Verwendung der Wortgenerierung
+     * Buchstaben zur Verwendung der Wortgenerierung.
      */
     private static final char[][] RANDOM_STR = {
-        { 'a', 'e', 'i', 'o', 'u' },
-        { 'b', 'd', 'f', 'g', 'k', 'l', 'm', 'n', 'p', 'r', 's', 't', 'w' }
+        {'a', 'e', 'i', 'o', 'u'},
+        {'b', 'd', 'f', 'g', 'k', 'l', 'm', 'n', 'p', 'r', 's', 't', 'w'}
     };
 
     /**
-     * Konstruktor. ruft die Superklasse auf
+     * Konstruktor. ruft die Superklasse auf.
      */
     public RandomStrings() {
         super();
     }
 
     /**
-     * Konstruktor. ruft die Superklasse auf
+     * Konstruktor. ruft die Superklasse auf.
      * @param init Zahl zur Initialisierung des Zufallszahlengenerators
      */
     public RandomStrings(long init) {
@@ -195,7 +191,6 @@ public class RandomStrings extends Random {
         return new String(res);
     }
 
-
     /**
      * Erzeugt ein Wort bestimmter Laenge in Kleinbuchstaben.<br>
      * Es werden Woerter erzeugt, die lesbar sind. Dies wird dadurch erreicht,
@@ -214,7 +209,5 @@ public class RandomStrings extends Random {
         }
         return new String(res);
     }
-
-
-
+    
 }
