@@ -341,6 +341,14 @@ public class DBQConnection extends Observable implements Connection {
         try {
             //Close Statement cache:
             if (mSCache != null) {
+                //check if all resultsets were closed:
+                int stmt_created = mSCache.getCountCreated();
+                int stmt_used = mSCache.getCountReused();
+                int stmt_closed = mSCache.getCountReleased();
+                int totalstmt = (stmt_created + stmt_used);
+                if (stmt_closed < totalstmt) {
+                    logger.warn((totalstmt-stmt_closed)+" ResultSets have not been closed using closeResultSet()!");
+                }
                 mSCache.closeall();
                 mSCache = null;
             }
@@ -351,6 +359,11 @@ public class DBQConnection extends Observable implements Connection {
         try {
             //Close PreparedStatement Watcher:
             if (pstWatcher != null) {
+                int pstmt_created = pstWatcher.getCountCreated();
+                int pstmt_closed = pstWatcher.getCountClosed();
+                if (pstmt_closed < (pstmt_created)) {
+                    logger.warn((pstmt_created-pstmt_closed)+" PreparedStatements have not been closed using closePreparedStatement()!");
+                }
                 pstWatcher.closeall();
                 pstWatcher = null;
             }
@@ -367,7 +380,7 @@ public class DBQConnection extends Observable implements Connection {
                 connection = null;
             }
         } catch (SQLException e) {
-            logger.debug("Exception closing PreparedStatementWatcher", e);
+            logger.error("Exception closing JDBC connection: "+e.getMessage(), e);
         }
 
 
@@ -505,11 +518,27 @@ public class DBQConnection extends Observable implements Connection {
         int pstmt_created = pstWatcher.getCountCreated();
         int pstmt_closed = pstWatcher.getCountClosed();
 
+        StringBuilder resb = new StringBuilder(120);
+        int totalstmt = (stmt_created + stmt_used);
+        resb.append("ResultSets closed: ").append(stmt_closed);
+        resb.append(" of total ").append(totalstmt);
+        resb.append(" (created ").append(stmt_created);
+        resb.append(", reused ").append(stmt_used).append(")");
+        resb.append("  PreparedStatements closed: ").append(pstmt_closed);
+        resb.append(" of total ").append(pstmt_created);
+
+        if (stmt_closed < totalstmt) {
+            resb.append(System.getProperty("line.separator"));
+            resb.append(">>> Try to close ").append((totalstmt-stmt_closed));
+            resb.append(" more ResultSets using DBQConnection.closeResultSet(rs) <<<");
+        }
+
+
         String restr = "Statements closed: " + stmt_closed + " of total " +
                 (stmt_created + stmt_used) + " (created " +
                 stmt_created + ", reused " + stmt_used + ")" +
                 "  PreparedStatements closed: " + pstmt_closed + " of total " + pstmt_created;
-        return restr;
+        return resb.toString();
     }
 
     
@@ -669,55 +698,55 @@ public class DBQConnection extends Observable implements Connection {
 
 //start of interface java.sql.Connection JDK 6 features --->
 
-//    public Clob createClob() throws SQLException {
-//        return getConnection().createClob();
-//    }
-//
-//    public Blob createBlob() throws SQLException {
-//        return getConnection().createBlob();
-//    }
-//
-//    public NClob createNClob() throws SQLException {
-//        return getConnection().createNClob();
-//    }
-//
-//    public SQLXML createSQLXML() throws SQLException {
-//        return getConnection().createSQLXML();
-//    }
-//
-//    public boolean isValid(int timeout) throws SQLException {
-//        return (connection != null && connection.isValid(timeout));
-//    }
-//
-//    public void setClientInfo(String name, String value) throws SQLClientInfoException {
-//        getConnection().setClientInfo(name, value);
-//    }
-//
-//    public void setClientInfo(Properties properties) throws SQLClientInfoException {
-//        getConnection().setClientInfo(properties);
-//    }
-//
-//    public String getClientInfo(String name) throws SQLException {
-//        return getConnection().getClientInfo(name);
-//    }
-//
-//    public Properties getClientInfo() throws SQLException {
-//        return getConnection().getClientInfo();
-//    }
-//
-//    public Array createArrayOf(String typeName, Object[] elements) throws SQLException {
-//        return getConnection().createArrayOf(typeName, elements);
-//    }
-//
-//    public Struct createStruct(String typeName, Object[] attributes) throws SQLException {
-//        return getConnection().createStruct(typeName, attributes);
-//    }
-//
-//    public <T> T unwrap(Class<T> iface) throws SQLException {
-//        return getConnection().unwrap(iface);
-//    }
-//
-//    public boolean isWrapperFor(Class<?> iface) throws SQLException {
-//        return getConnection().isWrapperFor(iface);
-//    }
+    public java.sql.Clob createClob() throws SQLException {
+        return getConnection().createClob();
+    }
+
+    public java.sql.Blob createBlob() throws SQLException {
+        return getConnection().createBlob();
+    }
+
+    public java.sql.NClob createNClob() throws SQLException {
+        return getConnection().createNClob();
+    }
+
+    public java.sql.SQLXML createSQLXML() throws SQLException {
+        return getConnection().createSQLXML();
+    }
+
+    public boolean isValid(int timeout) throws SQLException {
+        return (connection != null && connection.isValid(timeout));
+    }
+
+    public void setClientInfo(String name, String value) throws java.sql.SQLClientInfoException {
+        getConnection().setClientInfo(name, value);
+    }
+
+    public void setClientInfo(java.util.Properties properties) throws java.sql.SQLClientInfoException {
+        getConnection().setClientInfo(properties);
+    }
+
+    public String getClientInfo(String name) throws SQLException {
+        return getConnection().getClientInfo(name);
+    }
+
+    public java.util.Properties getClientInfo() throws SQLException {
+        return getConnection().getClientInfo();
+    }
+
+    public java.sql.Array createArrayOf(String typeName, Object[] elements) throws SQLException {
+        return getConnection().createArrayOf(typeName, elements);
+    }
+
+    public java.sql.Struct createStruct(String typeName, Object[] attributes) throws SQLException {
+        return getConnection().createStruct(typeName, attributes);
+    }
+
+    public <T> T unwrap(Class<T> iface) throws SQLException {
+        return getConnection().unwrap(iface);
+    }
+
+    public boolean isWrapperFor(Class<?> iface) throws SQLException {
+        return getConnection().isWrapperFor(iface);
+    }
 }
