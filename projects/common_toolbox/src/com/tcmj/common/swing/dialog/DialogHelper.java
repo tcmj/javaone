@@ -1,8 +1,9 @@
-/* DialogHelper.java
+/* $HeadURL$
+ * SVN: $Id$
  * Created on 26. Februar 2007, 11:21
  * Copyright(c) 2005 tcmj.  All Rights Reserved.
- * CVS: $Id: DialogHelper.java,v 1.1 2007/02/26 11:33:27 TDEUT Exp $
- * Last Modify: $Date: 2007/02/26 11:33:27 $
+ * CVS: $Id$
+ * Last Modify: $Date$
  */
 package com.tcmj.common.swing.dialog;
 
@@ -19,7 +20,7 @@ import javax.swing.JOptionPane;
 
 /**
  * This class provides some useful procedures for working with dialogs
- * @version $Id: DialogHelper.java,v 1.1 2007/02/26 11:33:27 TDEUT Exp $
+ * @version $Id$
  * @author tdeut - Thomas Deutsch
  */
 public final class DialogHelper {

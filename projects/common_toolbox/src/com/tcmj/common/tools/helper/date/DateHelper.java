@@ -1,5 +1,6 @@
-/* DateHelper.java, Created on 26. August 2008, 15:08
- * CVS: $Id: DateHelper.java,v 1.1 2008/08/27 15:00:00 TDEUT Exp $
+/* $HeadURL$
+ * SVN: $Id$
+ * DateHelper.java, Created on 26. August 2008, 15:08
  */
 package com.tcmj.common.tools.helper.date;
 
@@ -15,6 +16,7 @@ import java.util.Stack;
  * <p> use following import in your classes <br>import static com.tcmj.common.tools.helper.date.DateHelper.*;</p>
  * @author tdeut - Thomas Deutsch
  * @JUnit Test available!
+ * @version $Revision$
  */
 public final class DateHelper {
 
@@ -328,7 +330,7 @@ releaseCalendar(calendar);
     }
 
 
-    /** Rounds a java date to hours.
+    /** Rounds a java date (up/down) to minutes.
      * rounds up if seconds >= 30 and rounds down if < 30.
      * @param date 2009-04-04 23:23:43
      * @return 2009-04-04 23:24:00
