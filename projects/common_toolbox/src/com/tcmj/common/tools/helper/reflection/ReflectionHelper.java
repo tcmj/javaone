@@ -1,4 +1,4 @@
-/* Copyright(c) 2009 tcmj.de  All Rights Reserved. */
+/* Copyright(c) 2009 tcmj  All Rights Reserved. */
 package com.tcmj.common.tools.helper.reflection;
 
 import java.lang.reflect.Constructor;
@@ -6,11 +6,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
- * Helper for reflection operations.
+ * Helper for reflection operations (Cached!).
  * @author tdeut - Thomas Deutsch
  * @junit com.tcmj.common.tools.helper.reflection.ReflectionHelperTest
  */
@@ -32,7 +30,7 @@ public final class ReflectionHelper {
      * @param className class to load (must be in classpath)
      * @return Class object on success
      */
-    public static <T> Class<T> loadClass(String className) {
+    public static final <T> Class<T> loadClass(String className) {
 
         if (classCache == null) {
             classCache = new HashMap<String, Class>();
@@ -48,7 +46,7 @@ public final class ReflectionHelper {
                 classCache.put(className, cclass);
                 return cclass;
             } catch (ClassNotFoundException e) {
-                throw new RuntimeException("Class not found: " + className, e);
+                throw new RuntimeException("ClassNotFound: " + className, e);
             }
         }
 
@@ -62,7 +60,7 @@ public final class ReflectionHelper {
      * @return <T>
      */
     @SuppressWarnings("unchecked")
-    public static <T> T newClass(String className, Class<?>[] paramTypes, Object... parameters) {
+    public static <T> T newObject(String className, Class<?>[] paramTypes, Object... parameters) {
 
         Class<T> classinstance = loadClass(className);
 
@@ -84,7 +82,43 @@ public final class ReflectionHelper {
 
     }
 
-    public static void setValue(Object instance, String setter, Object value) {
+    /**
+     * Instantiates the given class with a no-arg constructor.
+     * @param className the class to be instantiated
+     * @return <T>
+     */
+    public static <T> T newObject(String className) {
+
+        Class<T> classinstance = loadClass(className);
+
+        try {
+
+            Object[] parameters = null;
+            Class<?>[] paramTypes = null;
+
+            Constructor<T> constructor = classinstance.getConstructor(paramTypes);
+
+            return constructor.newInstance(parameters);
+
+        } catch (InstantiationException iex) {
+            throw new RuntimeException("InstantiationException: " + iex.getMessage(), iex);
+        } catch (IllegalAccessException iaccex) {
+            throw new RuntimeException("IllegalAccessException: " + iaccex.getMessage(), iaccex);
+        } catch (InvocationTargetException invex) {
+            throw new RuntimeException("InvocationTargetException: " + invex.getMessage(), invex);
+        } catch (NoSuchMethodException nsmex) {
+            throw new RuntimeException("NoSuchMethodException: " + nsmex.getMessage(), nsmex);
+        }
+
+    }
+
+    /** Executes a method on the given instance object using exactly one parameter.
+     * This function is designed to call set methods.
+     * @param instance the object on which the method should be invoked
+     * @param setter name of the (set)method to invoke
+     * @param value parameter of the (set)method
+     */
+    public static final void setValue(Object instance, String setter, Object value) {
 
         Class classObj = instance.getClass();
 
@@ -100,14 +134,42 @@ public final class ReflectionHelper {
 
     }
 
+    /** Executes a method on the given instance object using NO parameters.
+     * This function is designed to call get methods.
+     * @param instance the object on which the method should be invoked
+     * @param getter name of the (get)method to invoke
+     * @return return value of the (get)method
+     */
+    public static final Object getValue(Object instance, String getter) {
+
+        Class classObj = instance.getClass();
+
+        Method method = getMethod(classObj, getter);
+        try {
+            Object[] noparams = null;
+            return method.invoke(instance, noparams);
+        } catch (IllegalAccessException iaccex) {
+            throw new RuntimeException("IllegalAccessException: " + iaccex.getMessage(), iaccex);
+        } catch (InvocationTargetException invex) {
+            throw new RuntimeException("InvocationTargetException: " + invex.getMessage(), invex);
+        }
+
+
+    }
+
+    /** extracts a specific Method object from the given Class object.
+     * @param clazz Class object
+     * @param methodName name of the method to search for
+     * @return Method object if found (or RuntimeException if not)
+     */
     public static final Method getMethod(Class clazz, String methodName) {
 
         if (methodCache == null) {
             methodCache = new HashMap<String, Method>();
         }
 
-        StringBuilder bld = new StringBuilder(""+clazz.hashCode());
-        bld.append(methodName.hashCode());
+        StringBuilder bld = new StringBuilder(String.valueOf(clazz.hashCode()));
+        bld.append(methodName);
         String key = bld.toString();
 
         Method method = methodCache.get(key);
@@ -115,14 +177,13 @@ public final class ReflectionHelper {
         if (method == null) {
 
             Method[] methods = clazz.getMethods();
-            
-            for (int i = 0; i < methods.length; i++) {
+
+            for (int i = 0, max = methods.length; i < max; i++) {
                 method = methods[i];
 
                 if (method.getName().equals(methodName)) {
 
                     methodCache.put(key, method);
-                    System.out.println("put "+methodName);
                     return method;
 
                 }
@@ -130,11 +191,25 @@ public final class ReflectionHelper {
             }
 
             throw new RuntimeException("No method: '" + methodName + "' found in class: " + clazz);
-            
-        }else{
+
+        } else {
             return method;
         }
 
+    }
+
+    /** Prints size of the class/method cache. */
+    public static final String getCacheInfo() {
+        StringBuilder bld = new StringBuilder("ReflectionHelper: ");
+        if (classCache != null) {
+            bld.append(classCache.size());
+            bld.append(" classes cached! ");
+        }
+        if (methodCache != null) {
+            bld.append(methodCache.size());
+            bld.append(" methods cached!");
+        }
+        return bld.toString();
     }
 
 }
