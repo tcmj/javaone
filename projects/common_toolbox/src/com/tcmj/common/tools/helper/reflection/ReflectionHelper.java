@@ -30,7 +30,7 @@ public final class ReflectionHelper {
      * @param className class to load (must be in classpath)
      * @return Class object on success
      */
-    public static final <T> Class<T> loadClass(String className) {
+    public static <T> Class<T> loadClass(String className) {
 
         if (classCache == null) {
             classCache = new HashMap<String, Class>();
@@ -140,7 +140,7 @@ public final class ReflectionHelper {
      * @param getter name of the (get)method to invoke
      * @return return value of the (get)method
      */
-    public static final Object getValue(Object instance, String getter) {
+    public static Object getValue(Object instance, String getter) {
 
         Class classObj = instance.getClass();
 
@@ -162,7 +162,7 @@ public final class ReflectionHelper {
      * @param methodName name of the method to search for
      * @return Method object if found (or RuntimeException if not)
      */
-    public static final Method getMethod(Class clazz, String methodName) {
+    public static Method getMethod(Class clazz, String methodName) {
 
         if (methodCache == null) {
             methodCache = new HashMap<String, Method>();
@@ -199,7 +199,7 @@ public final class ReflectionHelper {
     }
 
     /** Prints size of the class/method cache. */
-    public static final String getCacheInfo() {
+    public static String getCacheInfo() {
         StringBuilder bld = new StringBuilder("ReflectionHelper: ");
         if (classCache != null) {
             bld.append(classCache.size());

@@ -1,36 +1,31 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.tcmj.common.tools.text;
 
 /**
- *
- * @author tcmj
+ * String manipulations.
+ * @author Thomas Deutsch
+ * @version 1.0
+ * @JUnit com.tcmj.common.tools.text.StringToolTest
  */
 public class StringTool {
 
     /**
-     * Converts a database name (table or column) to a java name (first letter capitalised).
-     * employee_name -> EmployeeName.
-     *
-     * Derived from middlegen's dbnameconverter.
-     * @param s The database name to convert.
-     *
-     * @return The converted database name.
+     * Converts any name to a java name (first letter capitalised).
+     * idea from middlegen's dbnameconverter.
+     * @param input eg.: junk_food
+     * @return eg.: JunkFood
      */
-    public static String toUpperCamelCase(String s) {
-        if ("".equals(s)) {
-            return s;
+    public static String toCamelCase(String input) {
+        if ("".equals(input) || input == null) {
+            return input;
         }
-        StringBuffer result = new StringBuffer();
+        StringBuffer sb = new StringBuffer();
 
         boolean capitalize = true;
         boolean lastCapital = false;
         boolean lastDecapitalized = false;
         String p = null;
-        for (int i = 0; i < s.length(); i++) {
-            String c = s.substring(i, i + 1);
+        for (int i = 0; i < input.length(); i++) {
+            String c = input.substring(i, i + 1);
             if ("_".equals(c) || " ".equals(c) || "-".equals(c)) {
                 capitalize = true;
                 continue;
@@ -49,23 +44,22 @@ public class StringTool {
 
             if (capitalize) {
                 if (p == null || !p.equals("_")) {
-                    result.append(c.toUpperCase());
+                    sb.append(c.toUpperCase());
                     capitalize = false;
                     p = c;
                 } else {
-                    result.append(c.toLowerCase());
+                    sb.append(c.toLowerCase());
                     capitalize = false;
                     p = c;
                 }
             } else {
-                result.append(c.toLowerCase());
+                sb.append(c.toLowerCase());
                 lastDecapitalized = true;
                 p = c;
             }
 
         }
-        String r = result.toString();
-        return r;
+        return sb.toString();
     }
 
     public static String join(String seperator, String[] strings) {

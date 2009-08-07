@@ -343,7 +343,7 @@ releaseCalendar(calendar);
 
 
     /** Method to retrieve a pooled calendar. */
-    private static final Calendar getCalendar(){
+    private static Calendar getCalendar(){
         if (calpool.empty()) {
             return Calendar.getInstance();
         }else{
@@ -352,7 +352,7 @@ releaseCalendar(calendar);
     }
 
     /** Releases a unused calendar. */
-    private static final void releaseCalendar(Calendar cal){
+    private static void releaseCalendar(Calendar cal){
         if (calpool.contains(cal)) {
             throw new UnsupportedOperationException("Calendar released twice!");
         }

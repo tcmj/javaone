@@ -534,10 +534,10 @@ public class DBQConnection extends Observable implements Connection {
         }
 
 
-        String restr = "Statements closed: " + stmt_closed + " of total " +
-                (stmt_created + stmt_used) + " (created " +
-                stmt_created + ", reused " + stmt_used + ")" +
-                "  PreparedStatements closed: " + pstmt_closed + " of total " + pstmt_created;
+//        String restr = "Statements closed: " + stmt_closed + " of total " +
+//                (stmt_created + stmt_used) + " (created " +
+//                stmt_created + ", reused " + stmt_used + ")" +
+//                "  PreparedStatements closed: " + pstmt_closed + " of total " + pstmt_created;
         return resb.toString();
     }
 
