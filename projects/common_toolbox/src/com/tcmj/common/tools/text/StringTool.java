@@ -68,4 +68,36 @@ public class StringTool {
         return r;
     }
 
+    public static String join(String seperator, String[] strings) {
+        int length = strings.length;
+        if (length == 0) {
+            return "";
+        }
+        StringBuffer buf = new StringBuffer(length * strings[0].length()).append(strings[0]);
+        for (int i = 1; i < length; i++) {
+            buf.append(seperator).append(strings[i]);
+        }
+        return buf.toString();
+    }
+
+    public static String toString(Object[] array) {
+        int len = array.length;
+        if (len == 0) {
+            return "";
+        }
+        StringBuffer buf = new StringBuffer(len * 12);
+        for (int i = 0; i < len - 1; i++) {
+            buf.append(array[i]).append(", ");
+        }
+        return buf.append(array[len - 1]).toString();
+    }
+
+    public static boolean isNotEmpty(String string) {
+        return string != null && string.length() > 0;
+    }
+
+    public static boolean isEmpty(String string) {
+        return string == null || string.length() == 0;
+    }
+
 }
