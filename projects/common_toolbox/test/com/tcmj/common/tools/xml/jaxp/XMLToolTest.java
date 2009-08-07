@@ -158,16 +158,5 @@ public class XMLToolTest {
 
     }
 
-    /**
-     * Test of validate method, of class XMLTool.
-     */
-    @Test
-    public void testValidate() throws Exception {
-        System.out.println("validate");
-        Document document = null;
-        File xsdFile = null;
-        XMLTool.validate(document, xsdFile);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
+    
 }

@@ -94,7 +94,7 @@ public class DBQuickConnectTestOnline {
 
 
             }
-            db.closeResultSet(rs2);
+//            db.closeResultSet(rs2);
 
 
         }

@@ -28,33 +28,41 @@ public class ReflectionHelperTest {
         System.out.println(" result = " + result);
     }
 
-    
+    @Test(expected = RuntimeException.class)
+    public void loadClassWhenClassDoesNotExist() {
+        ReflectionHelper.loadClass("jafa.nutil.Dates");
+    }
+
     /**
-     * Test of 'public static <T> T newClass(String className, Class<?>[] paramTypes, Object... parameters)' method, of class ReflectionHelper.
+     * Test of 'public static <T> T newObject(String className, Class<?>[] paramTypes, Object... parameters)' method, of class ReflectionHelper.
      */
     @Test
-    public void newClass() {
+    public void newObject() {
         System.out.println("public static <T> T newClass(String className, Class<?>[] paramTypes, Object... parameters)");
         String clazzName = "java.math.BigDecimal";
         Class<?>[] parameterTypes = new Class<?>[]{int.class};
         int expResult = 30;
-        Object result = ReflectionHelper.newClass(clazzName, parameterTypes, 30);
+        Object result = ReflectionHelper.newObject(clazzName, parameterTypes, 30);
         assertEquals(expResult, ((BigDecimal) result).intValue());
         System.out.println(" result = " + result);
-    }
 
+        System.out.println("public static <T> T newClass(String className)");
+        Object result2 = ReflectionHelper.newObject("java.util.Date");
+        assertNotNull(result2);
+        System.out.println(" result = " + result2);
+
+    }
 
     @Test(expected = RuntimeException.class)
     public void newClassWhenClassDoesNotExist() throws Exception {
-        ReflectionHelper.newClass("non.existing.Unknown", new Class[]{}, new Object[]{});
+        ReflectionHelper.newObject("non.existing.Unknown", new Class[]{}, new Object[]{});
     }
-
 
     /**
      * Test of 'public static void setValue(Object instance, String setter, Object value)' method, of class ReflectionHelper.
      */
     @Test
-    public void setValue() throws Exception{
+    public void setValueAndGetValue() throws Exception {
         System.out.println("public static void setValue(Object instance, String setter, Object value)");
 
         SimplePojo pojo = new SimplePojo();
@@ -70,30 +78,44 @@ public class ReflectionHelperTest {
 
         assertEquals("Alpha", pojo.getValueA());
 
-        System.out.println(" result = setValue works fine! " );
+        System.out.println(" result = setValue works fine! ");
 
+
+        Object got = ReflectionHelper.getValue(pojo, "getValueA");
+        assertEquals(got, pojo.getValueA());
+        System.out.println(" result = getValue works also fine! ");
 
         long start = System.currentTimeMillis();
 
-        for (int i = 1; i <= 1000000; i++) {
+        for (int i = 1; i <= 100000; i++) {
 
             ReflectionHelper.setValue(pojo, "setValueA", "Alpha");
             ReflectionHelper.setValue(pojo, "setValueB", "Beta");
+            ReflectionHelper.getValue(pojo, "getValueA");
+            ReflectionHelper.getValue(pojo, "getValueB");
 
         }
 
         long end = System.currentTimeMillis();
-        System.out.println("time test: "+(end-start)+" ms");
+        System.out.println(" time: " + (end - start) + " ms ");
 
 
-
-
+        System.out.println(" " + ReflectionHelper.getCacheInfo());
     }
 
+    @Test(expected = RuntimeException.class)
+    public void setValueWhenMethodDoesNotExist() {
+        SimplePojo pojo = new SimplePojo();
+        ReflectionHelper.setValue(pojo, "unExistingMethodName", "Value2Set");
+    }
 
+    @Test
+    public void simpleTest() throws Exception {
+//        Class c = new Class();
+    }
 
+    static class SimplePojo {
 
-    class SimplePojo{
         private String valueA;
 
         private String valueB;
@@ -101,17 +123,18 @@ public class ReflectionHelperTest {
         public String getValueA() {
             return valueA;
         }
+
         public void setValueA(String valueA) {
             this.valueA = valueA;
         }
+
         public String getValueB() {
             return valueB;
         }
+
         public void setValueB(String valueB) {
             this.valueB = valueB;
         }
 
     }
-
-
 }
