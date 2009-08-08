@@ -2,7 +2,6 @@
  * SVN: $Id$
  * Created on 26. Februar 2007, 11:21
  * Copyright(c) 2005 tcmj.  All Rights Reserved.
- * CVS: $Id$
  * Last Modify: $Date$
  */
 package com.tcmj.common.swing.dialog;
@@ -13,15 +12,14 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Toolkit;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
 /**
- * This class provides some useful procedures for working with dialogs
+ * This class provides some useful procedures for working with dialogs.
  * @version $Id$
  * @author tdeut - Thomas Deutsch
+ * @JUnit com.tcmj.common.swing.dialog.DialogHelperTest
  */
 public final class DialogHelper {
 
@@ -32,11 +30,11 @@ public final class DialogHelper {
     /** Singleton. */
     private static final DialogHelper singleton = new DialogHelper();
 
-    /** Singleton ! */
+    /** Singleton. */
     private DialogHelper() {
     }
 
-    /**Singleton.
+    /** Singleton.
      * @return DialogHelper instance
      */
     public static final DialogHelper getInstance() {
@@ -48,17 +46,17 @@ public final class DialogHelper {
         JOptionPane.showMessageDialog(parent, msg, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
-    /** Display Error message    */
+    /** Display Error message.    */
     public void displayInfoMessage(Component parent, String msg) {
         JOptionPane.showMessageDialog(parent, msg, "Information", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    /** Display Error message    */
+    /** Display Error message.    */
     public void displayErrorMessage(String msg) {
         displayErrorMessage(null, msg);
     }
 
-    /** Display Error message    */
+    /** Display Error message.    */
     public void displayInfoMessage(String msg) {
         displayInfoMessage(null, msg);
     }
@@ -67,7 +65,7 @@ public final class DialogHelper {
      * Display the loading dialog.
      * @return JDialog to dispose
      */
-    public static final JDialog showLoadingDialog(final String message) {
+    public static final JDialog showMessageDialog(final String message) {
         final javax.swing.JDialog dlgloading = new javax.swing.JDialog();
         new Thread() {
 
@@ -93,33 +91,11 @@ public final class DialogHelper {
         return dlgloading;
     }
 
-    static class DrawingWindow extends Frame {
-
-        String title = "";
-
-//        int width;
-//        int height;
-//        int xpos;
-//        int ypos;
-
-        DrawingWindow(String title) {
-            super();
-            this.title = title;
-        }
-
-        @Override
-        public void paint(Graphics g) {
-            g.setColor(Color.BLACK);
-            g.drawString(title, 5, 12);
-        }
-
-    }
-
     /**
      * Display the loading dialog.
      * @return JDialog to dispose
      */
-    public static final Frame showLoad(final String message) {
+    public static final Frame showMessageFrame(final String message) {
         final Frame dlgloading = new DrawingWindow(message);
 
         new Thread() {
@@ -129,7 +105,7 @@ public final class DialogHelper {
                 setPriority(Thread.MAX_PRIORITY);
                 dlgloading.setUndecorated(true);
                 dlgloading.setBackground(Color.LIGHT_GRAY);
-                int width = (message.length() * 6) + 10;
+                int width = (message.length() * 6) + 20;
                 int height = 16;
                 int xpos = (SCREENSIZE.width - width) / 2;
                 int ypos = (SCREENSIZE.height - 20) / 2;
@@ -141,60 +117,25 @@ public final class DialogHelper {
         return dlgloading;
     }
 
-    /**
-     * Display the loading dialog.
-     * @return JDialog to dispose
-     */
-    public static final JDialog showLoadingDialog() {
-        return showLoadingDialog("Loading...");
-    }
-
     /** centers a frame, dialog or something else on the screen */
     public static void centerComponent(Component com) {
-
         com.setLocation((SCREENSIZE.width - com.getSize().width) / 2,
                 (SCREENSIZE.height - com.getSize().height) / 2);
-
     }
 
-    /**Example using this class
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        try {
+    /** Frame class. */
+    static class DrawingWindow extends Frame {
 
-//            Toolkit.getDefaultToolkit().
-//            SplashScreen splash = SplashScreen.getSplashScreen();
+        String title;
 
-
-            DialogHelper dlghelp = DialogHelper.getInstance();
-
-            dlghelp.displayInfoMessage("Infomessage -not modal-");
-
-//            JDialog dlg = DialogHelper.showLoadingDialog();
-            long start = System.currentTimeMillis();
-            Frame dlg = DialogHelper.showLoad("Errormessage -not modal-");
-            long end = System.currentTimeMillis();
-            System.out.println("time dlg = "+(end-start));
-
-            Thread.sleep(9000);
-
-            dlg.setVisible(false);
-
-            long start2 = System.currentTimeMillis();
-            JDialog jdlg = DialogHelper.showLoadingDialog();
-            long end2 = System.currentTimeMillis();
-            System.out.println("time dlg2 = "+(end2-start2));
-
-            Thread.sleep(6000);
-            jdlg.setVisible(false);
-//            dlghelp.displayErrorMessage("Errormessage -not modal-");
-
-        } catch (Exception exc) {
-            System.out.println("E: " + exc.getMessage());
-        } finally {
-            System.exit(0);
+        DrawingWindow(String title) {
+            this.title = title;
         }
-    }
 
+        @Override
+        public void paint(Graphics g) {
+            g.drawString(title, 5, 12);
+        }
+
+    }
 }
