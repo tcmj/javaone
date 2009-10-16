@@ -114,6 +114,7 @@ public class XMLMap implements Map<String, String>, Serializable {
      * @param key Key Name
      * @param value Value (Text)
      */
+    @Override
     public String put(String key, String value) {
         if (key == null) {
             throw new XMLMapException("Null not accepted as key!");
@@ -339,6 +340,7 @@ public class XMLMap implements Map<String, String>, Serializable {
      * @param key name including full path of the key to remove.
      * @return the value of the removed entry or null if the key was not found.
      */
+    @Override
     public String remove(Object key) {
         XMLEntry entry = data.remove(key);
         return entry == null ? null : entry.getValue();
@@ -445,14 +447,17 @@ public class XMLMap implements Map<String, String>, Serializable {
             logger.debug("uri: " + uri);
             NamespaceContext nsc = new NamespaceContext() {
 
+                @Override
                 public String getNamespaceURI(String prefix) {
                     return uri;
                 }
 
+                @Override
                 public String getPrefix(String namespaceURI) {
                     return prfix;
                 }
 
+                @Override
                 public Iterator<?> getPrefixes(String namespaceURI) {
                     throw new UnsupportedOperationException("Not supported yet.");
                 }
@@ -815,6 +820,7 @@ public class XMLMap implements Map<String, String>, Serializable {
      * if you save the model (after calling this method) you will get an empty
      * xmlfile area (non XMLMap - nodes will not be deleted)
      */
+    @Override
     public void clear() {
         this.data.clear();
     }
@@ -966,6 +972,7 @@ public class XMLMap implements Map<String, String>, Serializable {
          * Getter for Property Key.
          * @return Keyname
          */
+        @Override
         public String getKey() {
             return this.key;
         }
@@ -974,6 +981,7 @@ public class XMLMap implements Map<String, String>, Serializable {
          * Getter for Property Value.
          * @return Value
          */
+        @Override
         public String getValue() {
             if (type == TYPE_SINGLE) {
                 return this.value[0];
@@ -1024,6 +1032,7 @@ public class XMLMap implements Map<String, String>, Serializable {
             }
         }
 
+        @Override
         public String setValue(String val) {
             String old = this.value[0];
             if (type == TYPE_SINGLE) {
@@ -1164,18 +1173,22 @@ public class XMLMap implements Map<String, String>, Serializable {
      * Getter for the Amount of all Entries.
      * @return the size of the Map
      */
+    @Override
     public int size() {
         return this.data.size();
     }
 
+    @Override
     public boolean isEmpty() {
         return (size() == 0);
     }
 
+    @Override
     public boolean containsKey(Object object) {
         return this.data.containsKey(object);
     }
 
+    @Override
     public boolean containsValue(Object object) {
         Iterator<XMLEntry> itDataValues = this.data.values().iterator();
         while (itDataValues.hasNext()) {
@@ -1194,15 +1207,18 @@ public class XMLMap implements Map<String, String>, Serializable {
      * @param key full path to look for
      * @return the value or null if entry not found.
      */
+    @Override
     public String get(Object key) {
         XMLEntry entry = data.get(key);
         return entry == null ? null : entry.getValue();
     }
 
+    @Override
     public Set<String> keySet() {
         return this.data.keySet();
     }
 
+    @Override
     public Collection<String> values() {
         Set<String> setValues = new LinkedHashSet<String>();
         for (XMLEntry elem : this.data.values()) {
@@ -1211,6 +1227,7 @@ public class XMLMap implements Map<String, String>, Serializable {
         return setValues;
     }
 
+    @Override
     public Set<Map.Entry<String, String>> entrySet() {
 
         Set<Map.Entry<String, String>> setEntries = new LinkedHashSet<Map.Entry<String, String>>();
@@ -1225,6 +1242,7 @@ public class XMLMap implements Map<String, String>, Serializable {
         return setEntries;
     }
 
+    @Override
     public void putAll(Map<? extends String,? extends String> stringmap) {
     	for (Iterator<? extends Map.Entry<? extends String, ? extends String>> itentryset = stringmap.entrySet().iterator(); itentryset.hasNext(); ) {
             Map.Entry<? extends String, ? extends String> entry = itentryset.next();

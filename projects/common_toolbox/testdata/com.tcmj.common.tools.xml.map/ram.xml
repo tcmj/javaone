@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <tcmj>
-  <xmlprop>
-    <a>
-      <b>
-        <one>xmap</one>
-        <two>xmap</two>
-      </b>
-    </a>
-  </xmlprop>
+  <a>
+    <b>
+      <one>xmap</one>
+      <two>xmap</two>
+    </b>
+  </a>
 </tcmj>

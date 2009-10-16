@@ -394,12 +394,12 @@ public class XMLMapTest {
         model.put("one-oo", "erster eintrag");
         assertEquals("erster eintrag", model.get("one-oo"));
 
-        model.put("one-oo", "ersten eintrag überschreiben");
-        assertEquals("ersten eintrag überschreiben", model.get("one-oo"));
+        model.put("one-oo", "ersten eintrag ueberschreiben");
+        assertEquals("ersten eintrag ueberschreiben", model.get("one-oo"));
 
-        model.put("a-b-c-d-e-f-g", "ebene hinzuzufügen");
+        model.put("a-b-c-d-e-f-g", "ebene hinzuzufuegen");
 
-        assertEquals("ebene hinzuzufügen", model.get("a-b-c-d-e-f-g"));
+        assertEquals("ebene hinzuzufuegen", model.get("a-b-c-d-e-f-g"));
 
         assertEquals(2, model.size());
     }

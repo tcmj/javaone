@@ -50,14 +50,17 @@ public class XMLTool {
             final String uri = document.lookupNamespaceURI(prefix);
             NamespaceContext nsc = new NamespaceContext() {
 
+                @Override
                 public String getNamespaceURI(String prefix) {
                     return uri;
                 }
 
+                @Override
                 public String getPrefix(String namespaceURI) {
                     return prefix;
                 }
 
+                @Override
                 public Iterator<?> getPrefixes(String namespaceURI) {
                     throw new UnsupportedOperationException("Not supported yet.");
                 }
