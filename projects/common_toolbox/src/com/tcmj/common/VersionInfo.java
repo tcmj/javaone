@@ -4,8 +4,6 @@ package com.tcmj.common;
 
 import com.tcmj.common.swing.dialog.DialogHelper;
 import java.awt.Frame;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Version Info for com.tcmj.common
@@ -20,7 +18,7 @@ public class VersionInfo {
     }
 
     public static final String getVersion() {
-        return "1.09.08.08";
+        return "1.09.10.16";
     }
 
     public static final String getVersionDate() {
@@ -40,11 +38,9 @@ public class VersionInfo {
             String line = System.getProperty("line.separator");
 
             StringBuilder sb = new StringBuilder();
-//            sb.append("--------------------------------------------------------------------------").append(line);
             sb.append("Title: ").append(getLibTitle()).append(line);
             sb.append("Version: ").append(getVersion()).append(line);
             sb.append("Build: ").append(getVersionDate()).append(line);
-//            sb.append("--------------------------------------------------------------------------").append(line);
             
 
             DialogHelper.getInstance().displayInfoMessage(dlg, sb.toString());

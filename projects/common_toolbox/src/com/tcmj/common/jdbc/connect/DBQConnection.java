@@ -545,6 +545,7 @@ public class DBQConnection extends Observable implements Connection {
     
 //start of interface java.sql.Connection --->
 
+    @Override
     public Statement createStatement() throws SQLException {
         return mSCache.getStatement();
     }
@@ -555,142 +556,177 @@ public class DBQConnection extends Observable implements Connection {
      * @return Prepared Statement Object. (forward-only, connections default-holdability)
      * @throws SQLException maybe on errors during preparation.
      */
+    @Override
     public PreparedStatement prepareStatement(String sql) throws SQLException {
         return pstWatcher.getPreparedStatement(sql);
     }
 
+    @Override
     public CallableStatement prepareCall(String sql) throws SQLException {
         return getConnection().prepareCall(sql);
     }
 
+    @Override
     public String nativeSQL(String sql) throws SQLException {
         return getConnection().nativeSQL(sql);
     }
 
+    @Override
     public boolean getAutoCommit() throws SQLException {
         return getConnection().getAutoCommit();
     }
 
+    @Override
     public void commit() throws SQLException {
         getConnection().commit();
     }
 
+    @Override
     public void rollback() throws SQLException {
         getConnection().rollback();
     }
 
+    @Override
     public void close() throws SQLException {
         closeConnection();
     }
 
+    @Override
     public DatabaseMetaData getMetaData() throws SQLException {
         return getConnection().getMetaData();
     }
 
+    @Override
     public void setReadOnly(boolean readOnly) throws SQLException {
         getConnection().setReadOnly(readOnly);
     }
 
+    @Override
     public boolean isReadOnly() throws SQLException {
         return getConnection().isReadOnly();
     }
 
+    @Override
     public void setCatalog(String catalog) throws SQLException {
         getConnection().setCatalog(catalog);
     }
 
+    @Override
     public String getCatalog() throws SQLException {
         return getConnection().getCatalog();
     }
 
+    @Override
     public void setTransactionIsolation(int level) throws SQLException {
         getConnection().setTransactionIsolation(level);
     }
 
+    @Override
     public int getTransactionIsolation() throws SQLException {
         return getConnection().getTransactionIsolation();
     }
 
+    @Override
     public SQLWarning getWarnings() throws SQLException {
         return getConnection().getWarnings();
     }
 
+    @Override
     public void clearWarnings() throws SQLException {
         getConnection().clearWarnings();
     }
 
+    @Override
     public Statement createStatement(int resultSetType, int resultSetConcurrency) throws SQLException {
         return mSCache.getStatement(resultSetType, resultSetConcurrency, getConnection().getHoldability());
     }
 
+    @Override
     public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
         return pstWatcher.getPreparedStatement(sql, resultSetType, resultSetConcurrency, connection.getHoldability());
     }
 
+    @Override
     public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
         return getConnection().prepareCall(sql, resultSetType, resultSetConcurrency);
     }
 
+    @Override
     public Map<String, Class<?>> getTypeMap() throws SQLException {
         return getConnection().getTypeMap();
     }
 
+    @Override
     public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
         getConnection().setTypeMap(map);
     }
 
+    @Override
     public void setHoldability(int holdability) throws SQLException {
         getConnection().setHoldability(holdability);
     }
 
+    @Override
     public int getHoldability() throws SQLException {
         return getConnection().getHoldability();
     }
 
+    @Override
     public Savepoint setSavepoint() throws SQLException {
         return getConnection().setSavepoint();
     }
 
+    @Override
     public Savepoint setSavepoint(String name) throws SQLException {
         return getConnection().setSavepoint(name);
     }
 
+    @Override
     public void rollback(Savepoint savepoint) throws SQLException {
         getConnection().rollback(savepoint);
     }
 
+    @Override
     public void releaseSavepoint(Savepoint savepoint) throws SQLException {
         getConnection().releaseSavepoint(savepoint);
     }
 
+    @Override
     public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
         return mSCache.getStatement(resultSetType, resultSetConcurrency, resultSetConcurrency);
     }
 
+    @Override
     public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
         return pstWatcher.getPreparedStatement(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
     }
 
+    @Override
     public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
         return getConnection().prepareCall(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
     }
 
+    @Override
     public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys) throws SQLException {
         return pstWatcher.getPreparedStatement(sql, autoGeneratedKeys);
     }
 
+    @Override
     public PreparedStatement prepareStatement(String sql, int[] columnIndexes) throws SQLException {
         return pstWatcher.getPreparedStatement(sql, columnIndexes);
     }
 
+    @Override
     public PreparedStatement prepareStatement(String sql, String[] columnNames) throws SQLException {
         return pstWatcher.getPreparedStatement(sql, columnNames);
     }
 
+    @Override
     public void setAutoCommit(boolean autoCommit) throws SQLException {
         connection.setAutoCommit(autoCommit);
     }
 
+    @Override
     public boolean isClosed() throws SQLException {
         return (connection == null) || (connection.isClosed());
     }
@@ -698,54 +734,67 @@ public class DBQConnection extends Observable implements Connection {
 
 //start of interface java.sql.Connection JDK 6 features --->
 
+    @Override
     public java.sql.Clob createClob() throws SQLException {
         return getConnection().createClob();
     }
 
+    @Override
     public java.sql.Blob createBlob() throws SQLException {
         return getConnection().createBlob();
     }
 
+    @Override
     public java.sql.NClob createNClob() throws SQLException {
         return getConnection().createNClob();
     }
 
+    @Override
     public java.sql.SQLXML createSQLXML() throws SQLException {
         return getConnection().createSQLXML();
     }
 
+    @Override
     public boolean isValid(int timeout) throws SQLException {
         return (connection != null && connection.isValid(timeout));
     }
 
+    @Override
     public void setClientInfo(String name, String value) throws java.sql.SQLClientInfoException {
         getConnection().setClientInfo(name, value);
     }
 
+    @Override
     public void setClientInfo(java.util.Properties properties) throws java.sql.SQLClientInfoException {
         getConnection().setClientInfo(properties);
     }
 
+    @Override
     public String getClientInfo(String name) throws SQLException {
         return getConnection().getClientInfo(name);
     }
 
+    @Override
     public java.util.Properties getClientInfo() throws SQLException {
         return getConnection().getClientInfo();
     }
 
+    @Override
     public java.sql.Array createArrayOf(String typeName, Object[] elements) throws SQLException {
         return getConnection().createArrayOf(typeName, elements);
     }
 
+    @Override
     public java.sql.Struct createStruct(String typeName, Object[] attributes) throws SQLException {
         return getConnection().createStruct(typeName, attributes);
     }
 
+    @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
         return getConnection().unwrap(iface);
     }
 
+    @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
         return getConnection().isWrapperFor(iface);
     }

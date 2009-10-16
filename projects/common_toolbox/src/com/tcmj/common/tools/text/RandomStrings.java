@@ -3,15 +3,15 @@ package com.tcmj.common.tools.text;
 import java.util.Random;
 
 /**
- * <p>Überschrift: Zufalls-Zahlen und -Zeichen Generator</p>
- * <p>Beschreibung: generiert zusaetzlich zu den normalen Funktionen der Random-Klasse
+ * <p>Zufalls-Zahlen und -Zeichen Generator</p>
+ * <p>generiert zusaetzlich zu den normalen Funktionen der Random-Klasse
  * noch Hexadezimalzahlen per Zufall, Characters, Strings bestimmter Laenge, Strings
  * in Kleinbuchstaben, Strings in Grossbuchstaben, Capitalized Strings und Woerter.</p>
  * <p>Copyright: Copyright (c) 2003</p>
  * <p>Organisation: tcmj</p>
  * @author Thomas Deutsch
  * @version 1.0
- * @JUnit Test available!
+ * @JUnit com.tcmj.common.tools.text.RandomStringsTest
  */
 public class RandomStrings extends Random {
 

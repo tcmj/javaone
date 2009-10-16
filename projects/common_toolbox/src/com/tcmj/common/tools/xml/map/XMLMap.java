@@ -175,10 +175,10 @@ public class XMLMap implements Map<String, String>, Serializable {
 
             String entrykey = itdata.next();
 
-            /* Wenn der zu prüfende key ungleich dem aktuellem key ist.*/
+            /* Wenn der zu pruefende key ungleich dem aktuellem key ist.*/
             if (!entrykey.equals(keytocheck)) {
 
-                /* Sonderfall (bezüglich startsWith):
+                /* Sonderfall (bezueglich startsWith):
                  * put("key1","xxx");
                  * put("key10","xxx");
                  * oder auch:
@@ -186,8 +186,8 @@ public class XMLMap implements Map<String, String>, Serializable {
                  * put("one.key10","xxx");
                  */
 
-                /* wenn die Keys auf der gleichen Ebene liegen müssen sie nur
-                ungleich sein um angelegt werden zu können (valide zu sein)  */
+                /* wenn die Keys auf der gleichen Ebene liegen muessen sie nur
+                ungleich sein um angelegt werden zu koennen (valide zu sein)  */
                 boolean samelevel = isSameLevel(entrykey, keytocheck);
 
                 if (entrykey.startsWith(keytocheck) && !samelevel) {
@@ -657,7 +657,7 @@ public class XMLMap implements Map<String, String>, Serializable {
         if (uppernode != null) { //wenn er ein Kind namens <xMLEntryPoint> hat...
             Node prevnode = uppernode.getPreviousSibling();
 
-            //...löschen:
+            //...lï¿½schen:
             if (prevnode.getNodeType() == Node.TEXT_NODE) {
                 root.removeChild(prevnode);
             }
@@ -691,9 +691,9 @@ public class XMLMap implements Map<String, String>, Serializable {
             String keypart = null;
 
             //Schleife durch alle parts des keys, wobei nicht vorhandene ebenen
-            //angelegt werden und bereits vorhandene übersprungen!
-            //Zudem wird immer der aktuelle Knoten (actnode) und der Vorgänger
-            //gespeichert (Vorgänger wird benötigt bei Listen-Values)
+            //angelegt werden und bereits vorhandene ï¿½bersprungen!
+            //Zudem wird immer der aktuelle Knoten (actnode) und der Vorgï¿½nger
+            //gespeichert (Vorgï¿½nger wird benï¿½tigt bei Listen-Values)
             for (int x = 0; x < keyparts.length; x++) {
 
                 keypart = keyparts[x];
@@ -830,7 +830,7 @@ public class XMLMap implements Map<String, String>, Serializable {
         if (this.data.isEmpty()) {
             return "No Entries available!";
         } else {
-            int initialsize = data.size() * 50; //(Anzahl Einträge x 50 Zeichen pro Zeile
+            int initialsize = data.size() * 50; //(Anzahl Eintrï¿½ge x 50 Zeichen pro Zeile
             StringBuffer buffer = new StringBuffer(initialsize);
             String line = System.getProperty("line.separator");
             buffer.append(line).append("----XMLMap----").append(line);
