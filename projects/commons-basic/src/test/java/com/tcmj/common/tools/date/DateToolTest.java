@@ -336,6 +336,27 @@ public class DateToolTest {
 
     }
 
+    @Test
+    public void testFormatDuration() {
+        System.out.println("formatDuration");
+
+        assertEquals("50 ms", DateTool.formatDuration(50L));
+        assertEquals("900 ms", DateTool.formatDuration(900L));
+        assertEquals("1 sec", DateTool.formatDuration(1000L));
+        assertEquals("1 sec", DateTool.formatDuration(1500L));
+        assertEquals("10 sec", DateTool.formatDuration(10000L));
+        assertEquals("59 sec", DateTool.formatDuration(59000L));
+        assertEquals("1 min", DateTool.formatDuration(60000L));
+        assertEquals("1 min 5 sec", DateTool.formatDuration(65000L));
+        assertEquals("10 min 50 sec", DateTool.formatDuration(650000L));
+        assertEquals("1 hour 49 min", DateTool.formatDuration(6540000L));
+        assertEquals("1 hour 50 min", DateTool.formatDuration(6590000L));
+        assertEquals("1 hour 50 min", DateTool.formatDuration(6600000L));
+
+    }
+
+
+
 
     @Test
     public void testRoundDate() {

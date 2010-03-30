@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.apache.commons.lang.time.FastDateFormat;
@@ -275,8 +276,69 @@ public final class DateTool {
      * @param timeinmillis (eg '10020000')
      * @return eg '2 hours 47 minutes'
      */
-    public static final String formatDuration(long timeinmillis) {
-        return DurationFormatUtils.formatDurationWords(timeinmillis, true, true);
+    public static final String formatDuration(long durationMillis) {
+//        String formatedDuration = DurationFormatUtils.formatDurationWords(timeinmillis, true, true);
+//        return formatedDuration;
+
+
+        if (durationMillis < 1000) {
+            return String.valueOf(durationMillis).concat(" ms");
+        }
+        if (durationMillis > ONE_HOUR) {
+            durationMillis = roundDate(new Date(durationMillis)).getTime();
+        }
+
+
+        boolean suppressLeadingZeroElements = true;
+        boolean suppressTrailingZeroElements = true;
+
+        // This method is generally replacable by the format method, but
+        // there are a series of tweaks and special cases that require
+        // trickery to replicate.
+        String duration = DurationFormatUtils.formatDuration(durationMillis, "d' days 'H' hours 'm' min 's' sec'");
+        if (suppressLeadingZeroElements) {
+            // this is a temporary marker on the front. Like ^ in regexp.
+            duration = " " + duration;
+            String tmp = StringUtils.replaceOnce(duration, " 0 days", "");
+            if (tmp.length() != duration.length()) {
+                duration = tmp;
+                tmp = StringUtils.replaceOnce(duration, " 0 hours", "");
+                if (tmp.length() != duration.length()) {
+                    duration = tmp;
+                    tmp = StringUtils.replaceOnce(duration, " 0 min", "");
+                    duration = tmp;
+                    if (tmp.length() != duration.length()) {
+                        duration = StringUtils.replaceOnce(tmp, " 0 sec", "");
+                    }
+                }
+            }
+            if (duration.length() != 0) {
+                // strip the space off again
+                duration = duration.substring(1);
+            }
+        }
+        if (suppressTrailingZeroElements) {
+            String tmp = StringUtils.replaceOnce(duration, " 0 sec", "");
+            if (tmp.length() != duration.length()) {
+                duration = tmp;
+                tmp = StringUtils.replaceOnce(duration, " 0 min", "");
+                if (tmp.length() != duration.length()) {
+                    duration = tmp;
+                    tmp = StringUtils.replaceOnce(duration, " 0 hours", "");
+                    if (tmp.length() != duration.length()) {
+                        duration = StringUtils.replaceOnce(tmp, " 0 days", "");
+                    }
+                }
+            }
+        }
+        // handle plurals
+        duration = " " + duration;
+//        duration = StringUtils.replaceOnce(duration, " 1 seconds", " 1 second");
+//        duration = StringUtils.replaceOnce(duration, " 1 minutes", " 1 minute");
+        duration = StringUtils.replaceOnce(duration, " 1 hours", " 1 hour");
+        duration = StringUtils.replaceOnce(duration, " 1 days", " 1 day");
+        return duration.trim();
+
     }
 
 
