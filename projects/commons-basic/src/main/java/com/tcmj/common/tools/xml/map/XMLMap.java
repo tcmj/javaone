@@ -838,7 +838,7 @@ public class XMLMap implements Map<String, String>, Serializable {
             int initialsize = data.size() * 50; //(Anzahl Eintr�ge x 50 Zeichen pro Zeile
             StringBuffer buffer = new StringBuffer(initialsize);
             String line = System.getProperty("line.separator");
-            buffer.append(line).append("----XMLMap----").append(line);
+            buffer.append("----XMLMap ----").append(line);
             Iterator<XMLEntry> itData = this.data.values().iterator();
             while (itData.hasNext()) {
 

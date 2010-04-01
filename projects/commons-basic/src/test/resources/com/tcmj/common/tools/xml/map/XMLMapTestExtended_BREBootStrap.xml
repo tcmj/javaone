@@ -1,0 +1,16 @@
+<BootStrap>
+	<Database>
+		<Driver>com.jnetdirect.jsql.JSQLDriver</Driver>
+		<URL>jdbc:JSQLConnect://BSCHN:1433/database=PMDB</URL>
+		<UserName>pubuser</UserName>
+		<Password>
+			<![CDATA[1BmoU:&/h[L_e^<+.uto%)v!iU]<F6x9q@65^K>8`kC9VPgBS}WN`x5W8Nr1sq06l[\"),hfnh{/aB_*bdMJIi#>x0]=Oc_3p9d|6L:"Od.t]X4!,{jwz~VKzioZ2Hq"zW$a-bU^b\H_T:`DW8M1umE0a!uS\*;xB0t~]!Lk""n~_2/u''9le|8aCn@3a%Q:K5^5tMs!SU@Amj\]ibKh~>&6dtIi:6Vz*!g3l4z-C&t[8_yGN)Dq]}SH%rGrg_bo]]>
+		</Password>
+		<PublicGroupId>1</PublicGroupId>
+	</Database>
+	<CfgVersion>5.1</CfgVersion>
+	<CodeBase>http://localhost:9091/</CodeBase>
+	<Configurations>
+		<BRE name="Primavera Configuration" instances="1" logDir="C:\Programme\myprimavera/PrimavisionLogs" />
+	</Configurations>
+</BootStrap>
