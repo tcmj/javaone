@@ -136,7 +136,7 @@ public class DBQConnection extends Observable implements Connection {
     /**Set the database driver class used to connect.
      * <b>do not use Driver.NOTSELECTED!<(b>
      * <b>do not use Driver.CUSTOM - use setDriver(String) instead!<(b>
-     * @param driverclass use the Driver enum for this parameter
+     * @param driver use the Driver enum for this parameter
      * @see Driver
      * @throws ClassNotFoundException
      * @throws InstantiationException
@@ -552,7 +552,7 @@ public class DBQConnection extends Observable implements Connection {
 
     /**Creates a new PreparedStatement object.<br>
      * <b>Using this method you can access further statistics about cleaning up resources </b>
-     * @param pSQL DML or DDL Sql statement with '?' as parameter placeholders.
+     * @param sql DML or DDL Sql statement with '?' as parameter placeholders.
      * @return Prepared Statement Object. (forward-only, connections default-holdability)
      * @throws SQLException maybe on errors during preparation.
      */

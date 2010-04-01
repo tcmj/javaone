@@ -41,28 +41,39 @@ public final class DialogHelper {
         return singleton;
     }
 
-    /** Display Error message.    */
+    /** Display Error message.
+     * @param parent parent frame/component
+     * @param msg message to show
+     */
     public void displayErrorMessage(Component parent, String msg) {
         JOptionPane.showMessageDialog(parent, msg, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
-    /** Display Error message.    */
+    /** Display Error message.
+     * @param parent parent frame/component
+     * @param msg message to show
+     */
     public void displayInfoMessage(Component parent, String msg) {
         JOptionPane.showMessageDialog(parent, msg, "Information", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    /** Display Error message.    */
+    /** Display Error message.
+     * @param msg message to show
+     */
     public void displayErrorMessage(String msg) {
         displayErrorMessage(null, msg);
     }
 
-    /** Display Error message.    */
+    /** Display Error message.
+     * @param msg message to show
+     */
     public void displayInfoMessage(String msg) {
         displayInfoMessage(null, msg);
     }
 
     /**
      * Display the loading dialog.
+     * @param message text to show
      * @return JDialog to dispose
      */
     public static final JDialog showMessageDialog(final String message) {
@@ -93,6 +104,7 @@ public final class DialogHelper {
 
     /**
      * Display the loading dialog.
+     * @param message text to show
      * @return JDialog to dispose
      */
     public static final Frame showMessageFrame(final String message) {
@@ -117,14 +129,17 @@ public final class DialogHelper {
         return dlgloading;
     }
 
-    /** centers a frame, dialog or something else on the screen */
+    /** centers a frame, dialog or something else on the screen.<br>
+     * formula: (Screen.Width - Component.Width / 2) and (Screen.Height - Component.Height / 2)
+     * @param com frame or component
+     */
     public static void centerComponent(Component com) {
         com.setLocation((SCREENSIZE.width - com.getSize().width) / 2,
                 (SCREENSIZE.height - com.getSize().height) / 2);
     }
 
-    /** Frame class. */
-    static class DrawingWindow extends Frame {
+    /** internal used Frame class. */
+    private static class DrawingWindow extends Frame {
 
         String title;
 
