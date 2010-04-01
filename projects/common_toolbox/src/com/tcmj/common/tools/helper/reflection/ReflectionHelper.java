@@ -1,6 +1,7 @@
 /* Copyright(c) 2009 tcmj  All Rights Reserved. */
 package com.tcmj.common.tools.helper.reflection;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -54,10 +55,11 @@ public final class ReflectionHelper {
 
     /**
      * Instantiates the given class with the given parameters
+     * @param <T> type
      * @param className the class to be instantiated
      * @param paramTypes the constructor parameters types
      * @param parameters the constructor parameters
-     * @return <T>
+     * @return <T> instance of given type
      */
     @SuppressWarnings("unchecked")
     public static <T> T newObject(String className, Class<?>[] paramTypes, Object... parameters) {
@@ -87,6 +89,7 @@ public final class ReflectionHelper {
      * @param className the class to be instantiated
      * @return <T>
      */
+    @SuppressWarnings("unchecked")
     public static <T> T newObject(String className) {
 
         Class<T> classinstance = loadClass(className);
@@ -113,7 +116,9 @@ public final class ReflectionHelper {
     }
 
     /** Executes a method on the given instance object using exactly one parameter.
-     * This function is designed to call set methods.
+     * This function is designed to call set methods.<br>
+     * Warning!: Do not use this function if you have more than one set methods
+     *           with same name (but different paramters) !!! 
      * @param instance the object on which the method should be invoked
      * @param setter name of the (set)method to invoke
      * @param value parameter of the (set)method
@@ -162,7 +167,7 @@ public final class ReflectionHelper {
      * @param methodName name of the method to search for
      * @return Method object if found (or RuntimeException if not)
      */
-    public static Method getMethod(Class clazz, String methodName) {
+    public static Method getMethod(Class<?> clazz, String methodName) {
 
         if (methodCache == null) {
             methodCache = new HashMap<String, Method>();
@@ -198,6 +203,20 @@ public final class ReflectionHelper {
 
     }
 
+    /**
+     * reads a java annotation from a method.
+     * @param <T> class object
+     * @param clz class to read
+     * @param methodName name of the method to search for
+     * @param annotationClazz class of the annotation to search for
+     * @return the whole annotation class (same type as the third parameter)
+     */
+    public static <T extends Annotation> T  getMethodAnnotation(Class<?> clz, String methodName, Class<T> annotationClazz) {
+        Method method = getMethod(clz, methodName);
+        Annotation annotation = method.getAnnotation(annotationClazz);
+        return (T) annotation;
+    }
+ 
     /** Prints size of the class/method cache. */
     public static String getCacheInfo() {
         StringBuilder bld = new StringBuilder("ReflectionHelper: ");

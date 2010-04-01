@@ -1,8 +1,8 @@
 package com.tcmj.common.tools.helper.reflection;
 
 import java.math.BigDecimal;
-import java.util.Calendar;
 import java.util.Date;
+import javax.xml.bind.annotation.XmlElement;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -110,8 +110,15 @@ public class ReflectionHelperTest {
     }
 
     @Test
-    public void simpleTest() throws Exception {
-//        Class c = new Class();
+    public void annotationTest_ReadAnnotation() throws Exception {
+        System.out.println("public static <T extends Annotation> T  getMethodAnnotation(Class<?> clz, String methodName, Class<T> annotationClazz)");
+        XmlElement xmlElementAnnotation = ReflectionHelper.getMethodAnnotation(SimplePojo.class, "getValueB", XmlElement.class);
+        assertNotNull(xmlElementAnnotation);
+        System.out.println(" xmlElementAnnotation: "+xmlElementAnnotation);
+        Test testAnnotation = ReflectionHelper.getMethodAnnotation(ReflectionHelperTest.class, "annotationTest_ReadAnnotation", Test.class);
+        assertNotNull(testAnnotation);
+        System.out.println(" testAnnotation: "+testAnnotation);
+        
     }
 
     static class SimplePojo {
@@ -120,6 +127,7 @@ public class ReflectionHelperTest {
 
         private String valueB;
 
+        @SuppressWarnings("unchecked")
         public String getValueA() {
             return valueA;
         }
@@ -128,6 +136,7 @@ public class ReflectionHelperTest {
             this.valueA = valueA;
         }
 
+        @XmlElement(name="test55")
         public String getValueB() {
             return valueB;
         }
