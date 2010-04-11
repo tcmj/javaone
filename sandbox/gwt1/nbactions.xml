@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+        <action>
+            <actionName>CUSTOM-gwt:mergewebxml</actionName>
+            <displayName>gwt:mergewebxml</displayName>
+            <goals>
+                <goal>gwt:mergewebxml</goal>
+            </goals>
+        </action>
+        <action>
+            <actionName>CUSTOM-gwt:run</actionName>
+            <displayName>gwt:run</displayName>
+            <goals>
+                <goal>gwt:run</goal>
+            </goals>
+        </action>
+    </actions>
