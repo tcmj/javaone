@@ -1,9 +1,13 @@
 /* Copyright 2009 */
 package com.tcmj.common.tools.xml.jaxb;
 
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 
 /**
  * JaxbTool.
@@ -27,4 +31,31 @@ public class JaxbTool {
         m.marshal(instance, System.out);
 
     }
+
+
+    public static final <T> T xmlString2Class(String xmlString, Class<T> clazz) throws JAXBException {
+        StringReader reader = new StringReader(xmlString);
+        JAXBContext context = JAXBContext.newInstance(clazz);
+        Unmarshaller u = context.createUnmarshaller();
+        T individual = (T) u.unmarshal(reader);
+        return individual;
+    }
+
+
+    public static final <T> T xmlStream2Class(InputStream xmlStream, Class<T> clazz) throws JAXBException {
+        JAXBContext context = JAXBContext.newInstance(clazz);
+        Unmarshaller u = context.createUnmarshaller();
+        T individual = (T) u.unmarshal(xmlStream);
+        return individual;
+    }
+    public static final <T> T xmlReader2Class(Reader xmlReader, Class<T> clazz) throws JAXBException {
+        JAXBContext context = JAXBContext.newInstance(clazz);
+        Unmarshaller u = context.createUnmarshaller();
+        T individual = (T) u.unmarshal(xmlReader);
+        return individual;
+    }
+
+
+
+
 }

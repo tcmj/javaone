@@ -19,19 +19,19 @@ import org.apache.commons.lang.time.FastDateFormat;
  * @version $Revision: $
  * @JUnit com.tcmj.common.tools.date.DateHelperTest
  */
-public final class DateTool {
+public final class DateTool extends DateUtils {
 
-    /** 24 hours in ms (24h x 60min x 60sec x 1000ms). */
-    public static final long ONE_DAY = 24L * 60L * 60L * 1000L;
-
-    /** 1 hour in ms (60min x 60sec x 1000ms). */
-    public static final long ONE_HOUR = 60L * 60L * 1000L;
-
-    /** 1 minute in ms (60sec x 1000ms). */
-    public static final long ONE_MINUTE = 60L * 1000L;
-
-    /** 1 second in ms (1000ms). */
-    public static final long ONE_SECOND = 1000L;
+//    /** 24 hours in ms (24h x 60min x 60sec x 1000ms). */
+//    public static final long ONE_DAY = 24L * 60L * 60L * 1000L;
+//
+//    /** 1 hour in ms (60min x 60sec x 1000ms). */
+//    public static final long ONE_HOUR = 60L * 60L * 1000L;
+//
+//    /** 1 minute in ms (60sec x 1000ms). */
+//    public static final long ONE_MINUTE = 60L * 1000L;
+//
+//    /** 1 second in ms (1000ms). */
+//    public static final long ONE_SECOND = 1000L;
 
     /** Pattern: yyyyMMdd */
     private static final FastDateFormat DFYYYYMMDD = FastDateFormat.getInstance("yyyy-MM-dd");
@@ -219,9 +219,9 @@ public final class DateTool {
 
         long pUnit;
         if (Calendar.DATE == calendarConstant) {
-            pUnit = ONE_DAY;
+            pUnit = MILLIS_PER_DAY;
         } else if (Calendar.HOUR_OF_DAY == calendarConstant) {
-            pUnit = ONE_HOUR;
+            pUnit = MILLIS_PER_HOUR;
         } else {
             pUnit = 1L;
         }
@@ -284,7 +284,7 @@ public final class DateTool {
         if (durationMillis < 1000) {
             return String.valueOf(durationMillis).concat(" ms");
         }
-        if (durationMillis > ONE_HOUR) {
+        if (durationMillis > MILLIS_PER_HOUR) {
             durationMillis = roundDate(new Date(durationMillis)).getTime();
         }
 
