@@ -2,12 +2,19 @@ package com.tcmj.common.tools.xml.dom;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Iterator;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
@@ -55,10 +62,12 @@ public class XMLTool {
                     return uri;
                 }
 
+
                 @Override
                 public String getPrefix(String namespaceURI) {
                     return prefix;
                 }
+
 
                 @Override
                 public Iterator<?> getPrefixes(String namespaceURI) {
@@ -84,6 +93,7 @@ public class XMLTool {
 
     }
 
+
     /**searches some xml nodes via xpath.
      * @param document jaxp document
      * @param xpathexp XPath Expression
@@ -96,6 +106,7 @@ public class XMLTool {
         return (NodeList) selectNode(document, xpathexp, prefix, XPathConstants.NODESET);
     }
 
+
     /**searches a single xml node via xpath.
      * @param document jaxp document
      * @param xpathexp XPath Expression
@@ -107,6 +118,7 @@ public class XMLTool {
             String xpathexp, final String prefix) throws XPathExpressionException {
         return (Node) selectNode(document, xpathexp, prefix, XPathConstants.NODE);
     }
+
 
     /**Validates a xml file.
      * @todo implement Errorhandler
@@ -128,6 +140,28 @@ public class XMLTool {
 
         validator.validate(new DOMSource(document));
 
+
+    }
+
+
+    /**
+     * Convert a xml document to a string.
+     * @param doc xml document
+     * @return the string
+     * @throws TransformerConfigurationException
+     * @throws TransformerException
+     */
+    public static String toXmlString(Document doc) throws TransformerConfigurationException, TransformerException {
+        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+
+        //initialize StreamResult with File object to save to file
+        StreamResult result = new StreamResult(new StringWriter());
+        DOMSource source = new DOMSource(doc);
+        transformer.transform(source, result);
+
+        String xmlString = result.getWriter().toString();
+        return xmlString;
 
     }
 }
