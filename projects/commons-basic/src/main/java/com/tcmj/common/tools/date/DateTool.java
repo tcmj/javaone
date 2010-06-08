@@ -17,7 +17,6 @@ import org.apache.commons.lang.time.FastDateFormat;
  * @author tcmj - Thomas Deutsch
  * @since 2008
  * @version $Revision: $
- * @JUnit com.tcmj.common.tools.date.DateHelperTest
  */
 public final class DateTool extends DateUtils {
 
@@ -32,7 +31,6 @@ public final class DateTool extends DateUtils {
 //
 //    /** 1 second in ms (1000ms). */
 //    public static final long ONE_SECOND = 1000L;
-
     /** Pattern: yyyyMMdd */
     private static final FastDateFormat DFYYYYMMDD = FastDateFormat.getInstance("yyyy-MM-dd");
 
@@ -247,7 +245,7 @@ public final class DateTool extends DateUtils {
 
     /**
      * Date formatter.
-     * Date formats are not synchronized. It is recommended to create 
+     * Date formats are not synchronized. It is recommended to create
      * separate format instances for each thread. If multiple threads
      * access a format concurrently, it must be synchronized externally.
      * @param date to format
