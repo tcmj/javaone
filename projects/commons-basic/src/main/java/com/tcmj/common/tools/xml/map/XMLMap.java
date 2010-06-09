@@ -77,7 +77,7 @@ public class XMLMap implements Map<String, String>, Serializable {
     /** The Name of the Roots child (default = 'xmlprop'). */
     private String xMLEntryPoint /*= "xmlmap"*/;
     /** JAXP XML Document. */
-    private Document document = null;
+    private transient Document document = null;
     /** Separator to concat levels to each other. Default = '.'  */
     private String levelSeparator;
     /** compiled pattern to split the keys. */
@@ -1076,7 +1076,7 @@ public class XMLMap implements Map<String, String>, Serializable {
         @Override
         public int hashCode() {
             return (key == null ? 0 : key.hashCode()) ^
-                    (value == null ? 0 : value.hashCode());
+                    (value == null ? 0 : java.util.Arrays.hashCode(value));
         }
 
         @Override

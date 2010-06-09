@@ -58,7 +58,7 @@ public class Expression {
             } else if (object instanceof Map) {
                 empty = isEmptyMap((Map) object);
             } else {
-                empty = (object != null);
+                empty = false;
             }
         }
         return empty;
