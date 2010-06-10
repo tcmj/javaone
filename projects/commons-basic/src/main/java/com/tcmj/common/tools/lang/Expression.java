@@ -9,7 +9,7 @@ import java.util.Map;
  * @author Thomas Deutsch <thomas-deutsch(a.t)tcmj.de>
  * @since 07.06.2010
  */
-public class Expression {
+public final class Expression {
 
     /**
      * private no-arg-constructor.
@@ -23,7 +23,7 @@ public class Expression {
      * @param collection any list or set or map
      * @return true or false
      */
-    private static final boolean isEmptyCollection(Collection collection) {
+    private static boolean isEmptyCollection(Collection collection) {
         return (collection == null || collection.isEmpty());
     }
 
@@ -33,7 +33,7 @@ public class Expression {
      * @param map any list or set or map
      * @return true or false
      */
-    private static final boolean isEmptyMap(Map map) {
+    private static boolean isEmptyMap(Map map) {
         return (map == null || map.isEmpty());
     }
 
@@ -45,18 +45,18 @@ public class Expression {
      * <li>java.util.Collection (isEmpty)</li>
      * <li>java.util.Map (isEmpty)</li>
      * </ul>
-     * @param object
-     * @return
+     * @param obj Object
+     * @return bool
      */
-    public static final boolean isEmpty(Object object) {
+    public static boolean isEmpty(Object obj) {
         boolean empty;
-        if (object == null) {
+        if (obj == null) {
             empty = true;
         } else {
-            if (object instanceof Collection) {
-                empty = isEmptyCollection((Collection) object);
-            } else if (object instanceof Map) {
-                empty = isEmptyMap((Map) object);
+            if (obj instanceof Collection) {
+                empty = isEmptyCollection((Collection) obj);
+            } else if (obj instanceof Map) {
+                empty = isEmptyMap((Map) obj);
             } else {
                 empty = false;
             }
@@ -68,10 +68,10 @@ public class Expression {
     /**
      * Negotiates the isEmpty method.<br/>
      * {@link #isEmpty(Obect)}<br/>
-     * @param object
+     * @param obj Object
      * @return true or false
      */
-    public static final boolean isNotEmpty(Object object) {
-        return !(isEmpty(object));
+    public static boolean isNotEmpty(Object obj) {
+        return !(isEmpty(obj));
     }
 }

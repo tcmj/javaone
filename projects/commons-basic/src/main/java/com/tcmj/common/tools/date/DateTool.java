@@ -31,10 +31,10 @@ public final class DateTool extends DateUtils {
 //
 //    /** 1 second in ms (1000ms). */
 //    public static final long ONE_SECOND = 1000L;
-    /** Pattern: yyyyMMdd */
+    /** Pattern: yyyyMMdd. */
     private static final FastDateFormat DFYYYYMMDD = FastDateFormat.getInstance("yyyy-MM-dd");
 
-    /** Pattern: yyyy-MM-dd */
+    /** Pattern: yyyy-MM-dd. */
     private static final FastDateFormat DFYYYYMMDDHHMM = FastDateFormat.getInstance("yyyy-MM-dd HH:mm");
 
 
@@ -54,7 +54,7 @@ public final class DateTool extends DateUtils {
      * @param second (0 to 59)
      * @return a date object
      */
-    public static final Date date(int year, int month, int day, int hour, int minute, int second) {
+    public static Date date(int year, int month, int day, int hour, int minute, int second) {
         Calendar calendar = getCalendar();
         calendar.set(Calendar.YEAR, year);
         calendar.set(Calendar.MONTH, (month - 1));
@@ -159,16 +159,16 @@ public final class DateTool extends DateUtils {
     public static Date copyTime(Date sourcedate, Date targetdate) {
 
         Calendar calendar = getCalendar(sourcedate);
-        int hour_start = calendar.get(Calendar.HOUR_OF_DAY);
-        int minute_start = calendar.get(Calendar.MINUTE);
-        int sec_start = calendar.get(Calendar.SECOND);
-        int msec_start = calendar.get(Calendar.MILLISECOND);
+        int hourStart = calendar.get(Calendar.HOUR_OF_DAY);
+        int minuteStart = calendar.get(Calendar.MINUTE);
+        int secStart = calendar.get(Calendar.SECOND);
+        int msecStart = calendar.get(Calendar.MILLISECOND);
 
         calendar.setTime(targetdate);     //put time information to target
-        calendar.set(Calendar.HOUR_OF_DAY, hour_start);
-        calendar.set(Calendar.MINUTE, minute_start);
-        calendar.set(Calendar.SECOND, sec_start);
-        calendar.set(Calendar.MILLISECOND, msec_start);
+        calendar.set(Calendar.HOUR_OF_DAY, hourStart);
+        calendar.set(Calendar.MINUTE, minuteStart);
+        calendar.set(Calendar.SECOND, secStart);
+        calendar.set(Calendar.MILLISECOND, msecStart);
 
         Date adjustedDate = calendar.getTime();
 
@@ -183,15 +183,15 @@ public final class DateTool extends DateUtils {
      * the Start date and converts it from ms to days.<br>
      * <b>number of days between the same Day returns '0'<br>
      * 01.Jan to 10.Jan = 9 days (not 10!)</b><br>
-     * @param pStart begin
-     * @param pEnd finish
+     * @param start begin
+     * @param end finish
      * @return amount of days between
      */
-    public static long daysbetween(Date pStart, Date pEnd) {
-        if (pStart == null || pEnd == null) {
+    public static long daysbetween(Date start, Date end) {
+        if (start == null || end == null) {
             throw new IllegalArgumentException("The function daysbetween cannot handle NULL parameters!");
         }
-        return between(pStart, pEnd, Calendar.DATE);
+        return between(start, end, Calendar.DATE);
     }
 
 
@@ -200,20 +200,26 @@ public final class DateTool extends DateUtils {
      * minute, second and milisec. information will be deleted.
      * it substracts the finish date from
      * the pStart date and converts it from ms to hours.<br>
-     * @param pStart begin
-     * @param pEnd finish
+     * @param start begin
+     * @param end finish
      * @return amount of hours between
      */
-    public static long hoursbetween(Date pStart, Date pEnd) {
-        if (pStart == null || pEnd == null) {
+    public static long hoursbetween(Date start, Date end) {
+        if (start == null || end == null) {
             throw new IllegalArgumentException("The function hoursbetween cannot handle NULL parameters!");
         }
-        return between(pStart, pEnd, Calendar.HOUR_OF_DAY);
+        return between(start, end, Calendar.HOUR_OF_DAY);
     }
 
 
-    /** Internal method to compute the time between two dates. */
-    private static long between(Date pStart, Date pEnd, int calendarConstant) {
+    /**
+     * Internal method to compute the time between two dates.
+     * @param start begin
+     * @param end finish
+     * @param calendarConstant {@link java.util.Calendar}
+     * @return miliseconds
+     */
+    private static long between(Date start, Date end, int calendarConstant) {
 
         long pUnit;
         if (Calendar.DATE == calendarConstant) {
@@ -224,12 +230,12 @@ public final class DateTool extends DateUtils {
             pUnit = 1L;
         }
 
-        Calendar calendar = getCalendar(DateUtils.truncate(pStart, calendarConstant));
+        Calendar calendar = getCalendar(DateUtils.truncate(start, calendarConstant));
 
         int dstOffsetStart = calendar.get(Calendar.DST_OFFSET) + calendar.get(Calendar.ZONE_OFFSET);
         long lnStart = calendar.getTimeInMillis();
 
-        calendar.setTime(DateUtils.truncate(pEnd, calendarConstant));
+        calendar.setTime(DateUtils.truncate(end, calendarConstant));
 
         int dstOffsetEnd = calendar.get(Calendar.DST_OFFSET) + calendar.get(Calendar.ZONE_OFFSET);
         long lnFinish = calendar.getTimeInMillis();
@@ -251,7 +257,7 @@ public final class DateTool extends DateUtils {
      * @param date to format
      * @return "yyyy-MM-dd"
      */
-    public synchronized static String formatDate(Date date) {
+    public static String formatDate(Date date) {
         return DFYYYYMMDD.format(date);
     }
 
@@ -264,22 +270,22 @@ public final class DateTool extends DateUtils {
      * @param date to format
      * @return "yyyy-MM-dd HH:mm"
      */
-    public synchronized static String formatDateTime(Date date) {
+    public static String formatDateTime(Date date) {
         return DFYYYYMMDDHHMM.format(date);
     }
 
 
     /**
      * Formats miliseconds to a human readable format.
-     * @param timeinmillis (eg '10020000')
+     * @param durationMillis (eg '10020000')
      * @return eg '2 hours 47 minutes'
      */
-    public static final String formatDuration(long durationMillis) {
+    public static String formatDuration(long durationMillis) {
 //        String formatedDuration = DurationFormatUtils.formatDurationWords(timeinmillis, true, true);
 //        return formatedDuration;
 
 
-        if (durationMillis < 1000) {
+        if (durationMillis < MILLIS_PER_SECOND) {
             return String.valueOf(durationMillis).concat(" ms");
         }
         if (durationMillis > MILLIS_PER_HOUR) {
@@ -389,7 +395,7 @@ public final class DateTool extends DateUtils {
     /** Method to retrieve a calendar.
      * @return a calendar object
      */
-    public static final Calendar getCalendar() {
+    public static Calendar getCalendar() {
         return Calendar.getInstance();
     }
 
@@ -398,7 +404,7 @@ public final class DateTool extends DateUtils {
      * @param initialdate date to set to the calendar
      * @return a calendar object
      */
-    public static final Calendar getCalendar(Date initialdate) {
+    public static Calendar getCalendar(Date initialdate) {
         Calendar calendar = getCalendar();
         calendar.setTime(initialdate);
         return calendar;
@@ -406,12 +412,12 @@ public final class DateTool extends DateUtils {
 
 
     /***
-     * Iterate over the days between start and enddate (both inclusive)
+     * Iterate over the days between start and enddate (both inclusive).
      * @param from 2010-01-01
      * @param until 2010-01-03
      * @return 2010-01-01, 2010-01-02, 2010-01-03
      */
-    public static final Iterator<Date> iterate(Date from, Date until) {
+    public static Iterator<Date> iterate(Date from, Date until) {
         if (from == null || until == null) {
             throw new UnsupportedOperationException("The function iterate cannot handle NULL parameters!");
         }
@@ -423,8 +429,10 @@ public final class DateTool extends DateUtils {
      */
     static class DateIterator implements Iterator<Date> {
 
+        /** Calendar. */
         private Calendar calendar = Calendar.getInstance();
 
+        /** End Date. */
         private final Date endDate;
 
 
@@ -434,7 +442,7 @@ public final class DateTool extends DateUtils {
          * @param startDay start date (inclusive)
          * @param endDay end date (inclusive)
          */
-        DateIterator(java.util.Date startDay, java.util.Date endDay) {
+        DateIterator(final Date startDay, final Date endDay) {
             super();
             this.calendar.setTime(DateTool.removeTime(startDay));
             endDate = DateTool.removeTime(endDay);
@@ -445,15 +453,17 @@ public final class DateTool extends DateUtils {
          * Has the iterator not reached the end date yet?
          * @return <code>true</code> if the iterator has yet to reach the end date
          */
+        @Override
         public boolean hasNext() {
             return calendar.getTimeInMillis() <= endDate.getTime();
         }
 
 
         /**
-         * Return the next date in the iteration
+         * Return the next date in the iteration.
          * @return a Date object without time (time is set to 00:00:00)
          */
+        @Override
         public Date next() {
             if (calendar.getTimeInMillis() > endDate.getTime()) {
                 throw new NoSuchElementException();
@@ -470,6 +480,7 @@ public final class DateTool extends DateUtils {
          * @throws UnsupportedOperationException
          * @see java.util.Iterator#remove()
          */
+        @Override
         public void remove() {
             throw new UnsupportedOperationException();
         }

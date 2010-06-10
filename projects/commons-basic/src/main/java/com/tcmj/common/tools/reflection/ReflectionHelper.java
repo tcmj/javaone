@@ -118,7 +118,7 @@ public final class ReflectionHelper {
     /** Executes a method on the given instance object using exactly one parameter.
      * This function is designed to call set methods.<br>
      * Warning!: Do not use this function if you have more than one set methods
-     *           with same name (but different paramters) !!! 
+     *           with same name (but different paramters) !!!
      * @param instance the object on which the method should be invoked
      * @param setter name of the (set)method to invoke
      * @param value parameter of the (set)method
@@ -216,7 +216,7 @@ public final class ReflectionHelper {
         Annotation annotation = method.getAnnotation(annotationClazz);
         return (T) annotation;
     }
- 
+
     /** Prints size of the class/method cache. */
     public static String getCacheInfo() {
         StringBuilder bld = new StringBuilder("ReflectionHelper: ");
