@@ -300,14 +300,19 @@ public class DBQConnection extends Observable implements Connection {
      * @throws SQLException any
      */
     public int sqlExecution(String pSQL) throws SQLException {
+        int result = -1;
+
         //obtain a Statement object (cached or newly created):
         Statement mStat = mSCache.getStatement();
 
-        //Execution:
-        int result = mStat.executeUpdate(pSQL);
-
-        //release resources:
-        mSCache.releaseStatement(mStat);
+        try {
+            result = mStat.executeUpdate(pSQL);
+        } catch (SQLException e) {
+            throw e;
+        }finally{
+            //release resources:
+            mSCache.releaseStatement(mStat);
+        }
 
         //return the amount of changed rows:
         return result;
