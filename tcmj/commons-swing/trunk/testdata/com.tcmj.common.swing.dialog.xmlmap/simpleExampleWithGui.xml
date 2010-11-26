@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<BusinessObjects>
+<Project>
+    <numbers>three</numbers>
+    <dates>nextrun</dates>
+    <foo>1</foo>
+    <a>
+      <b>
+        <c>xy</c>
+      </b>
+    </a>
+    <datum>xy</datum>
+    <x>
+      <y>
+        <z>123</z>
+        <a>xy</a>
+      </y>
+    </x>
+  </Project>
+</BusinessObjects>

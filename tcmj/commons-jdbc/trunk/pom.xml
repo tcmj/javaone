@@ -1,0 +1,54 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <groupId>com.tcmj</groupId>
+        <artifactId>tcmj-parent</artifactId>
+        <version>1.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.tcmj.common</groupId>
+    <artifactId>commons-jdbc</artifactId>
+    <packaging>jar</packaging>
+    <version>2.10.06-SNAPSHOT</version>
+    <name>tcmj-commons-jdbc</name>
+    <description>
+        This java package provides a simple way to work with databases.
+    </description>
+    <developers>
+        <developer>
+            <id>tcmj</id>
+            <name>Thomas Deutsch</name>
+            <email>reg@tcmj.de</email>
+        </developer>
+    </developers>
+    
+    <dependencies>
+
+        <!-- COMPILE DEPENDENCIES -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.tcmj.common</groupId>
+            <artifactId>commons-basic</artifactId>
+            <version>2.10.06-SNAPSHOT</version>
+        </dependency>
+ 
+        <!-- TEST DEPENDENCIES -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+
+
+</project>
+
