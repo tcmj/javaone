@@ -9,7 +9,7 @@
     <groupId>com.tcmj.common</groupId>
     <artifactId>commons-basic</artifactId>
     <packaging>jar</packaging>
-    <version>2.10.09-SNAPSHOT</version>
+    <version>2.10.11-SNAPSHOT</version>
     <name>tcmj-commons-basic</name>
     <description>
         This java package provides helper classes and functions which were needed
