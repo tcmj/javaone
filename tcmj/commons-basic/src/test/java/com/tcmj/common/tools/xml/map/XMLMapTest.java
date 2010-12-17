@@ -63,16 +63,12 @@ public class XMLMapTest {
 
     @Before
     public void beforeEachTest() {
-        m();
+        logger.info("-------------------------------------------------------------------------------------------------------");
 
         //2. Neue Instanz des XMLPropertyModels erzeugen:
         model = new XMLMap(file);
     }
 
-
-    private void m() {
-        logger.info("-------------------------------------------------------------------------------------------------------");
-    }
 
 
     /**

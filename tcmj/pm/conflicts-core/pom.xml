@@ -1,0 +1,54 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <groupId>com.tcmj.pm</groupId>
+        <artifactId>tcmj-pm-parent</artifactId>
+        <version>1</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.tcmj.pm</groupId>
+    <artifactId>conflicts-core</artifactId>
+    <packaging>jar</packaging>
+    <version>2.12.16-SNAPSHOT</version>
+    <name>tcmj-pm-conflicts</name>
+    <description>
+        Project managment library used to detect overlapping periods.
+        It can be used to detect conflicts in a project plan.
+    </description>
+
+    <dependencies>
+
+        <!-- COMPILE DEPENDENCIES -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+         <dependency>
+            <groupId>com.tcmj.common</groupId>
+            <artifactId>commons-basic</artifactId>
+        </dependency>
+        <!-- TEST DEPENDENCIES -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!--
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <scope>test</scope>
+        </dependency>
+        -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+
+
+</project>
+

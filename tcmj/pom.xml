@@ -6,10 +6,11 @@
     <artifactId>tcmj-parent</artifactId>
     <version>1</version>
     <packaging>pom</packaging>
-    <name>tcmj-parent-pom</name>
+    <name>tcmj-parent</name>
     <modules>
         <module>commons-basic</module>
         <module>commons-jdbc\trunk</module>
+        <module>pm</module>
     </modules>
     <url>http://www.tcmj.de</url>
     <description>
@@ -147,9 +148,19 @@
                 <version>${org.slf4j.version}</version>
             </dependency>
             <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>0.9.26</version>
+            </dependency>
+            <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>4.6</version>
+            </dependency>
+            <dependency>
+                <groupId>com.tcmj.common</groupId>
+                <artifactId>commons-basic</artifactId>
+                <version>2.10.11-SNAPSHOT</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -222,17 +233,17 @@
             </plugin>
         
 
-    </plugins>
-</reporting>
+        </plugins>
+    </reporting>
 
 
-<properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <org.slf4j.version>1.5.11</org.slf4j.version>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <org.slf4j.version>1.6.1</org.slf4j.version>
 
-    <checkstyle.config.location>\coding-resources\src\main\resources\checkstyle\tcmjstyle.xml</checkstyle.config.location>
+        <checkstyle.config.location>\coding-resources\src\main\resources\checkstyle\tcmjstyle.xml</checkstyle.config.location>
 
          
-</properties>
+    </properties>
 </project>
 
