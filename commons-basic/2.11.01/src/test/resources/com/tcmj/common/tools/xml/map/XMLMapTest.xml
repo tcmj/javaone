@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<tcmj>
+     <a>a</a>
+     <b>b</b>
+     <c>c</c>
+     <x>
+          <y>
+               <z>myvalueXYZ</z>
+          </y>
+     </x>
+</tcmj>
