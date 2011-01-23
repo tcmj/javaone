@@ -10,8 +10,8 @@ import java.util.Map;
 
 /**
  * Helper for reflection operations (Cached!).
+ * <img alt="tcmj" src="doc-files/tcmjbg.gif" align="right">
  * @author tdeut - Thomas Deutsch
- * @junit com.tcmj.common.tools.helper.reflection.ReflectionHelperTest
  */
 public final class ReflectionHelper {
 

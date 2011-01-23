@@ -121,7 +121,7 @@ public class XMLTool {
 
 
     /**Validates a xml file.
-     * @todo implement Errorhandler
+     * TODO implement Errorhandler
      * @param document jaxp dom document
      * @param xsdFile file handle to the xsd file
      * @throws SAXException

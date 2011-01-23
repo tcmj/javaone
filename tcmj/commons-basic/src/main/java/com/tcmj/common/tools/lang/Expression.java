@@ -6,6 +6,7 @@ import java.util.Map;
 
 /**
  * Expression Helper with extended functionality.
+ * Consider using {@link org.apache.commons.lang.Validate}
  * @author Thomas Deutsch <thomas-deutsch(a.t)tcmj.de>
  * @since 07.06.2010
  */
@@ -67,11 +68,22 @@ public final class Expression {
 
     /**
      * Negotiates the isEmpty method.<br/>
-     * {@link #isEmpty(Obect)}<br/>
+     * {@link #isEmpty(Object)}<br/>
      * @param obj Object
      * @return true or false
      */
     public static boolean isNotEmpty(Object obj) {
         return !(isEmpty(obj));
     }
+
+
+
+    public static void validate() {
+
+
+
+    }
+
+
+
 }

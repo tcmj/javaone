@@ -8,7 +8,6 @@ import java.util.Random;
  * @author tcmj - Thomas Deutsch
  * @since 2003
  * @version $Revision: $
- * @JUnit com.tcmj.common.tools.text.RandomStringsTest
  */
 public class RandomStrings extends Random {
 

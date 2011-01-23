@@ -60,7 +60,6 @@ import org.w3c.dom.Node;
  *  model.saveXML();<br>
  * </code>
  * @author Thomas Deutsch - thomas-deutsch@tcmj.de
- * @JUnit Test available!
  */
 public class XMLMap implements Map<String, String>, Serializable {
 
@@ -259,10 +258,7 @@ public class XMLMap implements Map<String, String>, Serializable {
 
     /**
      * Adds a Java Object to a specific key.<BR>
-     * You can also use {@link #put(String,String,Object) }
-     * <BR><B>Note</B><BR>
-     * To update the value (text) use {@link put(String,String,String)}
-     * with the specific key<BR>
+     * You can also use {@link #put(String,String,Object)}
      * To delete the object also use this method with null in the value parameter<BR>
      * @param key Keyname on which a java object shall be attached.
      * @param obj any java class instance

@@ -5,7 +5,6 @@ package com.tcmj.common.tools.text;
  * to setter or getter methods.
  * @author Thomas Deutsch
  * @version $Revision: $
- * @JUnit com.tcmj.common.tools.text.CamelCaseTest
  */
 public class CamelCase {
 
@@ -19,7 +18,7 @@ public class CamelCase {
         if ("".equals(input) || input == null) {
             return input;
         }
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         boolean capitalize = true;
         boolean lastCapital = false;

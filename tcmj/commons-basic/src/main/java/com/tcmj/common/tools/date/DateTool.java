@@ -8,6 +8,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.apache.commons.lang.time.FastDateFormat;
+import static org.apache.commons.lang.Validate.notNull;
 
 /**
  * Helper for time and date operations.
@@ -20,17 +21,6 @@ import org.apache.commons.lang.time.FastDateFormat;
  */
 public final class DateTool extends DateUtils {
 
-//    /** 24 hours in ms (24h x 60min x 60sec x 1000ms). */
-//    public static final long ONE_DAY = 24L * 60L * 60L * 1000L;
-//
-//    /** 1 hour in ms (60min x 60sec x 1000ms). */
-//    public static final long ONE_HOUR = 60L * 60L * 1000L;
-//
-//    /** 1 minute in ms (60sec x 1000ms). */
-//    public static final long ONE_MINUTE = 60L * 1000L;
-//
-//    /** 1 second in ms (1000ms). */
-//    public static final long ONE_SECOND = 1000L;
     /** Pattern: yyyyMMdd. */
     private static final FastDateFormat DFYYYYMMDD = FastDateFormat.getInstance("yyyy-MM-dd");
 
@@ -175,6 +165,7 @@ public final class DateTool extends DateUtils {
      * Resets (to '0'): hours, minutes, seconds, miliseconds
      * @param source Date to remove times info
      * @return DateUtils.truncate(source, Calendar.DATE);
+     * @throws java.lang.IllegalArgumentException if the Date parameter is null
      */
     public static Date removeTime(Date source) {
         return DateUtils.truncate(source, Calendar.DATE);
@@ -188,6 +179,8 @@ public final class DateTool extends DateUtils {
      * @return a new date object with the merged time and date informations
      */
     public static Date copyTime(Date sourcedate, Date targetdate) {
+
+        notNull(targetdate, "Your target date parameter may not be null!");
 
         Calendar calendar = getCalendar(sourcedate);
         int hourStart = calendar.get(Calendar.HOUR_OF_DAY);
@@ -203,7 +196,6 @@ public final class DateTool extends DateUtils {
 
         Date adjustedDate = calendar.getTime();
 
-
         return adjustedDate;
     }
 
@@ -217,11 +209,9 @@ public final class DateTool extends DateUtils {
      * @param start begin
      * @param end finish
      * @return amount of days between
+     * @throws java.lang.IllegalArgumentException if any of the both parameters is null
      */
     public static long daysbetween(Date start, Date end) {
-        if (start == null || end == null) {
-            throw new IllegalArgumentException("The function daysbetween cannot handle NULL parameters!");
-        }
         return between(start, end, Calendar.DATE);
     }
 
@@ -234,11 +224,9 @@ public final class DateTool extends DateUtils {
      * @param start begin
      * @param end finish
      * @return amount of hours between
+     * @throws java.lang.IllegalArgumentException if any of the Date parameters are null
      */
     public static long hoursbetween(Date start, Date end) {
-        if (start == null || end == null) {
-            throw new IllegalArgumentException("The function hoursbetween cannot handle NULL parameters!");
-        }
         return between(start, end, Calendar.HOUR_OF_DAY);
     }
 
@@ -249,9 +237,11 @@ public final class DateTool extends DateUtils {
      * @param end finish
      * @param calendarConstant {@link java.util.Calendar}
      * @return miliseconds
+     * @throws java.lang.IllegalArgumentException if any of the Date parameters are null
      */
     private static long between(Date start, Date end, int calendarConstant) {
-
+        notNull(start, "Parameter 'start' may not be null!");
+        notNull(start, "Parameter 'end' may not be null!");
         long pUnit;
         if (Calendar.DATE == calendarConstant) {
             pUnit = MILLIS_PER_DAY;
@@ -287,8 +277,10 @@ public final class DateTool extends DateUtils {
      * access a format concurrently, it must be synchronized externally.
      * @param date to format
      * @return "yyyy-MM-dd"
+     * @throws java.lang.IllegalArgumentException if the Date parameter is null
      */
     public static String formatDate(Date date) {
+        notNull(date, "Cannot format a null Date object!");
         return DFYYYYMMDD.format(date);
     }
 
@@ -300,8 +292,10 @@ public final class DateTool extends DateUtils {
      * access a format concurrently, it must be synchronized externally.
      * @param date to format
      * @return "yyyy-MM-dd HH:mm"
+     * @throws java.lang.IllegalArgumentException if the Date parameter is null
      */
     public static String formatDateTime(Date date) {
+        notNull(date, "Cannot format a null Date object!");
         return DFYYYYMMDDHHMM.format(date);
     }
 
@@ -408,6 +402,7 @@ public final class DateTool extends DateUtils {
      * @param seconds 0 to 59
      * @param milis  0 to 999
      * @return a java long time value
+     * @throws java.lang.IllegalArgumentException if the Date parameter is null
      */
     public static long setTime(Date source, int hours24, int minutes, int seconds, int milis) {
         Calendar calendar = getCalendar(source);
@@ -429,6 +424,7 @@ public final class DateTool extends DateUtils {
      * @param seconds 0 to 59
      * @param milis  0 to 999
      * @return a java util Date object
+     * @throws java.lang.IllegalArgumentException if the source date parameter is null
      */
     public static Date setTimeAsDate(Date source, int hours24, int minutes, int seconds, int milis) {
         return new Date(setTime(source, hours24, minutes, seconds, milis));
@@ -439,6 +435,7 @@ public final class DateTool extends DateUtils {
      * rounds up if seconds >= 30 and rounds down if < 30.
      * @param date 2009-04-04 23:23:43
      * @return 2009-04-04 23:24:00
+     * @throws java.lang.IllegalArgumentException if the Date parameter is null
      */
     public static Date roundDate(Date date) {
         return DateUtils.round(date, Calendar.MINUTE);
@@ -456,8 +453,10 @@ public final class DateTool extends DateUtils {
     /** Method to retrieve a calendar.
      * @param initialdate date to set to the calendar
      * @return a calendar object
+     * @throws java.lang.IllegalArgumentException if the Date parameter is null
      */
     public static Calendar getCalendar(Date initialdate) {
+        notNull(initialdate, "Parameter 'initialdate' may not be null!");
         Calendar calendar = getCalendar();
         calendar.setTime(initialdate);
         return calendar;
@@ -469,11 +468,9 @@ public final class DateTool extends DateUtils {
      * @param from 2010-01-01
      * @param until 2010-01-03
      * @return 2010-01-01, 2010-01-02, 2010-01-03
+     * @throws java.lang.IllegalArgumentException if the Date parameters are null
      */
     public static Iterator<Date> iterate(Date from, Date until) {
-        if (from == null || until == null) {
-            throw new UnsupportedOperationException("The function iterate cannot handle NULL parameters!");
-        }
         return new DateIterator(from, until);
     }
 
@@ -494,9 +491,12 @@ public final class DateTool extends DateUtils {
          * from a given start date and ending at a given end date.
          * @param startDay start date (inclusive)
          * @param endDay end date (inclusive)
+         * @throws java.lang.IllegalArgumentException if the Date parameters are null
          */
         DateIterator(final Date startDay, final Date endDay) {
             super();
+            notNull(startDay, "Parameter startDay is null!");
+            notNull(endDay, "Parameter endDay is null!");
             this.calendar.setTime(DateTool.removeTime(startDay));
             endDate = DateTool.removeTime(endDay);
         }
