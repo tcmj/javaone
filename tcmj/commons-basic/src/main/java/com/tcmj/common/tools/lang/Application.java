@@ -17,18 +17,18 @@
  */
 package com.tcmj.common.tools.lang;
 
+import static com.tcmj.common.tools.lang.Check.notNull;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
 
 /**
  * Common application tools.
- * @author Thomas Deutsch <thomas-deutsch(a.t)tcmj.de>
+ * @author tcmj - Thomas Deutsch
  * @since 23.01.2011
  */
 public class Application {
 
     /**
-     * default no-arg-constructor.
+     * default no-arg-constructor. 
      */
     private Application() {
     }
@@ -44,8 +44,8 @@ public class Application {
      * @return the title or an empty string
      * @throws java.lang.IllegalArgumentException if the parameter 'context' is null
      */
-    public static String getApplicationTitle(Class context) {
-        Validate.notNull(context, "Parameter 'context' may not be null!");
+    public static String getApplicationTitle(Class<?> context) {
+        notNull(context, "Parameter 'context' may not be null!");
         String title = "";
         String implementationTitle = context.getPackage().getImplementationTitle();
         if (StringUtils.isNotBlank(implementationTitle)) {
@@ -69,8 +69,8 @@ public class Application {
      * @return the version or an empty string
      * @throws java.lang.IllegalArgumentException if the parameter 'context' is null
      */
-    public static String getApplicationVersion(Class context) {
-        Validate.notNull(context, "Parameter 'context' may not be null!");
+    public static String getApplicationVersion(Class<?> context) {
+        notNull(context, "Parameter 'context' may not be null!");
         String version = "";
         String implementationVersion = context.getPackage().getImplementationVersion();
         if (StringUtils.isNotBlank(implementationVersion)) {
@@ -94,8 +94,8 @@ public class Application {
      * @return the vendor or an empty string
      * @throws java.lang.IllegalArgumentException if the parameter 'context' is null
      */
-    public static String getApplicationVendor(Class context) {
-        Validate.notNull(context, "Parameter 'context' may not be null!");
+    public static String getApplicationVendor(Class<?> context) {
+        notNull(context, "Parameter 'context' may not be null!");
         String title = "";
         String implementationVendor = context.getPackage().getImplementationVendor();
         if (StringUtils.isNotBlank(implementationVendor)) {

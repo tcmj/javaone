@@ -13,7 +13,7 @@ import static org.apache.commons.lang.Validate.notNull;
 /**
  * Helper for simple time and date operations.
  * <p> use following import in your classes <br>import static com.tcmj.common.tools.date.DateTool.*;</p>
- * For professional date and time operations consider using the Joda time library
+ * For professional date and time operations consider using the Joda time library.
  * @see org.apache.commons.lang.time.DateUtils
  * @author tcmj - Thomas Deutsch
  * @since 2008
@@ -62,7 +62,7 @@ public final class DateTool extends DateUtils {
      * seconds and milliseconds will be set to '0'
      * @param year Year (eg. 2008)
      * @param month Month (1 to 12)
-     * @param day Day (1 to 30/31) invalid days will be roled to the next month
+     * @param day Day (1 to 30/31) invalid days will be rolled to the next month
      * @param hour Hour (0 to 24)
      * @param minute (0 to 59)
      * @return a date object
@@ -77,7 +77,7 @@ public final class DateTool extends DateUtils {
      * minutes, seconds and milliseconds and  will be set to '0'
      * @param year Year (eg. 2008)
      * @param month Month (1 to 12)
-     * @param day Day (1 to 30/31) invalid days will be roled to the next month
+     * @param day Day (1 to 30/31) invalid days will be rolled to the next month
      * @param hour Hour (0 to 24)
      * @return a date object
      */
@@ -91,7 +91,7 @@ public final class DateTool extends DateUtils {
      * Time information will set to '0' (hour,minutes,sec,milis)
      * @param year Year (eg. 2008)
      * @param month Month (1 to 12)
-     * @param day Day (1 to 30/31) invalid days will be roled to the next month
+     * @param day Day (1 to 30/31) invalid days will be rolled to the next month
      * @return a date object
      */
     public static Date date(int year, int month, int day) {
@@ -100,7 +100,7 @@ public final class DateTool extends DateUtils {
 
 
     /**
-     * Checks if a date falls into a given timerange.<br>
+     * Checks if a date falls into a given time range.<br>
      *       <code>Date &gt;=  StartDate AND Date &lt;=  EndDate</code>
      * @param dateToCheck the date to check
      * @param timeRangeStart the pStart of the time period
@@ -162,7 +162,7 @@ public final class DateTool extends DateUtils {
 
     /**
      * Removes the whole time informations from a date.
-     * Resets (to '0'): hours, minutes, seconds, miliseconds
+     * Resets (to '0'): hours, minutes, seconds, milliseconds
      * @param source Date to remove times info
      * @return DateUtils.truncate(source, Calendar.DATE);
      * @throws java.lang.IllegalArgumentException if the Date parameter is null
@@ -173,7 +173,7 @@ public final class DateTool extends DateUtils {
 
 
     /**
-     * put hour and minutes from sourcedate (param1) to targetdate (param2).
+     * put hour and minutes from source date (param1) to target date (param2).
      * @param sourcedate date from which is being read
      * @param targetdate date to edit/change
      * @return a new date object with the merged time and date informations
@@ -202,7 +202,7 @@ public final class DateTool extends DateUtils {
 
     /**
      * computes the days <b>between</b> two dates.<br>
-     * it removes the time informations, substracts the finish date from
+     * it removes the time informations, subtracts the finish date from
      * the Start date and converts it from ms to days.<br>
      * <b>number of days between the same Day returns '0'<br>
      * 01.Jan to 10.Jan = 9 days (not 10!)</b><br>
@@ -218,8 +218,8 @@ public final class DateTool extends DateUtils {
 
     /**
      * computes the hours <b>between</b> two dates.<br>
-     * minute, second and milisec. information will be deleted.
-     * it substracts the finish date from
+     * minute, second and millisecond. information will be deleted.
+     * it subtracts the finish date from
      * the pStart date and converts it from ms to hours.<br>
      * @param start begin
      * @param end finish
@@ -236,7 +236,7 @@ public final class DateTool extends DateUtils {
      * @param start begin
      * @param end finish
      * @param calendarConstant {@link java.util.Calendar}
-     * @return miliseconds
+     * @return milliseconds
      * @throws java.lang.IllegalArgumentException if any of the Date parameters are null
      */
     private static long between(Date start, Date end, int calendarConstant) {
@@ -263,7 +263,7 @@ public final class DateTool extends DateUtils {
         //correcture needed if pStart and finish are in different timezones (CET/CEST):
         if (dstOffsetStart == dstOffsetEnd) {
             return (lnFinish - lnStart) / pUnit;
-        } else { //eg.: one date is in wintertime
+        } else { //eg.: one date is in winter time
             return ((lnFinish + dstOffsetEnd) - (lnStart + dstOffsetStart)) / pUnit;
         }
 
@@ -301,7 +301,7 @@ public final class DateTool extends DateUtils {
 
 
     /**
-     * Formats miliseconds to a human readable format.
+     * Formats milliseconds to a human readable format.
      * @param durationMillis (eg '10020000')
      * @param customlabels
      * @return eg '2 hours 47 minutes'
@@ -337,9 +337,8 @@ public final class DateTool extends DateUtils {
         final String zeroHours = StringUtils.join(new String[]{" 0", labels[3]});
         final String zeroDays = StringUtils.join(new String[]{" 0", labels[4]});
 
-        // This method is generally replacable by the format method, but
-        // there are a series of tweaks and special cases that require
-        // trickery to replicate.
+        // This method is generally replaceable by the format method, but
+        
 
         final String formatStrg =
                 StringUtils.join(new String[]{"d'", labels[4],"' H'", labels[3],"' m'", labels[2],"' s'", labels[1],"'"});
@@ -395,7 +394,7 @@ public final class DateTool extends DateUtils {
 
     /**
      * Sets time informations to a date.
-     * hours, minutes, seconds, miliseconds
+     * hours, minutes, seconds, milliseconds
      * @param source Date to remove times info
      * @param hours24 0 to 23
      * @param minutes 0 to 59
@@ -417,7 +416,7 @@ public final class DateTool extends DateUtils {
 
     /**
      * Sets time informations to a date.
-     * hours, minutes, seconds, miliseconds
+     * hours, minutes, seconds, milliseconds
      * @param source Date to remove times info
      * @param hours24 0 to 23
      * @param minutes 0 to 59
@@ -464,7 +463,7 @@ public final class DateTool extends DateUtils {
 
 
     /***
-     * Iterate over the days between start and enddate (both inclusive).
+     * Iterate over the days between start and end date (both inclusive).
      * @param from 2010-01-01
      * @param until 2010-01-03
      * @return 2010-01-01, 2010-01-02, 2010-01-03
@@ -487,7 +486,7 @@ public final class DateTool extends DateUtils {
 
 
         /**
-         * Constructs a DateIterator that steps throug all days beginning
+         * Constructs a DateIterator that steps through all days beginning
          * from a given start date and ending at a given end date.
          * @param startDay start date (inclusive)
          * @param endDay end date (inclusive)
