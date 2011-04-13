@@ -3,10 +3,12 @@ package com.tcmj.common.tools.reflection;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import static com.tcmj.common.tools.lang.Check.*;
 
 /**
  * Helper for reflection operations (Cached!).
@@ -34,7 +36,7 @@ public final class ReflectionHelper {
      * @return Class object on success
      */
     public static <T> Class<T> loadClass(String className) {
-
+        notBlank(className, "Name of the class cannot be blank!");
         if (classCache == null) {
             classCache = new HashMap<String, Class>();
         }
@@ -66,6 +68,8 @@ public final class ReflectionHelper {
      */
     @SuppressWarnings("unchecked")
     public static <T> T newObject(String className, Class<?>[] paramTypes, Object... parameters) {
+        notBlank(className, "Name of the class cannot be blank!");
+
 
         Class<T> classinstance = loadClass(className);
 
@@ -95,7 +99,7 @@ public final class ReflectionHelper {
      */
     @SuppressWarnings("unchecked")
     public static <T> T newObject(String className) {
-
+        notBlank(className, "Name of the class cannot be blank!");
         Class<T> classinstance = loadClass(className);
 
         try {
@@ -129,6 +133,8 @@ public final class ReflectionHelper {
      * @param value parameter of the (set)method
      */
     public static void setValue(Object instance, String setter, Object value) {
+        notNull(instance, "Parameter Object must not be null! (1)");
+        notBlank(setter, "Name of the setter cannot be blank (Parameter 2)");
 
         Class classObj = instance.getClass();
 
@@ -152,6 +158,8 @@ public final class ReflectionHelper {
      * @return return value of the (get)method
      */
     public static <T> T getValue(Object instance, String getter) {
+        notNull(instance, "Parameter Object must not be null! (1)");
+        notBlank(getter, "Name of the getter cannot be blank (Parameter 2)");
 
         Class classObj = instance.getClass();
 
@@ -175,7 +183,8 @@ public final class ReflectionHelper {
      * @return Method object if found (or RuntimeException if not)
      */
     public static Method getMethod(Class<?> clazz, String methodName) {
-
+        notNull(clazz, "Parameter Class<?> must not be null! (1)");
+        notBlank(methodName, "Name of the method cannot be blank!");
         if (methodCache == null) {
             methodCache = new HashMap<String, Method>();
         }
@@ -208,6 +217,33 @@ public final class ReflectionHelper {
             return method;
         }
 
+    }
+
+
+    /**
+     * Tries to find a {@link Field field} on the supplied {@link Class} with the
+     * supplied <code>name</code> and/or {@link Class type}. Searches all superclasses
+     * up to {@link Object}.
+     * @param clazz the class to introspect
+     * @param fieldname the name of the field (may be <code>null</code> if type is specified)
+     * @param fieldtype the type of the field (may be <code>null</code> if name is specified)
+     * @return the corresponding Field object, or <code>null</code> if not found
+     */
+    public static Field getField(Class<?> clazz, String fieldname, Class<?> fieldtype) {
+        notNull(clazz, "Parameter Class<?> must not be null! (1)");
+        ensure(fieldname != null || fieldtype != null, "Either name or type of the field must be specified");
+        Class<?> currentClass = clazz;
+        while (!Object.class.equals(currentClass) && currentClass != null) {
+            Field[] fields = currentClass.getDeclaredFields();
+            for (Field field : fields) {
+                if ((fieldname == null || fieldname.equals(field.getName()))
+                        && (fieldtype == null || fieldtype.equals(field.getType()))) {
+                    return field;
+                }
+            }
+            currentClass = currentClass.getSuperclass();
+        }
+        return null;
     }
 
 

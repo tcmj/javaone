@@ -11,9 +11,9 @@ import org.apache.commons.lang.time.FastDateFormat;
 import static org.apache.commons.lang.Validate.notNull;
 
 /**
- * Helper for time and date operations.
- * <p>This class uses a static calendar pool</p>
+ * Helper for simple time and date operations.
  * <p> use following import in your classes <br>import static com.tcmj.common.tools.date.DateTool.*;</p>
+ * For professional date and time operations consider using the Joda time library
  * @see org.apache.commons.lang.time.DateUtils
  * @author tcmj - Thomas Deutsch
  * @since 2008
@@ -211,8 +211,8 @@ public final class DateTool extends DateUtils {
      * @return amount of days between
      * @throws java.lang.IllegalArgumentException if any of the both parameters is null
      */
-    public static long daysbetween(Date start, Date end) {
-        return between(start, end, Calendar.DATE);
+    public static int daysbetween(Date start, Date end) {
+        return (int) between(start, end, Calendar.DATE);
     }
 
 

@@ -15,6 +15,7 @@ public class ReflectionHelperTest {
     public ReflectionHelperTest() {
     }
 
+
     /**
      * Test of 'public static <T> Class<T> loadClass(String className)' method, of class ReflectionHelper.
      */
@@ -28,10 +29,40 @@ public class ReflectionHelperTest {
         System.out.println(" result = " + result);
     }
 
+
     @Test(expected = RuntimeException.class)
     public void loadClassWhenClassDoesNotExist() {
         ReflectionHelper.loadClass("jafa.nutil.Dates");
     }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldThrowExceptionWhenCalledWithNullParameter_loadClass() {
+        ReflectionHelper.loadClass(null);
+    }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldThrowExceptionWhenCalledWithNullParameter_newObject() {
+        ReflectionHelper.newObject(null);
+    }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldThrowExceptionWhenCalledWithNullParameter_newObject_P1() {
+        ReflectionHelper.newObject(null, new Class<?>[]{int.class}, 30);
+    }
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldThrowExceptionWhenCalledWithNullParameter_newObject_P2() {
+        Object newObject = ReflectionHelper.newObject("java.lang.StringBuilder", null, "Hello");
+        fail("StringBuilder "+newObject+" created!");
+    }
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldThrowExceptionWhenCalledWithNullParameter_newObject_P3() {
+        Object newObject = ReflectionHelper.newObject("java.lang.Integer", new Class<?>[]{int.class}, (Object[])null);
+        fail("Integer "+newObject+" created!");
+    }
+
 
     /**
      * Test of 'public static <T> T newObject(String className, Class<?>[] paramTypes, Object... parameters)' method, of class ReflectionHelper.
@@ -53,10 +84,12 @@ public class ReflectionHelperTest {
 
     }
 
+
     @Test(expected = RuntimeException.class)
     public void newClassWhenClassDoesNotExist() throws Exception {
         ReflectionHelper.newObject("non.existing.Unknown", new Class[]{}, new Object[]{});
     }
+
 
     /**
      * Test of 'public static void setValue(Object instance, String setter, Object value)' method, of class ReflectionHelper.
@@ -103,22 +136,24 @@ public class ReflectionHelperTest {
         System.out.println(" " + ReflectionHelper.getCacheInfo());
     }
 
+
     @Test(expected = RuntimeException.class)
     public void setValueWhenMethodDoesNotExist() {
         SimplePojo pojo = new SimplePojo();
         ReflectionHelper.setValue(pojo, "unExistingMethodName", "Value2Set");
     }
 
+
     @Test
     public void annotationTest_ReadAnnotation() throws Exception {
         System.out.println("public static <T extends Annotation> T  getMethodAnnotation(Class<?> clz, String methodName, Class<T> annotationClazz)");
         XmlElement xmlElementAnnotation = ReflectionHelper.getMethodAnnotation(SimplePojo.class, "getValueB", XmlElement.class);
         assertNotNull(xmlElementAnnotation);
-        System.out.println(" xmlElementAnnotation: "+xmlElementAnnotation);
+        System.out.println(" xmlElementAnnotation: " + xmlElementAnnotation);
         Test testAnnotation = ReflectionHelper.getMethodAnnotation(ReflectionHelperTest.class, "annotationTest_ReadAnnotation", Test.class);
         assertNotNull(testAnnotation);
-        System.out.println(" testAnnotation: "+testAnnotation);
-        
+        System.out.println(" testAnnotation: " + testAnnotation);
+
     }
 
     static class SimplePojo {
@@ -127,23 +162,26 @@ public class ReflectionHelperTest {
 
         private String valueB;
 
+
         @SuppressWarnings("unchecked")
         public String getValueA() {
             return valueA;
         }
 
+
         public void setValueA(String valueA) {
             this.valueA = valueA;
         }
 
-        @XmlElement(name="test55")
+
+        @XmlElement(name = "test55")
         public String getValueB() {
             return valueB;
         }
 
+
         public void setValueB(String valueB) {
             this.valueB = valueB;
         }
-
     }
 }
