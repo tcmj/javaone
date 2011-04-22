@@ -23,6 +23,17 @@ import com.tcmj.pm.conflicts.data.SortItem.SortItemType;
 
 /**
  * Finds conflicts.
+ * Start C = 0%                  P={};
+ * A1:   C = 0% + 30% = 30%;     P = {P1}         keine Konfliktmeldung
+ * A4:   C = 30% + 50% = 80%;    P = {P1,P4}      keine Konfliktmeldung
+ * A2:   C = 80% + 40% = 120%;   P = {P1,P4,P2}   Konfliktmeldung
+ * E1:   C = 120% - 30% = 90%;   P = {P4,P2}      keine Konfliktmeldung
+ * E4:   C = 90% - 50% = 40%;    P = {P2}         keine Konfliktmeldung
+ * A3:   C = 40% + 20% = 60%;    P = {P2,P3}      keine Konfliktmeldung
+ * E2:   C = 60% - 40% = 20%;    P = {P3}         keine Konfliktmeldung
+ * E3:   C = 20% - 20% = 0%;     P = {}           keine Konfliktmeldung
+ * ENDE
+
  * Last Modify: $Date: 2009/04/30 09:57:04 $ by $Author: TDEUT
  * @version $Revision: 1.10 $
  * @author tdeut Thomas Deutsch

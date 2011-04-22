@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tcmj</groupId>
     <artifactId>tcmj-parent</artifactId>
-    <version>1</version>
+    <version>3</version>
     <packaging>pom</packaging>
     <name>tcmj-parent</name>
     <modules>
@@ -63,7 +63,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.1</version>
+                <version>2.3.2</version>
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
@@ -81,6 +81,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.1</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -91,7 +92,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.6</version>
+                <version>2.7.1</version>
             </plugin>
             <plugin>
                 <artifactId>maven-source-plugin</artifactId>
@@ -144,6 +145,7 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- Logging framework -->
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
@@ -154,21 +156,57 @@
                 <artifactId>slf4j-simple</artifactId>
                 <version>${org.slf4j.version}</version>
             </dependency>
+            <!-- Logging implementation (slf4j) -->
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
                 <version>0.9.26</version>
             </dependency>
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.6</version>
-            </dependency>
+
             <dependency>
                 <groupId>com.tcmj.common</groupId>
                 <artifactId>commons-basic</artifactId>
                 <version>2.11.01</version>
             </dependency>
+            <!-- Unit test framework -->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.8.2</version>
+            </dependency>
+
+            <!-- JUnit extension to call the tests multiple times -->
+            <dependency>
+                <groupId>org.databene</groupId>
+                <artifactId>contiperf</artifactId>
+                <version>1.07</version>
+            </dependency>
+
+            <!-- Mock framework -->
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>1.8.5</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-all</artifactId>
+                <version>1.8.5</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-module-junit4</artifactId>
+                <version>${powermock.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-api-mockito</artifactId>
+                <version>${powermock.version}</version>
+            </dependency>
+
+
+
         </dependencies>
     </dependencyManagement>
 
@@ -195,6 +233,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jxr-plugin</artifactId>
+                <version>2.2</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -202,62 +241,64 @@
                 <version>2.7</version>
                 <configuration>
                     <docfilessubdirs>true</docfilessubdirs>
-                        <overview>${basedir}/src/main/javadoc/overview.html</overview>
+                    <overview>${basedir}/src/main/javadoc/overview.html</overview>
 
-                    </configuration>
+                </configuration>
 
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-pmd-plugin</artifactId>
-                    <version>2.5</version>
-                    <configuration>
-                        <linkXref>true</linkXref>
-                        <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
-                        <minimumTokens>30</minimumTokens>
-                        <targetJdk>1.6</targetJdk>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>findbugs-maven-plugin</artifactId>
-                    <version>2.3.1</version>
-                    <configuration>
-                        <xmlOutput>true</xmlOutput>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>2.5</version>
+                <configuration>
+                    <linkXref>true</linkXref>
+                    <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
+                    <minimumTokens>30</minimumTokens>
+                    <targetJdk>1.6</targetJdk>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>findbugs-maven-plugin</artifactId>
+                <version>2.3.1</version>
+                <configuration>
+                    <xmlOutput>true</xmlOutput>
                     <!-- Optional derectory to put findbugs xdoc xml report -->
-                        <xmlOutputDirectory>target/site</xmlOutputDirectory>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>jdepend-maven-plugin</artifactId>
-                </plugin>
+                    <xmlOutputDirectory>target/site</xmlOutputDirectory>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jdepend-maven-plugin</artifactId>
+                <version>2.0-beta-2</version>
+            </plugin>
             
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>cobertura-maven-plugin</artifactId>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>javancss-maven-plugin</artifactId>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>taglist-maven-plugin</artifactId>
-                </plugin>
-        
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <version>2.5</version>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>javancss-maven-plugin</artifactId>
+                <version>2.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>taglist-maven-plugin</artifactId>
+                <version>2.4</version>
+            </plugin>
+        </plugins>
+    </reporting>
 
-            </plugins>
-        </reporting>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <org.slf4j.version>1.6.1</org.slf4j.version>
+        <powermock.version>1.4.7</powermock.version>
 
-
-        <properties>
-            <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-            <org.slf4j.version>1.6.1</org.slf4j.version>
-
-            <checkstyle.config.location>\coding-resources\src\main\resources\checkstyle\tcmjstyle.xml</checkstyle.config.location>
+        <checkstyle.config.location>\coding-resources\src\main\resources\checkstyle\tcmjstyle.xml</checkstyle.config.location>
 
          
-        </properties>
-    </project>
+    </properties>
+</project>
 

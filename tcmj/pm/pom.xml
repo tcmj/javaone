@@ -1,11 +1,10 @@
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.tcmj</groupId>
         <artifactId>tcmj-parent</artifactId>
-        <version>1</version>
+        <version>3</version>
     </parent>
     <groupId>com.tcmj.pm</groupId>
     <artifactId>tcmj-pm-parent</artifactId>
@@ -13,14 +12,18 @@
     <packaging>pom</packaging>
     <name>tcmj-pm-parent-pom</name>
     <modules>
+        <module>common</module>
         <module>conflicts-core</module>
         <module>conflicts-jfreechart</module>
-    </modules>
+        <module>spread</module>
+        <module>spread-jfreechart</module>
+    <module>bo</module>
+  </modules>
     <description>
         tcmj project management api.
-        conflicts-core - conflicts core module
+        conflicts-core - detects conflicts in periods
+        spread         - spreads any values over some periods using a custom curve
     </description>
-
     <distributionManagement>
         <site>
             <id>site</id>
@@ -28,7 +31,6 @@
             <url>file:///D:/temp/site/pm</url>
         </site>
     </distributionManagement>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -36,13 +38,19 @@
                 <artifactId>conflicts-core</artifactId>
                 <version>2.12.16-SNAPSHOT</version>
             </dependency>
+            <dependency>
+                <groupId>com.tcmj.pm</groupId>
+                <artifactId>spread</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>joda-time</groupId>
+                <artifactId>joda-time</artifactId>
+                <version>1.6.2</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <properties>
-    
         <checkstyle.config.location>..\coding-resources\src\main\resources\checkstyle\tcmjstyle.xml</checkstyle.config.location>
-
-         
     </properties>
 </project>
-

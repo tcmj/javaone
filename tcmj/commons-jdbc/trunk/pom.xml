@@ -3,13 +3,13 @@
     <parent>
         <groupId>com.tcmj</groupId>
         <artifactId>tcmj-parent</artifactId>
-        <version>2</version>
+        <version>3</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tcmj.common</groupId>
     <artifactId>commons-jdbc</artifactId>
     <packaging>jar</packaging>
-    <version>2.11.02-SNAPSHOT</version>
+    <version>2.11.03</version>
     <name>tcmj-commons-jdbc</name>
     <description>
         This java package provides a simple way to work with databases.
