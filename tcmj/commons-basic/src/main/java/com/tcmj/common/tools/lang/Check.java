@@ -17,7 +17,11 @@
  */
 package com.tcmj.common.tools.lang;
 
+import java.sql.ResultSet;
 import java.text.MessageFormat;
+import java.util.Collection;
+import java.util.Map;
+import java.util.zip.ZipFile;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -108,6 +112,44 @@ public class Check {
         return string;
     }
 
+    
+    /**
+     * checks if an object is null or empty.<br/>
+     * Supports<br/>
+     * <ul>
+     * <li>{@link java.util.Collection} (isEmpty)</li>
+     * <li>{@link java.util.Map} (isEmpty)</li>
+     * <li>Primitive arrays (length)</li>
+     * <li>{@link java.lang.CharSequence} (length)</li>
+     * <li>{@link java.util.zip.ZipFile} (size)</li>
+     * </ul>
+     * <b>All other classes will only be checked if they are null (=true) or not null (=false)!</b>
+     * @param obj Object
+     * @return bool
+     */
+    public static boolean isEmpty(Object obj) {
+        if (obj == null) {
+            return true;
+        } else {
+            if (Collection.class.isAssignableFrom(obj.getClass())) {
+                return ((Collection)obj).isEmpty();
+            } else if (Map.class.isAssignableFrom(obj.getClass())) {
+                return ((Map)obj).isEmpty();
+            } else if (Object[].class.isAssignableFrom(obj.getClass())) {
+                return ((Object[])obj).length==0;
+            } else if (CharSequence.class.isAssignableFrom(obj.getClass())) {
+                return ((CharSequence)obj).length()==0;
+            } else if (ZipFile.class.isAssignableFrom(obj.getClass())) {
+                return ((ZipFile)obj).size()==0;
+            } else {
+                return false;
+//                throw new UnsupportedOperationException("Empty check is not implemented for "+obj.getClass());
+            }
+        }
+    }
+    
+    
+    
 
     /** Internal method to produce strings filled with formatted values. */
     private static String buildMessage(String msg, Object... params) {

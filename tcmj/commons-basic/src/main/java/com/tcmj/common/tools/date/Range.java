@@ -191,4 +191,5 @@ public final class Range<T extends Comparable<T>> {
     public final String toString() {
         return String.format("Range[%s, %s]", this.lowerBound, this.upperBound);
     }
+
 }

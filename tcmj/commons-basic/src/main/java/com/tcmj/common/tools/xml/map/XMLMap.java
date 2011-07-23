@@ -42,6 +42,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import static com.tcmj.common.tools.lang.Check.*;
 
 /**
  * This class is a Map implementation for a XML-File.
@@ -95,16 +96,9 @@ public class XMLMap implements Map<String, String>, Serializable {
      * @param xml File handle to a XML File (does not have to exist).
      */
     public XMLMap(final File xml) {
-
-        if (xml == null) {
-            throw new XMLMapException("XML File handle cannot be null!");
-        }
-
         this.data = new LinkedHashMap<String, XMLEntry>();
-        this.xMLFileHandle = xml;
-
+        this.xMLFileHandle = notNull(xml, "XML File handle cannot be null!");
         setLevelSeparator(".");
-
     }
 
     /**
@@ -115,10 +109,8 @@ public class XMLMap implements Map<String, String>, Serializable {
      */
     @Override
     public String put(String key, String value) {
-        if (key == null) {
-            throw new XMLMapException("Null not accepted as key!");
-        }
 
+        notBlank(key, "Blank key not accepted!");
         validateEntry(key);
 
         XMLEntry oldentry = data.put(key, new XMLEntry(key, value));
@@ -161,8 +153,8 @@ public class XMLMap implements Map<String, String>, Serializable {
 
             XMLEntry entry = data.get(keypart);
             if (entry != null && !entry.getKey().equals(keytocheck)) {
-                throw new XMLMapException("Cannot add property '" + keytocheck +
-                        "' because of allready existing higher node entry '" + entry.getKey() + "'");
+                throw new XMLMapException("Cannot add property '" + keytocheck
+                        + "' because of allready existing higher node entry '" + entry.getKey() + "'");
             }
         }
 
@@ -191,8 +183,8 @@ public class XMLMap implements Map<String, String>, Serializable {
                 boolean samelevel = isSameLevel(entrykey, keytocheck);
 
                 if (entrykey.startsWith(keytocheck) && !samelevel) {
-                    throw new XMLMapException("Cannot add property '" + keytocheck +
-                            "' because of allready existing lower node entry '" + entrykey + "'");
+                    throw new XMLMapException("Cannot add property '" + keytocheck
+                            + "' because of allready existing lower node entry '" + entrykey + "'");
                 }
             }
         }
@@ -208,9 +200,9 @@ public class XMLMap implements Map<String, String>, Serializable {
 
         //wenn die keys komplett gleich sind ist der pfad derselbe,
         //oder wenn beide keinen separator besitzen (root)
-        if (key1.equals(key2) ||
-                (key1.indexOf(getLevelSeparator()) == -1) &&
-                (key2.indexOf(getLevelSeparator()) == -1)) {
+        if (key1.equals(key2)
+                || (key1.indexOf(getLevelSeparator()) == -1)
+                && (key2.indexOf(getLevelSeparator()) == -1)) {
             return true;
         } else {
             //..wenn nicht muss genau ermittelt werden:
@@ -314,10 +306,10 @@ public class XMLMap implements Map<String, String>, Serializable {
      * @return Java Object - cast it (eg. Date date = (Date)getObject(...))
      */
     public Object getObjectByValue(String value) {
-        Iterator<Entry<String,XMLEntry>> itd = data.entrySet().iterator();
+        Iterator<Entry<String, XMLEntry>> itd = data.entrySet().iterator();
         Object obj = null;
         while (itd.hasNext()) {
-            Map.Entry<String,XMLEntry> mapen = itd.next();
+            Map.Entry<String, XMLEntry> mapen = itd.next();
             XMLEntry xmlentry = mapen.getValue();
             if (value.equals(xmlentry.getValue())) {
 
@@ -370,7 +362,7 @@ public class XMLMap implements Map<String, String>, Serializable {
 
                 root = document.getDocumentElement();
             } catch (Exception ex) {
-                logger.error("Error reading XML: "+ex.getMessage(), ex);
+                logger.error("Error reading XML: " + ex.getMessage(), ex);
             }
 
             //Nur wenn es ein Wurzelelement gibt weiterlesen:
@@ -404,7 +396,7 @@ public class XMLMap implements Map<String, String>, Serializable {
 
                     if ((uppernode.getNodeType() == Node.ELEMENT_NODE)) {
                         //wenn es sich um ein Element handelt (kein Kommentar..)
-                        logger.debug("Current node: LocalName={} NodeName={} Prefix={}",  new Object[]{uppernode.getLocalName(), uppernode.getNodeName(), uppernode.getPrefix()});
+                        logger.debug("Current node: LocalName={} NodeName={} Prefix={}", new Object[]{uppernode.getLocalName(), uppernode.getNodeName(), uppernode.getPrefix()});
 
                         String nodename = uppernode.getNodeName();
                         deeper(uppernode, nodename);
@@ -424,8 +416,7 @@ public class XMLMap implements Map<String, String>, Serializable {
     private Node searchNode(String nodename) throws XPathExpressionException {
 
         // 1. Instantiate an XPathFactory.
-        javax.xml.xpath.XPathFactory factory =
-                javax.xml.xpath.XPathFactory.newInstance();
+        javax.xml.xpath.XPathFactory factory = javax.xml.xpath.XPathFactory.newInstance();
 
         // 2. Use the XPathFactory to create a new XPath object
         javax.xml.xpath.XPath xpath = factory.newXPath();
@@ -657,7 +648,7 @@ public class XMLMap implements Map<String, String>, Serializable {
         if (uppernode != null) { //wenn er ein Kind namens <xMLEntryPoint> hat...
             Node prevnode = uppernode.getPreviousSibling();
 
-            //...l�schen:
+            //...löschen:
             if (prevnode.getNodeType() == Node.TEXT_NODE) {
                 root.removeChild(prevnode);
             }
@@ -730,13 +721,11 @@ public class XMLMap implements Map<String, String>, Serializable {
             //Value oder Values anlegen:
             if (xmlentry.getValue() != null) {
 
-
                 if (xmlentry.getXmlNodeType() == Node.CDATA_SECTION_NODE) {
                     actualnode.appendChild(document.createCDATASection(xmlentry.getValue()));
                 } else {
                     actualnode.appendChild(document.createTextNode(xmlentry.getValue()));
                 }
-
 
             } else {
 
@@ -763,7 +752,6 @@ public class XMLMap implements Map<String, String>, Serializable {
 
         FileOutputStream outpt = new FileOutputStream(outputfile);
         try {
-
 
             TransformerFactory tfactory = TransformerFactory.newInstance();
             tfactory.setAttribute("indent-number", 2);
@@ -831,8 +819,8 @@ public class XMLMap implements Map<String, String>, Serializable {
         if (this.data.isEmpty()) {
             return "No Entries available!";
         } else {
-            int initialsize = data.size() * 50; //(Anzahl Eintr�ge x 50 Zeichen pro Zeile
-            StringBuffer buffer = new StringBuffer(initialsize);
+            int initialsize = data.size() * 50; //(Anzahl Einträge x 50 Zeichen pro Zeile
+            StringBuilder buffer = new StringBuilder(initialsize);
             String line = System.getProperty("line.separator");
             buffer.append("----XMLMap ----").append(line);
             Iterator<XMLEntry> itData = this.data.values().iterator();
@@ -848,9 +836,9 @@ public class XMLMap implements Map<String, String>, Serializable {
                 }
 
                 if (attributes) {
-                    Map<String,String> map = entry.getAttributes();
+                    Map<String, String> map = entry.getAttributes();
                     if (map != null) {
-                        buffer.append(" A:[" + map.entrySet() + "]");
+                        buffer.append(" A:[").append(map.entrySet()).append("]");
                     }
 
                 }
@@ -1071,8 +1059,8 @@ public class XMLMap implements Map<String, String>, Serializable {
 
         @Override
         public int hashCode() {
-            return (key == null ? 0 : key.hashCode()) ^
-                    (value == null ? 0 : java.util.Arrays.hashCode(value));
+            return (key == null ? 0 : key.hashCode())
+                    ^ (value == null ? 0 : java.util.Arrays.hashCode(value));
         }
 
         @Override
@@ -1144,8 +1132,8 @@ public class XMLMap implements Map<String, String>, Serializable {
      * @param separator
      */
     public final void setLevelSeparator(String separator) {
-        if (separator == null ||
-                separator.contains(":")) {
+        if (separator == null
+                || separator.contains(":")) {
             throw new UnsupportedOperationException("Not allowed level separator: " + separator);
         }
         levelSeparator = separator;
@@ -1238,8 +1226,8 @@ public class XMLMap implements Map<String, String>, Serializable {
     }
 
     @Override
-    public void putAll(Map<? extends String,? extends String> stringmap) {
-    	for (Iterator<? extends Map.Entry<? extends String, ? extends String>> itentryset = stringmap.entrySet().iterator(); itentryset.hasNext(); ) {
+    public void putAll(Map<? extends String, ? extends String> stringmap) {
+        for (Iterator<? extends Map.Entry<? extends String, ? extends String>> itentryset = stringmap.entrySet().iterator(); itentryset.hasNext();) {
             Map.Entry<? extends String, ? extends String> entry = itentryset.next();
             put(entry.getKey(), entry.getValue());
         }
@@ -1268,4 +1256,4 @@ public class XMLMap implements Map<String, String>, Serializable {
 
         return rebuilt;
     }
-}//end: class
+}

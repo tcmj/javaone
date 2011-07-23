@@ -44,8 +44,7 @@ public class XMLTool {
             final String prefix, QName returntype) throws XPathExpressionException {
 
         // 1. Instantiate an XPathFactory.
-        javax.xml.xpath.XPathFactory factory =
-                javax.xml.xpath.XPathFactory.newInstance();
+        javax.xml.xpath.XPathFactory factory = javax.xml.xpath.XPathFactory.newInstance();
 
         // 2. Use the XPathFactory to create a new XPath object
         javax.xml.xpath.XPath xpath = factory.newXPath();
@@ -101,7 +100,7 @@ public class XMLTool {
      * @return NodeList object
      * @throws XPathExpressionException on xpath compile errors
      */
-    public static final NodeList selectNodes(Document document,
+    public static NodeList selectNodes(Document document,
             String xpathexp, final String prefix) throws XPathExpressionException {
         return (NodeList) selectNode(document, xpathexp, prefix, XPathConstants.NODESET);
     }
@@ -114,7 +113,7 @@ public class XMLTool {
      * @return Node object
      * @throws XPathExpressionException on xpath compile errors
      */
-    public static final Node selectNode(Document document,
+    public static Node selectNode(Document document,
             String xpathexp, final String prefix) throws XPathExpressionException {
         return (Node) selectNode(document, xpathexp, prefix, XPathConstants.NODE);
     }
@@ -139,7 +138,6 @@ public class XMLTool {
         Validator validator = schema.newValidator();
 
         validator.validate(new DOMSource(document));
-
 
     }
 
