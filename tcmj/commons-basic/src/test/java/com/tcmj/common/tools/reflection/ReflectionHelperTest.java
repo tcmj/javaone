@@ -5,6 +5,7 @@ import java.util.Date;
 import javax.xml.bind.annotation.XmlElement;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.*;
 
 /**
  *
@@ -156,6 +157,32 @@ public class ReflectionHelperTest {
 
     }
 
+    
+    @Test
+    public void shouldFindAllMethods(){
+        assertThat(ReflectionHelper.getMethod(SimplePojo.class, "toString"), notNullValue());
+    }
+
+    @Test
+    public void shouldExtractAllClasses(){
+        //given
+        String one = "a string";
+        Class two = Double.class;
+        SimplePojo three = new SimplePojo();
+        Object[] anything = new Object[]{one, two, three};
+        
+        //when
+        Class[] extracted = ReflectionHelper.extractClasses(anything);
+        
+        //then
+        assertEquals(extracted[0], String.class);
+        assertEquals(extracted[1], Double.class);
+        assertEquals(extracted[2], SimplePojo.class);
+    }
+
+    
+    
+    
     static class SimplePojo {
 
         private String valueA;

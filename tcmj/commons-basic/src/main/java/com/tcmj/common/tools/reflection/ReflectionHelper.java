@@ -275,4 +275,23 @@ public final class ReflectionHelper {
         }
         return bld.toString();
     }
+    
+    /**
+     * Extracts all classes of the given objects using the getClass() method.
+     * 
+     * @param parameter any java objects
+     * @return array containing each return value of the getClass method
+     */
+    public static Class[] extractClasses(Object[] parameter) {
+        Class[] classes = new Class[parameter.length];
+        for (int i = 0; i < parameter.length; i++) {
+            if (parameter[i] instanceof Class) {
+                classes[i] = (Class) parameter[i];
+            } else {
+                classes[i] = parameter[i].getClass();
+            }
+        }
+        return classes;
+    }
+    
 }
