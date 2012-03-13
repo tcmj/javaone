@@ -180,7 +180,7 @@ public final class ReflectionHelper {
     /** extracts a specific Method object from the given Class object.
      * @param clazz Class object
      * @param methodName name of the method to search for
-     * @return Method object if found (or RuntimeException if not)
+     * @return Method object if found (or null if not)
      */
     public static Method getMethod(Class<?> clazz, String methodName) {
         notNull(clazz, "Parameter Class<?> must not be null! (1)");
@@ -198,7 +198,7 @@ public final class ReflectionHelper {
         if (method == null) {
 
             Method[] methods = clazz.getMethods();
-
+//TODO exception wenn mehr als 1x gefunden!
             for (int i = 0, max = methods.length; i < max; i++) {
                 method = methods[i];
 
@@ -211,8 +211,8 @@ public final class ReflectionHelper {
 
             }
 
-            throw new RuntimeException("No method: '" + methodName + "' found in class: " + clazz);
-
+//            throw new RuntimeException("No method: '" + methodName + "' found in class: " + clazz);
+            return null;
         } else {
             return method;
         }

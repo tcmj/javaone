@@ -105,10 +105,10 @@ public class SQLTool {
      * @param stmt Statement/PreparedStatement object
      * @param rs ResultSet object
      */
-    public static void close(Connection con, Statement stmt, ResultSet rs) {
+    public static void close(Connection connection, Statement stmt, ResultSet rs) {
         close(rs);
         close(stmt);
-        close(con);
+        close(connection);
     }
     
 }
