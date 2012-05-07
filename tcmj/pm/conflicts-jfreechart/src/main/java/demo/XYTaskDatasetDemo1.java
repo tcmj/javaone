@@ -18,6 +18,8 @@ import org.jfree.data.gantt.TaskSeriesCollection;
 import org.jfree.data.gantt.XYTaskDataset;
 import org.jfree.data.time.Day;
 import org.jfree.data.time.Hour;
+import org.jfree.data.time.TimeSeries;
+import org.jfree.data.time.TimeSeriesDataItem;
 import org.jfree.data.xy.IntervalXYDataset;
 import org.jfree.ui.ApplicationFrame;
 import org.jfree.ui.RefineryUtilities;
@@ -59,6 +61,10 @@ public class XYTaskDatasetDemo1 extends ApplicationFrame
 
   private static TaskSeriesCollection createTasks()
   {
+      TimeSeries timeseries = new TimeSeries("L&G European Index Trust");
+      timeseries.add(new TimeSeriesDataItem(null, WIDTH));
+      
+      
     TaskSeriesCollection localTaskSeriesCollection = new TaskSeriesCollection();
     TaskSeries localTaskSeries1 = new TaskSeries("Team A");
     localTaskSeries1.add(new Task("T1a", new Hour(11, new Day())));

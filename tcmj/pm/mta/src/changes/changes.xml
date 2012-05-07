@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="http://maven.apache.org/changes/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/xsd/changes-1.0.0.xsd">
+  <properties>
+    <title>Changes iMTA Module</title>
+    <author email="t.deutsch@inteco.de">Thomas Deutsch</author>
+  </properties>
+  <body>
+    <release version="1.2.00" date="2011-04-06" description="Feature Release">
+      <action dev="tdeut" type="add">
+        Neues Feature um Linienfarbe und Symbol individuell per Serie zu setzen.
+        Abwärtskompatibel!
+      </action>
+    </release>
+    <release version="1.0.01" date="2011-02-17" description="Bugfix Release">
+      <action dev="rniko" type="fix">
+        Fix für Vorgänge ohne Basisplan
+      </action>
+    </release>
+    <release version="1.0.00" date="2010-05-10" description="Migration Release">
+      <action dev="tdeut" type="add">
+        Erstellung dieses Moduls mit dem Ziel die iMTA in jedem beliebigen Projekt
+        zu verwenden. Stand wurde vom EADS Projekt herausgearbeitet.
+      </action>
+    </release>    
+  </body>
+</document>

@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package com.tcmj.common.jdbc.connect;
 
 import org.junit.After;
@@ -86,21 +81,15 @@ public class DriverTest {
 
     
 
-//    /**
-//     * Test of createURL method, of class Driver.
-//     */
-//    @Test
-//    public void testCreateURL() {
-//        System.out.println("createURL");
-//        String pDB_Alias_SID = "";
-//        String pHost = "";
-//        String pPort = "";
-//        Driver pDriver = null;
-//        String expResult = "";
-//        String result = Driver.createURL(pDB_Alias_SID, pHost, pPort, pDriver);
-//        assertEquals(expResult, result);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
+    /**
+     * Test of createURL method, of class Driver.
+     */
+    @Test
+    public void testCreateUrlACCESS_MDB() {
+        System.out.println("createURL:ACCESS_MDB");
+        String expResult = "jdbc:odbc:Driver={Microsoft Access Driver (*.mdb)};DBQ=.\\dbpath\\Accesfile.mdb";
+        String result = Driver.createURL(".\\dbpath\\Accesfile.mdb", null, null, Driver.ACCESS_MDB);
+        assertEquals(expResult, result);
+    }
 
 }

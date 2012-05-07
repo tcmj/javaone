@@ -7,6 +7,30 @@
         <author email="thomas-deutsch@tcmj.de">Thomas Deutsch</author>
     </properties>
     <body>
+        <release version="2.12.05" date="2012-05-01" description="Enhancements">
+            <action dev="tdeut" type="add">
+                Added class com.tcmj.common.tools.lang.Close with methods to swallow exceptions or wrap exceptions to unchecked
+            </action>
+            <action dev="tdeut" type="add">
+                Added class com.tcmj.common.tools.lang.Download with methods to download files from URLs
+            </action>
+        </release>
+        <release version="2.11.04" date="2011-04-01" description="Enhancements">
+            <action dev="tdeut" type="add">
+                Added class com.tcmj.common.tools.lang.Check as a check utility class (like apaches Validate or Googles Precondition class)
+            </action>
+            <action dev="tdeut" type="update">
+                minor improvements
+            </action>
+        </release>
+        <release version="2.11.01" date="2011-01-25" description="Enhancements">
+            <action dev="tdeut" type="add">
+                Added class com.tcmj.common.lang.Application with new methods to access some manifest entries
+            </action>
+            <action dev="tdeut" type="update">
+                improvements in the com.tcmj.common.tools.date.DateUtil class
+            </action>
+        </release>
         <release version="2.10.06" date="2010-06-01" description="Subsequent release">
             <action dev="tdeut" type="add">
                  rebuilt the whole class structure
@@ -16,14 +40,6 @@
             </action>
             <action dev="tdeut" type="remove" due-to="Mr. X" due-to-email="x@exist.com">
                 Removed database access classes and moved them in a new maven artifact
-            </action>
-        </release>
-        <release version="2.11.01" date="2011-01-25" description="Enhancements">
-            <action dev="tdeut" type="add">
-                Added class com.tcmj.common.lang.Application with new methods to access some manifest entries
-            </action>
-            <action dev="tdeut" type="update">
-                improvements in the com.tcmj.common.tools.date.DateUtil class
             </action>
         </release>
     </body>

@@ -103,7 +103,7 @@ public class Check {
      * @param string the string to check
      * @param message a message used by the thrown exception
      * @return the given string parameter (parameter no 1)
-     * @throws IllegalArgumentException if the string is blank {@see org.apache.commons.lang.StringUtils#isBlank(java.lang.String) }
+     * @throws IllegalArgumentException if the string is blank {@link org.apache.commons.lang.StringUtils#isBlank(java.lang.String) }
      */
     public static String notBlank(String string, String message, Object... params) {
         if (StringUtils.isBlank(string)) {

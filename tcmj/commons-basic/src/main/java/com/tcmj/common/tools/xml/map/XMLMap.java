@@ -43,6 +43,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import static com.tcmj.common.tools.lang.Check.*;
+import com.tcmj.common.tools.lang.Close;
 
 /**
  * This class is a Map implementation for a XML-File.
@@ -765,17 +766,17 @@ public class XMLMap implements Map<String, String>, Serializable {
                 transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
                 transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", "2");
             } catch (Exception ex) {
-                logger.warn("Not supported Attribute in writing XML: {}", ex.getMessage());
+                logger.warn("Unsupported attribute in writing XML: {}", ex.getMessage());
             }
 
             transformer.transform(new DOMSource(document), new StreamResult(new OutputStreamWriter(outpt, "UTF-8")));
 
             outpt.flush();
             outpt.getFD().sync();
-            outpt.close();
+            Close.quiet(outpt);
 
         } catch (IOException ioe) {
-            outpt.close();
+            Close.quiet(outpt);
             throw ioe;
         }
 

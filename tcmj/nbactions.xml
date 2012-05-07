@@ -21,4 +21,12 @@
                 <maven.test.skip>true</maven.test.skip>
             </properties>
         </action>
+        <action>
+            <actionName>CUSTOM-deploy (non-recurse)</actionName>
+            <displayName>deploy (non-recurse)</displayName>
+            <recursive>false</recursive>
+            <goals>
+                <goal>deploy</goal>
+            </goals>
+        </action>
     </actions>

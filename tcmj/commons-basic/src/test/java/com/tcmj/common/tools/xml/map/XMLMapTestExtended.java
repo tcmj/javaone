@@ -6,6 +6,7 @@
  */
 package com.tcmj.common.tools.xml.map;
 
+import com.tcmj.common.tools.lang.Close;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -81,11 +82,11 @@ public class XMLMapTestExtended {
 
         ObjectOutputStream objOut = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(serFilename)));
         objOut.writeObject(xmap);
-        objOut.close();
+        Close.quiet(objOut);
 
         ObjectInputStream objIn = new ObjectInputStream(new BufferedInputStream(new FileInputStream(serFilename)));
         XMLMap xmap2 = (XMLMap) objIn.readObject();
-        objIn.close();
+        Close.quiet(objIn);
         logger.info(xmap2.toString());
         assertEquals("123", xmap2.get("a"));
         assertEquals("456", xmap2.get("b.c"));
