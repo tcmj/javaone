@@ -38,13 +38,13 @@ public class Close {
      * wrap the exception to an unchecked exception.
      */
     private static void closeIntern(Closeable object, boolean throwUnchecked) {
-        try {
-            if (object != null) {
+        if (object != null) {
+            try {
                 object.close();
-            }
-        } catch (Exception e) {
-            if (throwUnchecked) {
-                throw new RuntimeException(e);
+            } catch (Exception e) {
+                if (throwUnchecked) {
+                    throw new RuntimeException(e);
+                }
             }
         }
     }
