@@ -14,8 +14,7 @@
     <description>
         This java package provides helper classes and functions which were needed
         in most java projects. It should be a extension to the apache commons-lang
-        library.
-        
+        library. 
         
         Todo:
         - Download (Datei von URL lesen, downloaden etc.) 
