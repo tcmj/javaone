@@ -4,20 +4,15 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tcmj</groupId>
     <artifactId>tcmj-parent</artifactId>
-    <version>5</version>
+    <version>6</version>
     <packaging>pom</packaging>
     <name>tcmj-parent</name>
-    <modules>
-        <module>commons-basic</module>
-        <module>commons-jdbc\trunk</module>
-        <module>pm</module>
-    </modules>
     <url>http://www.tcmj.de</url>
     <description>
-        All tcmj java projects.
+        Parent pom for all tcmj java projects.
         commons-basic - a java lang extension heavily using the apache commons-lang library.
         commons-jdbc  - java.sql.Connection implementation to simplify jdbc tasks (not a jdbc driver!)
-        pm            - project management package
+        pm            - project management library
     </description>
     <developers>
         <developer>
@@ -46,15 +41,16 @@
         </repository>
     </repositories>
     <scm>
-        <connection>scm:svn:http://tcmj.googlecode.com/svn/trunk/</connection>
-        <developerConnection>scm:svn:https://tcmj.googlecode.com/svn/trunk/</developerConnection>
-        <url>http://tcmj.googlecode.com/svn/trunk/</url>
+        <url>https://github.com/tcmj/javaone</url>
+        <connection>scm:git:ssh://github.com/tcmj/javaone.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/tcmj/javaone.git</developerConnection>
     </scm>
     <distributionManagement>
         <repository>
             <id>tcmj-repository</id>
             <name>tcmj google repository</name>
-            <url>https://tcmj.googlecode.com/svn/mvnrepo</url>
+            <url>svn:https://tcmj.googlecode.com/svn/mvnrepo</url>
+            <uniqueVersion>false</uniqueVersion>
         </repository>
         <site>
             <id>site</id>
@@ -67,10 +63,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.0</version>
+                <version>3.2</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>${java.source.level.version}</source>
+                    <target>${java.source.level.version}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
                     <optimize>true</optimize>
                 </configuration>
@@ -78,15 +74,20 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>2.6</version>
+                <version>2.7</version>
                 <configuration>
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.8.2</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.4</version>
+                <version>2.5</version>
                 <configuration>
                     <archive>
                         <index>true</index>
@@ -98,9 +99,16 @@
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.14</version>
+                <version>2.18</version>
             </plugin>
         </plugins>
+        <extensions>
+            <extension>
+                <groupId>org.jvnet.wagon-svn</groupId>
+                <artifactId>wagon-svn</artifactId>
+                <version>1.12</version>
+            </extension>
+        </extensions>
     </build>
     <dependencyManagement>
         <dependencies>
@@ -119,40 +127,40 @@
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>1.0.9</version>
+                <version>1.1.2</version>
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-core</artifactId>
-                <version>1.0.9</version>
+                <version>1.1.2</version>
             </dependency>
             <dependency>
                 <groupId>com.tcmj.common</groupId>
                 <artifactId>commons-basic</artifactId>
-                <version>2.11.03</version>
+                <version>2.14.07</version>
             </dependency>
             <!-- Unit test framework -->
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>4.11</version>
+                <version>4.12</version>
             </dependency>
             <!-- JUnit extension to call the tests multiple times -->
             <dependency>
                 <groupId>org.databene</groupId>
                 <artifactId>contiperf</artifactId>
-                <version>2.2.0</version>
+                <version>2.3.4</version>
             </dependency>
             <!-- Mock framework -->
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>1.9.5</version>
+                <version>1.10.8</version>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-all</artifactId>
-                <version>1.9.5</version>
+                <version>1.10.8</version>
             </dependency>
             <dependency>
                 <groupId>org.powermock</groupId>
@@ -179,7 +187,7 @@
                 <plugins>
                     <plugin>
                         <artifactId>maven-source-plugin</artifactId>
-                        <version>2.2.1</version>
+                        <version>2.4</version>
                         <executions>
                             <execution>
                                 <id>bundle-sources</id>
@@ -195,7 +203,7 @@
                     </plugin>
                     <plugin>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.9</version>
+                        <version>2.10.1</version>
                         <executions>
                             <execution>
                                 <id>javadoc-jar</id>
@@ -221,14 +229,14 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-site-plugin</artifactId>
-                        <version>3.2</version>
+                        <version>3.4</version>
                         <configuration>
                             <generateSitemap>true</generateSitemap>
                             <reportPlugins>
                                 <plugin>
                                     <groupId>org.apache.maven.plugins</groupId>
                                     <artifactId>maven-project-info-reports-plugin</artifactId>
-                                    <version>2.6</version>
+                                    <version>2.7</version>
                                     <configuration>
                                         <dependencyDetailsEnabled>true</dependencyDetailsEnabled>
                                         <dependencyLocationsEnabled>true</dependencyLocationsEnabled>
@@ -237,7 +245,7 @@
                                 <plugin>
                                     <groupId>org.apache.maven.plugins</groupId>
                                     <artifactId>maven-changes-plugin</artifactId>
-                                    <version>2.9</version>
+                                    <version>2.11</version>
                                     <reportSets>
                                         <reportSet>
                                             <reports>
@@ -249,7 +257,7 @@
                                 <plugin>
                                     <groupId>org.apache.maven.plugins</groupId>
                                     <artifactId>maven-checkstyle-plugin</artifactId>
-                                    <version>2.10</version>
+                                    <version>2.13</version>
                                     <configuration>
                                         <configLocation>${checkstyle.config.file}</configLocation>
                                         <enableRulesSummary>false</enableRulesSummary>
@@ -261,12 +269,12 @@
                                 <plugin>
                                     <groupId>org.apache.maven.plugins</groupId>
                                     <artifactId>maven-jxr-plugin</artifactId>
-                                    <version>2.3</version>
+                                    <version>2.5</version>
                                 </plugin>
                                 <plugin>
                                     <groupId>org.apache.maven.plugins</groupId>
                                     <artifactId>maven-javadoc-plugin</artifactId>
-                                    <version>2.9</version>
+                                    <version>2.10.1</version>
                                     <configuration>
                                         <docfilessubdirs>true</docfilessubdirs>
                                         <overview>${basedir}/src/main/javadoc/overview.html</overview>
@@ -275,7 +283,7 @@
                                 <plugin>
                                     <groupId>org.apache.maven.plugins</groupId>
                                     <artifactId>maven-pmd-plugin</artifactId>
-                                    <version>3.0.1</version>
+                                    <version>3.3</version>
                                     <configuration>
                                         <linkXref>true</linkXref>
                                         <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
@@ -286,7 +294,7 @@
                                 <plugin>
                                     <groupId>org.codehaus.mojo</groupId>
                                     <artifactId>findbugs-maven-plugin</artifactId>
-                                    <version>2.5.2</version>
+                                    <version>3.0</version>
                                     <configuration>
                                         <xmlOutput>true</xmlOutput>
                                         <!-- Optional derectory to put findbugs xdoc xml report -->
@@ -296,17 +304,17 @@
                                 <plugin>
                                     <groupId>org.codehaus.mojo</groupId>
                                     <artifactId>jdepend-maven-plugin</artifactId>
-                                    <version>2.0-beta-2</version>
+                                    <version>2.0</version>
                                 </plugin>
                                 <plugin>
                                     <groupId>org.codehaus.mojo</groupId>
                                     <artifactId>cobertura-maven-plugin</artifactId>
-                                    <version>2.5.2</version>
+                                    <version>2.6</version>
                                 </plugin>
                                 <plugin>
                                     <groupId>org.codehaus.mojo</groupId>
                                     <artifactId>javancss-maven-plugin</artifactId>
-                                    <version>2.0</version>
+                                    <version>2.1</version>
                                 </plugin>
                                 <plugin>
                                     <groupId>org.codehaus.mojo</groupId>
@@ -323,8 +331,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.source.level.version>1.6</java.source.level.version>
-        <org.slf4j.version>1.7.2</org.slf4j.version>
-        <powermock.version>1.5</powermock.version>
+        <org.slf4j.version>1.7.7</org.slf4j.version>
+        <powermock.version>1.6.0</powermock.version>
         <checkstyle.config.file>\coding-resources\src\main\resources\checkstyle\tcmjstyle.xml</checkstyle.config.file>
     </properties>
 </project>
