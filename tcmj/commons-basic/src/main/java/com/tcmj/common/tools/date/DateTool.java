@@ -4,10 +4,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateUtils;
-import org.apache.commons.lang.time.DurationFormatUtils;
-import org.apache.commons.lang.time.FastDateFormat;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
+import org.apache.commons.lang3.time.DurationFormatUtils;
+import org.apache.commons.lang3.time.FastDateFormat;
 import static com.tcmj.common.tools.lang.Check.*;
 
 /**
@@ -27,11 +27,9 @@ public final class DateTool extends DateUtils {
     /** Pattern: yyyy-MM-dd. */
     private static final FastDateFormat DFYYYYMMDDHHMM = FastDateFormat.getInstance("yyyy-MM-dd HH:mm");
 
-
     /** Singleton. */
     private DateTool() {
     }
-
 
     /**
      * Creates a date by the given parameters.<br>
@@ -56,7 +54,6 @@ public final class DateTool extends DateUtils {
         return calendar.getTime();
     }
 
-
     /**
      * Creates a date by the given parameters.<br>
      * seconds and milliseconds will be set to '0'
@@ -71,7 +68,6 @@ public final class DateTool extends DateUtils {
         return date(year, month, day, hour, minute, 0);
     }
 
-
     /**
      * Creates a date by the given parameters.<br>
      * minutes, seconds and milliseconds and  will be set to '0'
@@ -85,7 +81,6 @@ public final class DateTool extends DateUtils {
         return date(year, month, day, hour, 0, 0);
     }
 
-
     /**
      * Creates a date by given year, month and day parameters.<br>
      * Time information will set to '0' (hour,minutes,sec,milis)
@@ -98,7 +93,6 @@ public final class DateTool extends DateUtils {
         return date(year, month, day, 0, 0, 0);
     }
 
-
     /**
      * Checks if a date falls into a given time range.<br>
      *       <code>Date &gt;=  StartDate AND Date &lt;=  EndDate</code>
@@ -109,11 +103,9 @@ public final class DateTool extends DateUtils {
      *                true uses the original time informations
      * @return true if the date to check is between the period
      */
-    public static boolean isDateInRange(
-            Date dateToCheck, Date timeRangeStart, Date timeRangeEnd, boolean useTime) {
-
+    public static boolean isDateInRange(Date dateToCheck, Date timeRangeStart, Date timeRangeEnd, boolean useTime) {
         if (dateToCheck == null || timeRangeStart == null || timeRangeEnd == null) {
-            throw new IllegalArgumentException("cannot handle null parameters!");
+            throw new IllegalArgumentException("isDateInRange cannot handle null parameters!");
         }
 
         if (useTime) {
@@ -125,9 +117,7 @@ public final class DateTool extends DateUtils {
 
             return (rtdateCheck >= rtdateStart) && (rtdateCheck <= rtdateEnd);
         }
-
     }
-
 
     /**
      * Null safe equal method to compare dates.
@@ -136,18 +126,10 @@ public final class DateTool extends DateUtils {
      * @return only true if the dates are both null or equal
      */
     public static boolean isDateEqual(Date source, Date target) {
-        boolean isEqual;
-
-        if ((source == null && target != null)
+        return !((source == null && target != null)
                 || (source != null && target == null)
-                || (source != null && target != null && !source.equals(target))) {
-            isEqual = false;
-        } else {
-            isEqual = true;
-        }
-        return isEqual;
+                || (source != null && target != null && !source.equals(target))); 
     }
-
 
     /**
      * Null safe equal method to compare dates.
@@ -158,7 +140,6 @@ public final class DateTool extends DateUtils {
     public static boolean isNotDateEqual(Date source, Date target) {
         return !isDateEqual(source, target);
     }
-
 
     /**
      * Removes the whole time informations from a date.
@@ -171,7 +152,6 @@ public final class DateTool extends DateUtils {
         return DateUtils.truncate(source, Calendar.DATE);
     }
 
-
     /**
      * put hour and minutes from source date (param1) to target date (param2).
      * @param sourcedate date from which is being read
@@ -179,7 +159,6 @@ public final class DateTool extends DateUtils {
      * @return a new date object with the merged time and date informations
      */
     public static Date copyTime(Date sourcedate, Date targetdate) {
-
         notNull(targetdate, "Your target date parameter may not be null!");
 
         Calendar calendar = getCalendar(sourcedate);
@@ -199,7 +178,6 @@ public final class DateTool extends DateUtils {
         return adjustedDate;
     }
 
-
     /**
      * computes the days <b>between</b> two dates.<br>
      * it removes the time informations, subtracts the finish date from
@@ -215,7 +193,6 @@ public final class DateTool extends DateUtils {
         return (int) between(start, end, Calendar.DATE);
     }
 
-
     /**
      * computes the hours <b>between</b> two dates.<br>
      * minute, second and millisecond. information will be deleted.
@@ -229,7 +206,6 @@ public final class DateTool extends DateUtils {
     public static long hoursbetween(Date start, Date end) {
         return between(start, end, Calendar.HOUR_OF_DAY);
     }
-
 
     /**
      * Internal method to compute the time between two dates.
@@ -266,9 +242,7 @@ public final class DateTool extends DateUtils {
         } else { //eg.: one date is in winter time
             return ((lnFinish + dstOffsetEnd) - (lnStart + dstOffsetStart)) / pUnit;
         }
-
     }
-
 
     /**
      * Date formatter.
@@ -284,7 +258,6 @@ public final class DateTool extends DateUtils {
         return DFYYYYMMDD.format(date);
     }
 
-
     /**
      * Date and Time formatter.
      * Date formats are not synchronized. It is recommended to create
@@ -298,7 +271,6 @@ public final class DateTool extends DateUtils {
         notNull(date, "Cannot format a null Date object!");
         return DFYYYYMMDDHHMM.format(date);
     }
-
 
     /**
      * Formats milliseconds to a human readable format.
@@ -413,7 +385,6 @@ public final class DateTool extends DateUtils {
         return newtime;
     }
 
-
     /**
      * Sets time informations to a date.
      * hours, minutes, seconds, milliseconds
@@ -429,7 +400,6 @@ public final class DateTool extends DateUtils {
         return new Date(setTime(source, hours24, minutes, seconds, milis));
     }
 
-
     /** Rounds a java date (up/down) to minutes.
      * rounds up if seconds >= 30 and rounds down if < 30.
      * @param date 2009-04-04 23:23:43
@@ -440,14 +410,12 @@ public final class DateTool extends DateUtils {
         return DateUtils.round(date, Calendar.MINUTE);
     }
 
-
     /** Method to retrieve a calendar.
      * @return a calendar object
      */
     public static Calendar getCalendar() {
         return Calendar.getInstance();
     }
-
 
     /** Method to retrieve a calendar.
      * @param initialdate date to set to the calendar
@@ -460,7 +428,6 @@ public final class DateTool extends DateUtils {
         calendar.setTime(initialdate);
         return calendar;
     }
-
 
     /***
      * Iterate over the days between start and end date (both inclusive).
@@ -479,11 +446,10 @@ public final class DateTool extends DateUtils {
     static class DateIterator implements Iterator<Date> {
 
         /** Calendar. */
-        private Calendar calendar = Calendar.getInstance();
+        private final Calendar calendar = Calendar.getInstance();
 
         /** End Date. */
         private final Date endDate;
-
 
         /**
          * Constructs a DateIterator that steps through all days beginning
@@ -500,7 +466,6 @@ public final class DateTool extends DateUtils {
             endDate = DateTool.removeTime(endDay);
         }
 
-
         /**
          * Has the iterator not reached the end date yet?
          * @return <code>true</code> if the iterator has yet to reach the end date
@@ -509,7 +474,6 @@ public final class DateTool extends DateUtils {
         public boolean hasNext() {
             return calendar.getTimeInMillis() <= endDate.getTime();
         }
-
 
         /**
          * Return the next date in the iteration.
@@ -525,7 +489,6 @@ public final class DateTool extends DateUtils {
             return currentDate;
         }
 
-
         /**
          * Unsupported Operation.
          *
@@ -538,4 +501,3 @@ public final class DateTool extends DateUtils {
         }
     }
 }
-

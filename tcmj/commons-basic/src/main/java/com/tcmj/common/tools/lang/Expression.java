@@ -25,7 +25,7 @@ public final class Expression {
      * @return true or false
      */
     private static boolean isEmptyCollection(Collection collection) {
-        return (collection == null || collection.isEmpty());
+        return collection == null || collection.isEmpty();
     }
 
 
@@ -35,7 +35,7 @@ public final class Expression {
      * @return true or false
      */
     private static boolean isEmptyMap(Map map) {
-        return (map == null || map.isEmpty());
+        return map == null || map.isEmpty();
     }
 
 

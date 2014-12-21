@@ -9,7 +9,7 @@ package com.tcmj.common.tools.date;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
 import org.junit.Test;
 
 /**

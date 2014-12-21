@@ -27,6 +27,7 @@ import static java.lang.Integer.MIN_VALUE;
  *
  * @author Markus KARG (markus@headcrashing.eu)
  * @version 1.2.1
+ * @param <T> any comparable object
  */
 public final class Range<T extends Comparable<T>> {
 
@@ -34,20 +35,17 @@ public final class Range<T extends Comparable<T>> {
 
     private final T upperBound;
 
-
     /**
      * Creates a range with the specified bounds. The bounds will be included,
      * i. e. are part of the range. Bounds can be declared as being open, i. e.
      * the range is assumed to be endless in that direction.
      *
-     * @param lowerBound
-     *            The lowest possible value of the range, or {@code null} if
-     *            there is no lower bound.
-     * @param upperBound
-     *            The greatest possible value of the range, or {@code null} if
-     *            there is no upper bound.
-     * @throws IllegalArgumentException
-     *             if lower bound is greater than upper bound
+     * @param lowerBound The lowest possible value of the range, or {@code null}
+     * if there is no lower bound.
+     * @param upperBound The greatest possible value of the range, or
+     * {@code null} if there is no upper bound.
+     * @throws IllegalArgumentException if lower bound is greater than upper
+     * bound
      */
     public Range(final T lowerBound, final T upperBound) throws IllegalArgumentException {
         if (lowerBound != null && upperBound != null && lowerBound.compareTo(upperBound) > 0) {
@@ -58,19 +56,16 @@ public final class Range<T extends Comparable<T>> {
         this.upperBound = upperBound;
     }
 
-
     /**
      * Checks whether the specified object is within the range, including
      * bounds.
      *
-     * @param object
-     *            The object to be checked. Must not be {@code null}.
+     * @param object The object to be checked. Must not be {@code null}.
      * @return {@code false} if {@code object} is lower than the lower bound or
-     *         greater than the upper bound; otherwise {@code true}.
-     * @throws IllegalArgumentException
-     *             if {@code object} is {@code null}.
+     * greater than the upper bound; otherwise {@code true}.
+     * @throws IllegalArgumentException if {@code object} is {@code null}.
      */
-    public final boolean contains(final T object) throws IllegalArgumentException {
+    public boolean contains(final T object) throws IllegalArgumentException {
         if (object == null) {
             throw new IllegalArgumentException("object is null");
         }
@@ -86,22 +81,19 @@ public final class Range<T extends Comparable<T>> {
         return true;
     }
 
-
     /**
      * Checks whether the specified range is entirely contained in the range,
      * including bounds.
      *
-     * @param range
-     *            The range to be checked. Must not be {@code null}.
+     * @param range The range to be checked. Must not be {@code null}.
      * @return {@code false} if {@code range} has a lower bound lower than the
-     *         lower bound of this or an upper bound greater than the upper
-     *         bound of this (i. e. {@code other} overlaps or is completely
-     *         outside); otherwise {@code true}.
-     * @throws IllegalArgumentException
-     *             if {@code other} is {@code null}.
+     * lower bound of this or an upper bound greater than the upper bound of
+     * this (i. e. {@code other} overlaps or is completely outside); otherwise
+     * {@code true}.
+     * @throws IllegalArgumentException if {@code other} is {@code null}.
      * @since 1.1.0
      */
-    public final boolean contains(final Range<T> range) throws IllegalArgumentException {
+    public boolean contains(final Range<T> range) throws IllegalArgumentException {
         if (range == null) {
             throw new IllegalArgumentException("range is null");
         }
@@ -117,21 +109,18 @@ public final class Range<T extends Comparable<T>> {
         return true;
     }
 
-
     /**
      * Checks whether the specified range overlaps this range (i. e. whether the
      * ranges intersect).
      *
-     * @param range
-     *            The {@code range} to be checked. Must not be {@code null}.
+     * @param range The {@code range} to be checked. Must not be {@code null}.
      * @return {@code false} if {@code range} has an upper bound lower than the
-     *         lower bound of this or a lower bound greater than the upper bound
-     *         of this; otherwise {@code true}.
-     * @throws IllegalArgumentException
-     *             if {@code range} is {@code null}.
+     * lower bound of this or a lower bound greater than the upper bound of
+     * this; otherwise {@code true}.
+     * @throws IllegalArgumentException if {@code range} is {@code null}.
      * @since 1.2.0
      */
-    public final boolean overlaps(final Range<T> range) throws IllegalArgumentException {
+    public boolean overlaps(final Range<T> range) throws IllegalArgumentException {
         if (range == null) {
             throw new IllegalArgumentException("range is null");
         }
@@ -147,9 +136,8 @@ public final class Range<T extends Comparable<T>> {
         return true;
     }
 
-
     @Override
-    public final int hashCode() {
+    public int hashCode() {
         // MAX_value is used for open LOWER bound as it will be most far away
         // from any existing LOWER bound.
         final int lowerBoundHashCode = this.lowerBound == null ? MAX_VALUE : this.lowerBound.hashCode();
@@ -161,9 +149,8 @@ public final class Range<T extends Comparable<T>> {
         return lowerBoundHashCode << 16 ^ upperBoundHashCode;
     }
 
-
     @Override
-    public final boolean equals(final Object other) {
+    public boolean equals(final Object other) {
         if (!(other instanceof Range)) {
             return false;
         }
@@ -173,8 +160,7 @@ public final class Range<T extends Comparable<T>> {
         return equals(this.lowerBound, that.lowerBound) && equals(this.upperBound, that.upperBound);
     }
 
-
-    private static final boolean equals(final Object a, final Object b) {
+    private static boolean equals(final Object a, final Object b) {
         if (a == null && b == null) {
             return true;
         }
@@ -186,10 +172,8 @@ public final class Range<T extends Comparable<T>> {
         return false;
     }
 
-
     @Override
-    public final String toString() {
+    public String toString() {
         return String.format("Range[%s, %s]", this.lowerBound, this.upperBound);
     }
-
 }

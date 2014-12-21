@@ -74,19 +74,12 @@ public final class ReflectionHelper {
         Class<T> classinstance = loadClass(className);
 
         try {
-
             Constructor<T> constructor = classinstance.getConstructor(paramTypes);
 
             return constructor.newInstance(parameters);
 
-        } catch (InstantiationException iex) {
-            throw new RuntimeException("InstantiationException: " + iex.getMessage(), iex);
-        } catch (IllegalAccessException iaccex) {
-            throw new RuntimeException("IllegalAccessException: " + iaccex.getMessage(), iaccex);
-        } catch (InvocationTargetException invex) {
-            throw new RuntimeException("InvocationTargetException: " + invex.getMessage(), invex);
-        } catch (NoSuchMethodException nsmex) {
-            throw new RuntimeException("NoSuchMethodException: " + nsmex.getMessage(), nsmex);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException ex) {
+            throw new RuntimeException("Exception: " + ex.getMessage(), ex);
         }
 
     }
@@ -111,16 +104,9 @@ public final class ReflectionHelper {
 
             return constructor.newInstance(parameters);
 
-        } catch (InstantiationException iex) {
-            throw new RuntimeException("InstantiationException: " + iex.getMessage(), iex);
-        } catch (IllegalAccessException iaccex) {
-            throw new RuntimeException("IllegalAccessException: " + iaccex.getMessage(), iaccex);
-        } catch (InvocationTargetException invex) {
-            throw new RuntimeException("InvocationTargetException: " + invex.getMessage(), invex);
-        } catch (NoSuchMethodException nsmex) {
-            throw new RuntimeException("NoSuchMethodException: " + nsmex.getMessage(), nsmex);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException ex) {
+            throw new RuntimeException("Exception: " + ex.getMessage(), ex);
         }
-
     }
 
 

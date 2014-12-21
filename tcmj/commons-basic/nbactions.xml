@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+        <action>
+            <actionName>CUSTOM-deploy non-rec</actionName>
+            <displayName>deploy non-rec</displayName>
+            <recursive>false</recursive>
+            <goals>
+                <goal>deploy</goal>
+            </goals>
+        </action>
+        <action>
+            <actionName>CUSTOM-site</actionName>
+            <displayName>site</displayName>
+            <goals>
+                <goal>site</goal>
+            </goals>
+        </action>
+        <action>
+            <actionName>CUSTOM-site with reports</actionName>
+            <displayName>site with reports</displayName>
+            <goals>
+                <goal>site</goal>
+            </goals>
+            <activatedProfiles>
+                <activatedProfile>tcmjdocx</activatedProfile>
+            </activatedProfiles>
+        </action>
+    </actions>

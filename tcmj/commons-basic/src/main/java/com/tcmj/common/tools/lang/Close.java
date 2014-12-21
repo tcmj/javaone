@@ -18,6 +18,8 @@
 package com.tcmj.common.tools.lang;
 
 import java.io.Closeable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides a bunch of closing methods for streams, readers, writers, channels.
@@ -26,6 +28,9 @@ import java.io.Closeable;
  */
 public class Close {
 
+    /** slf4j Logging framework. */
+    private static final Logger logger = LoggerFactory.getLogger(Close.class);
+    
     /**
      * instantiation not allowed!
      */
@@ -42,6 +47,7 @@ public class Close {
             try {
                 object.close();
             } catch (Exception e) {
+                logger.error("Cannot close {}",object);
                 if (throwUnchecked) {
                     throw new RuntimeException(e);
                 }
@@ -51,6 +57,7 @@ public class Close {
 
     /**
      * Closes the object quietly swallowing any exception!
+     * @param object to be closed
      */
     public static void quiet(Closeable object) {
         closeIntern(object, false);
@@ -58,6 +65,7 @@ public class Close {
 
     /**
      * Closes the object wrapping exceptions to unchecked runtime exception!
+     * @param object to be closed
      */
     public static void unchecked(Closeable object) {
         closeIntern(object, true);

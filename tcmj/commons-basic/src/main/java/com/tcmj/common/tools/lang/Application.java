@@ -18,7 +18,7 @@
 package com.tcmj.common.tools.lang;
 
 import static com.tcmj.common.tools.lang.Check.notNull;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Common application tools.

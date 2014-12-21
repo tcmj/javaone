@@ -395,7 +395,7 @@ public class XMLMap implements Map<String, String>, Serializable {
 
 
 
-                    if ((uppernode.getNodeType() == Node.ELEMENT_NODE)) {
+                    if (uppernode.getNodeType() == Node.ELEMENT_NODE) {
                         //wenn es sich um ein Element handelt (kein Kommentar..)
                         logger.debug("Current node: LocalName={} NodeName={} Prefix={}", new Object[]{uppernode.getLocalName(), uppernode.getNodeName(), uppernode.getPrefix()});
 
@@ -1061,7 +1061,7 @@ public class XMLMap implements Map<String, String>, Serializable {
         @Override
         public int hashCode() {
             return (key == null ? 0 : key.hashCode())
-                    ^ (value == null ? 0 : java.util.Arrays.hashCode(value));
+                    ^ (value == null ? 0 : Arrays.hashCode(value));
         }
 
         @Override
