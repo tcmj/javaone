@@ -55,6 +55,19 @@
                     <packageName>com.example.myschema</packageName> <!-- The name of your generated source package -->
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <version>1.1.2</version>
+                <configuration>
+                    <targetClasses>
+                        <param>com.tcmj.common*</param>
+                    </targetClasses>
+                    <targetTests>
+                        <param>com.tcmj.common*</param>
+                    </targetTests>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -78,13 +91,13 @@
             <scope>provided</scope>
         </dependency>
 
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-            <version>2.0.3</version>
-            <scope>provided</scope>
-        </dependency>
--->
+                <dependency>
+                    <groupId>com.sun.xml.bind</groupId>
+                    <artifactId>jaxb-impl</artifactId>
+                    <version>2.0.3</version>
+                    <scope>provided</scope>
+                </dependency>
+        -->
         <!-- TEST DEPENDENCIES -->
         <dependency>
             <groupId>junit</groupId>

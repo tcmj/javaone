@@ -25,4 +25,12 @@
                 <activatedProfile>tcmjdocx</activatedProfile>
             </activatedProfiles>
         </action>
+        <action>
+            <actionName>CUSTOM-maven:mutationCoverage</actionName>
+            <displayName>maven:mutationCoverage</displayName>
+            <recursive>false</recursive>
+            <goals>
+                <goal>org.pitest:pitest-maven:mutationCoverage</goal>
+            </goals>
+        </action>
     </actions>

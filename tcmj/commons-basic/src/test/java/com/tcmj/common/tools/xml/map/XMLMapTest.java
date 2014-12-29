@@ -6,7 +6,7 @@
  */
 package com.tcmj.common.tools.xml.map;
 
-import com.tcmj.common.tools.xml.map.XMLMap.XMLMapException;
+import com.tcmj.common.tools.xml.map.intern.XMLMapException;
 import java.net.URL;
 import java.util.HashMap;
 import javax.xml.parsers.ParserConfigurationException;
@@ -23,6 +23,12 @@ import java.util.Map.Entry;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import static junit.framework.Assert.*;
+import static org.hamcrest.core.Is.is;
+import org.hamcrest.core.IsEqual;
+import static org.hamcrest.core.IsEqual.equalTo;
+import org.hamcrest.core.IsNull;
+import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -30,573 +36,541 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * JUnit Test for class {@link com.tcmj.common.tools.xml.map.XMLMap}
  *
- * @author tdeut
+ * @author tcmj
  */
 public class XMLMapTest {
 
-    /** slf4j Logging framework. */
-    private static final transient Logger logger = LoggerFactory.getLogger(XMLMap.class);
+    /**
+     * slf4j Logging framework.
+     */
+    private static final transient Logger LOG = LoggerFactory.getLogger(XMLMap.class);
 
-    /** Path to the xml test files (IN/OUT). */
+    /**
+     * Path to the xml test files (IN/OUT).
+     */
     private static final String testdatapath = "src\\test\\resources\\com\\tcmj\\common\\tools\\xml\\map\\";
 
-    /** delete test files after exiting this test. */
-    private static final boolean deleteOnExit = true;
+    /**
+     * delete test files after exiting this test.
+     */
+    private static final boolean deleteOnExit = false;
 
-    /** Model. */
-    private XMLMap model;
+    /**
+     * Model.
+     */
+    private XMLMap xmlMap;
 
-    /** File handle to an XML file. */
+    /**
+     * File handle to an XML file.
+     */
     private static File file;
 
-
-    ;
-
-
     @BeforeClass
-    public static final void initTestData() {
+    public static final void initTestData() throws Exception {
         URL resource = XMLMapTest.class.getResource("XMLMapTest.xml");
-        file = new File(resource.getFile());
+        LOG.info("URL resource: {}", resource);
+        file = new File(resource.toURI());
+        LOG.info("Using file: {}", file);
     }
-
 
     @Before
     public void beforeEachTest() {
-        logger.info("-------------------------------------------------------------------------------------------------------");
+        LOG.info("-------------------------------------------------------------------------------------------------------");
 
-        //2. Neue Instanz des XMLPropertyModels erzeugen:
-        model = new XMLMap(file);
+        //2. New instance of XMLPropertyModels 
+        xmlMap = new XMLMap(file);
     }
-
-
 
     /**
      * Test of put method, of class com.tcmj.tools.xml.model.XMLMap.
      */
     @Test
     public void testPutGet() {
-        logger.info("testPutGet");
+        LOG.info("testPutGet");
 
-        String key = "one", value = "1st";
-        model.put(key, value);
-        assertEquals(key, 1, model.size());
-        assertEquals(key, value, model.get(key));
+        xmlMap.put("one", "1st");
+        assertThat("Size has to be 1 after inserting one entry", xmlMap.size(), is(1));
+        assertThat("Getting the previous put value has to be the same", xmlMap.get("one"), equalTo("1st"));
 
-        key = "two.of.a.kind";
-        value = "2nd";
-        model.put(key, value);
-        assertEquals(key, 2, model.size());
-        assertEquals(key, value, model.get(key));
+        String key = "two.of.a.kind";
+        String value = "2nd";
+        xmlMap.put(key, value);
+        assertEquals(key, 2, xmlMap.size());
+        assertEquals(key, value, xmlMap.get(key));
 
         key = "three.level2";
         value = "a b c d e f";
-        model.put(key, value);
-        assertEquals(key, 3, model.size());
-        assertEquals(key, value, model.get(key));
+        xmlMap.put(key, value);
+        assertEquals(key, 3, xmlMap.size());
+        assertEquals(key, value, xmlMap.get(key));
 
         key = "four.big";
         value = "lower case";
-        model.put(key, value);
-        assertEquals(key, 4, model.size());
-        assertEquals(key, value, model.get(key));
+        xmlMap.put(key, value);
+        assertEquals(key, 4, xmlMap.size());
+        assertEquals(key, value, xmlMap.get(key));
 
         key = "four.BIG";
         value = "upper case";
-        model.put(key, value);
-        assertEquals(key, 5, model.size());
-        assertEquals(key, value, model.get(key));
-        model.put(key, value);
-        assertEquals(key, 5, model.size());
-        assertEquals(key, value, model.get(key));
+        xmlMap.put(key, value);
+        assertEquals(key, 5, xmlMap.size());
+        assertEquals(key, value, xmlMap.get(key));
+        xmlMap.put(key, value);
+        assertEquals(key, 5, xmlMap.size());
+        assertEquals(key, value, xmlMap.get(key));
 
         key = "x1.x2.x3.x4.x5";
         value = "long";
-        model.put(key, value);
-        assertEquals(key, 6, model.size());
-        assertEquals(key, value, model.get(key));
-
+        xmlMap.put(key, value);
+        assertEquals(key, 6, xmlMap.size());
+        assertEquals(key, value, xmlMap.get(key));
 
         key = "x1.x2.x3.x4.a";
         value = "value no ";
         for (int i = 1; i <= 25; i++) {
-            model.put(key + i, value + i);
-            assertEquals(key + i, value + i, model.get(key + i));
+            xmlMap.put(key + i, value + i);
+            assertEquals(key + i, value + i, xmlMap.get(key + i));
         }
-        assertEquals(key, 6 + 25, model.size());
+        assertEquals(key, 6 + 25, xmlMap.size());
         for (int i = 1; i <= 25; i++) {
-            assertEquals(key + i, value + i, model.get(key + i));
+            assertEquals(key + i, value + i, xmlMap.get(key + i));
         }
 
-        assertNull(model.get("Four.BIG"));
-        assertNull(model.get("fOur.BIG"));
-        assertNull(model.get("foUr.BIG"));
-        assertNull(model.get("fouR.BIG"));
+        assertNull(xmlMap.get("Four.BIG"));
+        assertNull(xmlMap.get("fOur.BIG"));
+        assertNull(xmlMap.get("foUr.BIG"));
+        assertNull(xmlMap.get("fouR.BIG"));
 
-
-//        logger.info(model.showDataEntries(false, true));
-
+//        LOG.info(model.showDataEntries(false, true));
     }
-
 
     /**
      * Test of isSameLevel method, of class com.tcmj.tools.xml.model.XMLMap.
      */
     @Test
     public void testIsSameLevel() {
-        logger.info("testIsSameLevel");
-        assertEquals(true, model.isSameLevel("key1", "key1"));
-        assertEquals(true, model.isSameLevel("key1", "key1"));
-        assertEquals(true, model.isSameLevel("a.key1", "a.key1"));
-        assertEquals(true, model.isSameLevel("a.ab", "a.cd"));
-        assertEquals(true, model.isSameLevel("a.b.c.ab", "a.b.c.cd"));
+        LOG.info("testIsSameLevel");
+        assertEquals(true, xmlMap.isSameLevel("key1", "key1"));
+        assertEquals(true, xmlMap.isSameLevel("key1", "key1"));
+        assertEquals(true, xmlMap.isSameLevel("a.key1", "a.key1"));
+        assertEquals(true, xmlMap.isSameLevel("a.ab", "a.cd"));
+        assertEquals(true, xmlMap.isSameLevel("a.b.c.ab", "a.b.c.cd"));
 
-        assertEquals(false, model.isSameLevel("a.eins", "b.zwei"));
-        assertEquals(false, model.isSameLevel("a", "b.zwei"));
-        assertEquals(false, model.isSameLevel("a.eins", "b"));
-        assertEquals(false, model.isSameLevel("a.b.c.ab", "v.b.c.ab"));
-        assertEquals(false, model.isSameLevel("a.a.a.a", "a.a.a.a.a"));
+        assertEquals(false, xmlMap.isSameLevel("a.eins", "b.zwei"));
+        assertEquals(false, xmlMap.isSameLevel("a", "b.zwei"));
+        assertEquals(false, xmlMap.isSameLevel("a.eins", "b"));
+        assertEquals(false, xmlMap.isSameLevel("a.b.c.ab", "v.b.c.ab"));
+        assertEquals(false, xmlMap.isSameLevel("a.a.a.a", "a.a.a.a.a"));
 
     }
-
 
     /**
      * Test of putObject method, of class com.tcmj.tools.xml.model.XMLMap.
      */
     @Test
     public void testPutObject() {
-        logger.info("testPutObject");
+        LOG.info("testPutObject");
 
         //--------------------- root key
         String key1 = "one";
-        model.put(key1, "ohnevalue");
+        xmlMap.put(key1, "ohnevalue");
 
-        assertNull(model.getObject(key1));
+        assertNull(xmlMap.getObject(key1));
 
-        model.putObject(key1, new java.util.Date());
+        xmlMap.putObject(key1, new java.util.Date());
 
-        assertNotNull(model.getObject(key1));
+        assertNotNull(xmlMap.getObject(key1));
 
-        model.putObject(key1, null);
+        xmlMap.putObject(key1, null);
 
-        assertNull(model.getObject(key1));
+        assertNull(xmlMap.getObject(key1));
 
         //--------------------- complex key
         String key2 = "a.b.c.d";
-        model.put(key2, "ohnevalue");
+        xmlMap.put(key2, "ohnevalue");
 
-        assertNull(model.getObject(key2));
+        assertNull(xmlMap.getObject(key2));
 
         java.util.Date specificdate = new java.util.Date();
-        model.putObject(key2, specificdate);
+        xmlMap.putObject(key2, specificdate);
 
-        Object dategot = model.getObject(key2);
+        Object dategot = xmlMap.getObject(key2);
         assertNotNull(dategot);
 
         assertEquals("not the same object!", specificdate, dategot);
 
-        model.putObject(key2, null);
+        xmlMap.putObject(key2, null);
 
-        assertNull(model.getObject(key2));
+        assertNull(xmlMap.getObject(key2));
 
         //--------------------- behavour of value
         String key3 = "x.aaa.zzz.dee";
-        model.put(key3, "myvalue567");
-        model.putObject(key3, new java.util.Date());
+        xmlMap.put(key3, "myvalue567");
+        xmlMap.putObject(key3, new java.util.Date());
 
-        assertEquals("value lost", "myvalue567", model.get(key3));
-
+        assertEquals("value lost", "myvalue567", xmlMap.get(key3));
 
     }
-
 
     /**
      * Test of getListProperty method, of class com.tcmj.tools.xml.model.XMLMap.
      */
     @Test
     public void testPutListValueGetListValue() {
-        logger.info("putListValue + getListValue");
+        LOG.info("Testing putListValue(String, String[]) and getListValue()...");
 
-        String[] v = new String[]{"aaa", "bbb", "ccc"};
+        String key = "person.address.phone";
+        xmlMap.putListValue(key, new String[]{"123", "456", "789"});
 
-        model.putListValue("o.boo.koo", v);
+        String[] lsv = xmlMap.getListValue(key);
 
+        assertThat("Amount of values", lsv.length, is(3));
+        assertThat("Value 123 available", Arrays.asList(lsv).contains("123"), is(true));
+        assertThat("Value 456 available", Arrays.asList(lsv).contains("456"), is(true));
+        assertThat("Value 789 available", Arrays.asList(lsv).contains("789"), is(true));
 
-        String[] lsv = model.getListValue("o.boo.koo");
-
-        assertEquals(3, lsv.length);
-        assertEquals("aaa", lsv[0]);
-        assertEquals("bbb", lsv[1]);
-        assertEquals("ccc", lsv[2]);
-
-        //case
-        assertNull(model.getListValue("gibt.es.nicht"));
+        assertThat("Value 555 not available", Arrays.asList(lsv).contains("555"), is(false));
+        assertThat("Value not available", xmlMap.getListValue("gibt.es.nicht"), nullValue());
 
         //case: immutability
-        String[] list = model.getListValue("o.boo.koo");
-        assertEquals("aaa", list[0]);
-        list[0] = "change";
-        String[] anotherlist = model.getListValue("o.boo.koo");
-        assertEquals("aaa", anotherlist[0]);
+        assertThat("immutability", xmlMap.getListValue(key)[0], equalTo("123"));
+        xmlMap.getListValue(key)[0] = "change";
+        assertThat("immutability", xmlMap.getListValue(key)[0], equalTo("123"));
     }
-
 
     /**
      * Test of getObject method, of class com.tcmj.tools.xml.model.XMLMap.
      */
     @Test
     public void testGetObject() {
-        logger.info("testGetObject");
+        LOG.info("testGetObject");
         java.util.Date ddd = new java.util.Date();
-        model.put("datum", "xy", ddd);
-        assertNotNull(model.getObject("datum"));
-        assertEquals(ddd, model.getObject("datum"));
+        xmlMap.put("datum", "xy", ddd);
+        assertNotNull(xmlMap.getObject("datum"));
+        assertEquals(ddd, xmlMap.getObject("datum"));
     }
 
-
     /**
-     * Test of getObjectByValue method, of class com.tcmj.tools.xml.model.XMLMap.
+     * Test of getObjectByValue method, of class
+     * com.tcmj.tools.xml.model.XMLMap.
      */
-    @Test(expected = XMLMap.XMLMapException.class)
+    @Test(expected = XMLMapException.class)
     public void testGetObjectByValue() throws Exception {
-        logger.info("testGetObjectByValue");
+        LOG.info("testGetObjectByValue");
         java.util.Date ddd1 = new java.util.Date();
         Thread.sleep(1000L);
         java.util.Date ddd2 = new java.util.Date();
 
-        model.put("a.b.c", "xy", ddd1);
-        model.put("x.y.a", "xy", ddd2);
-        model.put("x.y.z", "123", ddd2);
+        xmlMap.put("a.b.c", "xy", ddd1);
+        xmlMap.put("x.y.a", "xy", ddd2);
+        xmlMap.put("x.y.z", "123", ddd2);
 
-        assertNotNull(model.getObjectByValue("123"));
-        assertEquals(ddd2, model.getObjectByValue("123"));
+        assertNotNull(xmlMap.getObjectByValue("123"));
+        assertEquals(ddd2, xmlMap.getObjectByValue("123"));
 
-        model.getObjectByValue("xy");
+        xmlMap.getObjectByValue("xy");
     }
-
 
     /**
      * Test of remove method, of class com.tcmj.tools.xml.model.XMLMap.
      */
     @Test
     public void testRemove() throws XMLMapException {
-        logger.info("testRemove");
-        int size = model.size();
+        LOG.info("testRemove");
+        int size = xmlMap.size();
 
-        model.put("abcdef", "hello");
+        xmlMap.put("abcdef", "hello");
 
+        assertEquals(size + 1, xmlMap.size());
 
-        assertEquals(size + 1, model.size());
-
-        String val = model.remove("abcdef");
+        String val = xmlMap.remove("abcdef");
         assertEquals("hello", val);
-        assertEquals(size, model.size());
+        assertEquals(size, xmlMap.size());
 
         //-----------key not avail
-        assertNull(model.remove("key.not.available"));
-        assertEquals(size, model.size());
+        assertNull(xmlMap.remove("key.not.available"));
+        assertEquals(size, xmlMap.size());
     }
-
 
     /**
      * Test of readXML method, of class com.tcmj.tools.xml.model.XMLMap.
      */
     @Test
     public void testReadXMLSaveXML() throws FileNotFoundException, TransformerConfigurationException, UnsupportedEncodingException, TransformerException, IOException, XMLMapException, ParserConfigurationException {
-        logger.info("testReadXMLSaveXML");
-        int size = model.size();
-        logger.info("size: " + size);
+        LOG.info("testReadXMLSaveXML");
+        int size = xmlMap.size();
+        LOG.info("size: " + size);
 
-        model.saveXML();
+        xmlMap.saveXML();
 
-        model.readXML();
+        xmlMap.readXML();
 
-        int size2 = model.size();
+        int size2 = xmlMap.size();
 
         assertEquals(size, size2);
 
-        model.put("a", "a");
-        model.put("b", "b");
-        model.put("c", "c");
-        model.put("x.y.z", "myvalueXYZ");
-        model.saveXML();
-        model.readXML();
+        xmlMap.put("a", "a");
+        xmlMap.put("b", "b");
+        xmlMap.put("c", "c");
+        xmlMap.put("x.y.z", "myvalueXYZ");
+        xmlMap.saveXML();
+        xmlMap.readXML();
 
-        size2 = model.size();
+        size2 = xmlMap.size();
 
         assertEquals(4, size2);
     }
-
 
     /**
      * Test of clear method, of class com.tcmj.tools.xml.model.XMLMap.
      */
     @Test
     public void testClear() {
-        logger.info("clear");
+        LOG.info("clear");
 
+        xmlMap.put("a", "a");
+        xmlMap.put("b", "b");
+        xmlMap.put("c", "c");
 
-        model.put("a", "a");
-        model.put("b", "b");
-        model.put("c", "c");
+        assertTrue((xmlMap.size() > 0));
 
+        xmlMap.clear();
 
-        assertTrue((model.size() > 0));
-
-        model.clear();
-
-        assertTrue((model.size() == 0));
+        assertTrue((xmlMap.size() == 0));
     }
-
 
     /**
      * Test of showDataEntries method, of class com.tcmj.tools.xml.model.XMLMap.
      */
     @Test
     public void testShowDataEntries() {
-        logger.info("showDataEntries");
+        LOG.info("showDataEntries");
 
         //EmptyModel
-        model.clear();
-        assertNotNull(model.showDataEntries(true, true));
-        assertNotNull(model.showDataEntries(true, false));
-        assertNotNull(model.showDataEntries(false, true));
-        assertNotNull(model.showDataEntries(false, false));
+        xmlMap.clear();
+        assertNotNull(xmlMap.showDataEntries(true, true));
+        assertNotNull(xmlMap.showDataEntries(true, false));
+        assertNotNull(xmlMap.showDataEntries(false, true));
+        assertNotNull(xmlMap.showDataEntries(false, false));
 
         //Model with Data
-        model.put("montag.abend", "Essen ohne Java");
-        model.put("montag.mittag", "Essen mit Java", new java.util.Date());
-        model.setAttribute("montag.abend", "tag", "montag");
-        assertNotNull(model.showDataEntries(true, true));
-        assertNotNull(model.showDataEntries(true, false));
-        assertNotNull(model.showDataEntries(false, true));
-        assertNotNull(model.showDataEntries(false, false));
+        xmlMap.put("montag.abend", "Essen ohne Java");
+        xmlMap.put("montag.mittag", "Essen mit Java", new java.util.Date());
+        xmlMap.setAttribute("montag.abend", "tag", "montag");
+        assertNotNull(xmlMap.showDataEntries(true, true));
+        assertNotNull(xmlMap.showDataEntries(true, false));
+        assertNotNull(xmlMap.showDataEntries(false, true));
+        assertNotNull(xmlMap.showDataEntries(false, false));
 
     }
-
 
     /**
      * Test of getXMLRootNodeName method, of class tcmj.panels.xmlprop.XMLMap.
      */
     @Test
     public void testGetXMLRootNodeName() {
-        logger.info("testGetXMLRootNodeName");
-        assertNotNull(model.getXMLRootNodeName());
-        assertEquals("tcmj", model.getXMLRootNodeName());
+        LOG.info("testGetXMLRootNodeName");
+        assertNotNull(xmlMap.getXMLRootNodeName());
+        assertEquals("tcmj", xmlMap.getXMLRootNodeName());
 
-        model.setXMLRootNodeName("heinz");
-        assertNotNull(model.getXMLRootNodeName());
-        assertEquals("heinz", model.getXMLRootNodeName());
+        xmlMap.setXMLRootNodeName("heinz");
+        assertNotNull(xmlMap.getXMLRootNodeName());
+        assertEquals("heinz", xmlMap.getXMLRootNodeName());
 
+        xmlMap.setXMLRootNodeName("abcdefg");
 
-        model.setXMLRootNodeName("abcdefg");
-
-        assertEquals("abcdefg", model.getXMLRootNodeName());
+        assertEquals("abcdefg", xmlMap.getXMLRootNodeName());
     }
-
 
     /**
      * Test of getXMLEntryPoint method, of class tcmj.panels.xmlprop.XMLMap.
      */
     @Test
     public void testGetChildnodename() {
-        logger.info("testGetChildnodename");
-        assertNull(model.getXMLEntryPoint());
+        LOG.info("testGetChildnodename");
+        assertNull(xmlMap.getXMLEntryPoint());
 
-        model.setXMLEntryPoint("heinz");
-        assertNotNull(model.getXMLEntryPoint());
-        assertEquals("heinz", model.getXMLEntryPoint());
+        xmlMap.setXMLEntryPoint("heinz");
+        assertNotNull(xmlMap.getXMLEntryPoint());
+        assertEquals("heinz", xmlMap.getXMLEntryPoint());
     }
 
-
     /**
-     * Test of getLevelSeparator method, of class com.tcmj.tools.xml.model.XMLMap.
+     * Test of getLevelSeparator method, of class
+     * com.tcmj.tools.xml.model.XMLMap.
      */
     @Test
     public void testGetLevelSeparator() {
-        logger.info("getLevelSeparator + setLevelSeparator");
-        assertNotNull(model.getLevelSeparator());
-        assertEquals(".", model.getLevelSeparator());
+        LOG.info("getLevelSeparator + setLevelSeparator");
+        assertNotNull(xmlMap.getLevelSeparator());
+        assertEquals(".", xmlMap.getLevelSeparator());
 
-        model.setLevelSeparator("-");
-        assertNotNull(model.getLevelSeparator());
-        assertEquals("-", model.getLevelSeparator());
+        xmlMap.setLevelSeparator("-");
+        assertNotNull(xmlMap.getLevelSeparator());
+        assertEquals("-", xmlMap.getLevelSeparator());
 
-        model.put("one-oo", "erster eintrag");
-        assertEquals("erster eintrag", model.get("one-oo"));
+        xmlMap.put("one-oo", "erster eintrag");
+        assertEquals("erster eintrag", xmlMap.get("one-oo"));
 
-        model.put("one-oo", "ersten eintrag ueberschreiben");
-        assertEquals("ersten eintrag ueberschreiben", model.get("one-oo"));
+        xmlMap.put("one-oo", "ersten eintrag ueberschreiben");
+        assertEquals("ersten eintrag ueberschreiben", xmlMap.get("one-oo"));
 
-        model.put("a-b-c-d-e-f-g", "ebene hinzuzufuegen");
+        xmlMap.put("a-b-c-d-e-f-g", "ebene hinzuzufuegen");
 
-        assertEquals("ebene hinzuzufuegen", model.get("a-b-c-d-e-f-g"));
+        assertEquals("ebene hinzuzufuegen", xmlMap.get("a-b-c-d-e-f-g"));
 
-        assertEquals(2, model.size());
+        assertEquals(2, xmlMap.size());
     }
 
-
     /**
-     * Test of getXMLFileHandle method, of class com.tcmj.tools.xml.model.XMLMap.
+     * Test of getXMLFileHandle method, of class
+     * com.tcmj.tools.xml.model.XMLMap.
      */
     @Test
     public void testGetXMLFileHandle() {
-        logger.info("getXMLFileHandle");
-        assertNotNull(model.getXMLFileHandle());
+        LOG.info("getXMLFileHandle");
+        assertNotNull(xmlMap.getXMLFileHandle());
 
         File a = new File(testdatapath + "file.xml");
-        model.setXMLFileHandle(a);
+        xmlMap.setXMLFileHandle(a);
 
-        assertEquals(a, model.getXMLFileHandle());
+        assertEquals(a, xmlMap.getXMLFileHandle());
 
     }
-
 
     /**
      * Test of size method, of class com.tcmj.tools.xml.model.XMLMap.
      */
     @Test
     public void testSize() {
-        logger.info("size");
+        LOG.info("size");
 
-        assertEquals(0, model.size());
+        assertEquals(0, xmlMap.size());
 
-        model.put("a5", "a");
-        model.put("b5", "b");
-        model.put("c5", "c");
+        xmlMap.put("a5", "a");
+        xmlMap.put("b5", "b");
+        xmlMap.put("c5", "c");
 
-        int size = model.size();
+        int size = xmlMap.size();
 
         assertEquals(3, size);
 
         for (int i = 1; i <= 100; i++) {
-            model.put("key" + i, "value" + i);
+            xmlMap.put("key" + i, "value" + i);
         }
-        assertEquals(103, model.size());
+        assertEquals(103, xmlMap.size());
 
-        model.clear();
+        xmlMap.clear();
 
         //Ausgangsposition (leeres Model)
-        assertEquals(0, model.size());
+        assertEquals(0, xmlMap.size());
 
-
-        model.put("one.key10", "irgendwas");
-        model.put("one.key1", "irgendwas anderes");
-        assertEquals(2, model.size());
+        xmlMap.put("one.key10", "irgendwas");
+        xmlMap.put("one.key1", "irgendwas anderes");
+        assertEquals(2, xmlMap.size());
 
     }
-
 
     /**
      * Test of isEmpty method, of class com.tcmj.tools.xml.model.XMLMap.
      */
     @Test
     public void testIsEmpty() {
-        logger.info("isEmpty");
-        assertEquals(true, model.isEmpty());
-        model.put("c5", "c");
-        assertEquals(false, model.isEmpty());
-        model.clear();
-        assertEquals(true, model.isEmpty());
+        LOG.info("isEmpty");
+        assertEquals(true, xmlMap.isEmpty());
+        xmlMap.put("c5", "c");
+        assertEquals(false, xmlMap.isEmpty());
+        xmlMap.clear();
+        assertEquals(true, xmlMap.isEmpty());
 
     }
-
 
     /**
      * Test of containsKey method, of class com.tcmj.tools.xml.model.XMLMap.
      */
     @Test
     public void testContainsKey() throws XMLMapException {
-        logger.info("containsKey");
+        LOG.info("containsKey");
 
-        model.put("1.two.three", "100");
-        model.put("2.two.three", "100");
-        model.put("one.two.three.1", "100");
-        model.put("one.two.three.2", "100");
+        xmlMap.put("1.two.three", "100");
+        xmlMap.put("2.two.three", "100");
+        xmlMap.put("one.two.three.1", "100");
+        xmlMap.put("one.two.three.2", "100");
 
-
-        assertEquals(true, model.containsKey("one.two.three.1"));
-        assertEquals(false, model.containsKey("6.5.three.1"));
+        assertEquals(true, xmlMap.containsKey("one.two.three.1"));
+        assertEquals(false, xmlMap.containsKey("6.5.three.1"));
     }
-
 
     /**
      * Test of containsValue method, of class com.tcmj.tools.xml.model.XMLMap.
      *
-    //        XMLMap.XMLEntry a  = null;
-    //                a = new XMLMap.XMLEntry("key1","value1"){};
-    //
-    //        XMLMap.XMLEntry b = new XMLEntry(null,"value1");
-    //
-    //        logger.info("equals "+a.equals(b));
-    //
-    //        logger.info("equals "+a.equals("value1"));
+     * // XMLMap.XMLEntry a = null; // a = new
+     * XMLMap.XMLEntry("key1","value1"){}; // // XMLMap.XMLEntry b = new
+     * XMLEntry(null,"value1"); // // logger.info("equals "+a.equals(b)); // //
+     * logger.info("equals "+a.equals("value1"));
      */
     @Test
     public void testContainsValue() {
-        logger.info("containsValue");
-        model.put("1.two.three", "1");
-        model.put("2.two.three", "2");
-        model.put("one.two.three.1", "3");
-        model.put("one.two.three.2", "4");
+        LOG.info("containsValue");
+        xmlMap.put("1.two.three", "1");
+        xmlMap.put("2.two.three", "2");
+        xmlMap.put("one.two.three.1", "3");
+        xmlMap.put("one.two.three.2", "4");
 
-
-        assertEquals(true, model.containsValue("3"));
-        assertEquals(false, model.containsValue("43543"));
-        assertEquals(true, model.containsValue("1"));
-        assertEquals(false, model.containsValue("5"));
-        assertEquals(true, model.containsValue("4"));
-        assertEquals(false, model.containsValue("one.two.three.2"));
+        assertEquals(true, xmlMap.containsValue("3"));
+        assertEquals(false, xmlMap.containsValue("43543"));
+        assertEquals(true, xmlMap.containsValue("1"));
+        assertEquals(false, xmlMap.containsValue("5"));
+        assertEquals(true, xmlMap.containsValue("4"));
+        assertEquals(false, xmlMap.containsValue("one.two.three.2"));
     }
-
 
     /**
      * Test of keySet method, of class com.tcmj.tools.xml.model.XMLMap.
      */
     @Test
     public void testKeySet() {
-        logger.info("keySet");
-        model.put("mykey1", "myvalue1");
+        LOG.info("keySet");
+        xmlMap.put("mykey1", "myvalue1");
 
-        Set<String> result = model.keySet();
+        Set<String> result = xmlMap.keySet();
         assertNotNull(result);
 
     }
-
 
     /**
      * Test of values method, of class com.tcmj.tools.xml.model.XMLMap.
      */
     @Test
     public void testValues() {
-        logger.info("values");
+        LOG.info("values");
 
-        Collection<String> result = model.values();
+        Collection<String> result = xmlMap.values();
 
         assertNotNull(result);
 
     }
-
 
     /**
      * Test of entrySet method, of class com.tcmj.tools.xml.model.XMLMap.
      */
     @Test
     public void testEntrySet() {
-        logger.info("entrySet");
+        LOG.info("entrySet");
 
-        Collection<Entry<String, String>> entries = model.entrySet();
+        Collection<Entry<String, String>> entries = xmlMap.entrySet();
 
         assertNotNull(entries);
     }
-
 
     /**
      * Test of putAll method, of class com.tcmj.tools.xml.model.XMLMap.
      */
     @Test
     public void testPutAll() {
-        logger.info("putAll");
+        LOG.info("putAll");
 
         Map<String, String> map = new HashMap<String, String>();
 
@@ -604,109 +578,103 @@ public class XMLMapTest {
         map.put("mykey2", "myvalue2");
         map.put("a.b.c", "myvalue3");
 
-        model.putAll(map);
-        assertEquals(3, model.size());
+        xmlMap.putAll(map);
+        assertEquals(3, xmlMap.size());
     }
-
 
     /**
      * Test of testSetPropertiesToNull class tcmj.panels.xmlprop.XMLMap.
      */
     @Test
     public void testSetPropertiesToNull() {
-        logger.info("testSetPropertiesToNull");
+        LOG.info("testSetPropertiesToNull");
 
-        assertEquals(0, model.size());
-        logger.info("\t1");
-        model.put("ebene.uno", "Hallo");
-        model.put("mwst", "15%");
-        model.put("datum", "xy", new java.util.Date());
+        assertEquals(0, xmlMap.size());
+        LOG.info("\t1");
+        xmlMap.put("ebene.uno", "Hallo");
+        xmlMap.put("mwst", "15%");
+        xmlMap.put("datum", "xy", new java.util.Date());
 
-        assertEquals(3, model.size());
+        assertEquals(3, xmlMap.size());
 
-        logger.info("\t2");
-        assertEquals("Hallo", model.get("ebene.uno"));
-        assertEquals("15%", model.get("mwst"));
-        assertEquals("xy", model.get("datum"));
-        assertNotNull(model.getObject("datum"));
+        LOG.info("\t2");
+        assertEquals("Hallo", xmlMap.get("ebene.uno"));
+        assertEquals("15%", xmlMap.get("mwst"));
+        assertEquals("xy", xmlMap.get("datum"));
+        assertNotNull(xmlMap.getObject("datum"));
 
-        logger.info("\t3");
-        model.put("ebene.uno", null);
-        model.put("mwst", null);
-        model.put("datum", null, null);
+        LOG.info("\t3");
+        xmlMap.put("ebene.uno", null);
+        xmlMap.put("mwst", null);
+        xmlMap.put("datum", null, null);
 
-        logger.info("\t4");
-        assertNull("ebene.uno value sollte null liefern und nicht " + model.get("ebene.uno"), model.get("ebene.uno"));
-        assertNull("mwst value sollte null liefern und nicht " + model.get("mwst"), model.get("mwst"));
+        LOG.info("\t4");
+        assertNull("ebene.uno value sollte null liefern und nicht " + xmlMap.get("ebene.uno"), xmlMap.get("ebene.uno"));
+        assertNull("mwst value sollte null liefern und nicht " + xmlMap.get("mwst"), xmlMap.get("mwst"));
 
-        assertNull("datum value sollte null liefern und nicht " + model.get("datum"), model.get("datum"));
-        assertNull("datum object sollte null liefern und nicht " + model.getObject("datum"), model.getObject("datum"));
+        assertNull("datum value sollte null liefern und nicht " + xmlMap.get("datum"), xmlMap.get("datum"));
+        assertNull("datum object sollte null liefern und nicht " + xmlMap.getObject("datum"), xmlMap.getObject("datum"));
 
-        assertEquals(3, model.size());
+        assertEquals(3, xmlMap.size());
 
-        logger.info("\t5");
-        model.putObject("mwst", new java.util.Date());
+        LOG.info("\t5");
+        xmlMap.putObject("mwst", new java.util.Date());
 
-        assertNotNull("mwst soll nicht null sein!", model.getObject("mwst"));
-
+        assertNotNull("mwst soll nicht null sein!", xmlMap.getObject("mwst"));
 
     }
-
 
     /**
      * Test of put method, of class tcmj.panels.xmlprop.XMLMap.
      */
-    @Test(expected = XMLMap.XMLMapException.class)
+    @Test(expected = XMLMapException.class)
     public void testMixingLevels1() {
-        logger.info("testMixingLevels1");
-        model.put("one.two", "yet ok");
-        model.put("one.two.three", "not allowed");
+        LOG.info("testMixingLevels1");
+        xmlMap.put("one.two", "yet ok");
+        xmlMap.put("one.two.three", "not allowed");
         fail("not allowed to put 'one.two.three' after 'one.two'");
     }
-
 
     /**
      * Test of put, of class tcmj.panels.xmlprop.XMLMap.
      */
-    @Test(expected = XMLMap.XMLMapException.class)
+    @Test(expected = XMLMapException.class)
     public void testMixingLevels2() {
-        logger.info("testMixingLevels2");
-        model.put("one.two.three", "yet ok");
-        model.put("one.two", "not allowed");
+        LOG.info("testMixingLevels2");
+        xmlMap.put("one.two.three", "yet ok");
+        xmlMap.put("one.two", "not allowed");
         fail("not allowed to put 'one.two' after 'one.two.three'");
     }
-
 
     /**
      * Test of testSpecial1, of class tcmj.panels.xmlprop.XMLMap.
      */
     @Test
     public void testSpecial1() {
-        logger.info("testSpecial1");
+        LOG.info("testSpecial1");
 
-        model.put("key1", "irgendwas1");
-        model.put("key10", "irgendwas2");
-        model.put("key100", "irgendwas3");
+        xmlMap.put("key1", "irgendwas1");
+        xmlMap.put("key10", "irgendwas2");
+        xmlMap.put("key100", "irgendwas3");
 
-        model.put("key1", "irgendwas4");
-        model.put("key10", "irgendwas5");
-        model.put("key100", "irgendwas6");
+        xmlMap.put("key1", "irgendwas4");
+        xmlMap.put("key10", "irgendwas5");
+        xmlMap.put("key100", "irgendwas6");
 
-        model.put("one.key1", "irgendwas7");
-        model.put("one.key10", "irgendwas8");
-        model.put("one.key100", "irgendwas9");
+        xmlMap.put("one.key1", "irgendwas7");
+        xmlMap.put("one.key10", "irgendwas8");
+        xmlMap.put("one.key100", "irgendwas9");
 
-        model.put("one.key1", "irgendwas10");
-        model.put("one.key10", "irgendwas11");
-        model.put("one.key100", "irgendwas12");
+        xmlMap.put("one.key1", "irgendwas10");
+        xmlMap.put("one.key10", "irgendwas11");
+        xmlMap.put("one.key100", "irgendwas12");
 
-        assertEquals(6, model.size());
+        assertEquals(6, xmlMap.size());
     }
-
 
     @Test
     public void testMap() throws Exception {
-        logger.info("testMap");
+        LOG.info("testMap");
 
         Map<String, String> map = new XMLMap();
 
@@ -732,42 +700,18 @@ public class XMLMapTest {
 
     }
 
-
-    @Test
-    public void testMultiNodes() throws Exception {
-        logger.info("testMultiNodes");
-
-        XMLMap map = new XMLMap(new File(testdatapath + "XMLMapTest_testMultiNodes.xml"));
-        map.setXMLEntryPoint("xmlmap");
-        map.readXML();
-
-        assertFalse("map.isEmpty", map.isEmpty());
-
-        String[] lst = map.getListValue("o.boo.koo");
-
-        assertNotNull("ListValue not found", lst);
-
-        logger.info("lst.length = " + lst.length);
-        logger.info("lst.0 = " + lst[0]);
-
-        map.saveXML();
-
-        assertEquals(3, lst.length);
-    }
-
-
     /**
      * Test of LevelSeparators.
      */
     @Test
     public void testLevelSeparators() throws Exception {
-        logger.info("testLevelSeparators");
-        File testfile = new File(testdatapath + "XMLMapTest_testLevelSeparators_TMP.xml");
+        LOG.info("testLevelSeparators");
+        File testfile = new File(testdatapath, "XMLMapTest_testLevelSeparators_TMP.xml");
         initFile(testfile);
         String[] cases = new String[]{
             ".", "-", "\\", ",", "*", "_", "ooo", "@", "/", "|", "=", "?",
             "...", "x", "-|-", "||", "+"};
-        logger.info(" Separators to Test: {}", Arrays.asList(cases));
+        LOG.info(" Separators to Test: {}", Arrays.asList(cases));
 
         for (int i = 0; i < cases.length; i++) {
             if (testfile.exists()) {
@@ -795,15 +739,14 @@ public class XMLMapTest {
         }
     }
 
-
     /**
      * Test of LevelSeparators.
      */
     @Test
     public void testGetAttribute() throws Exception {
-        logger.info("testGetAttribute");
+        LOG.info("testGetAttribute");
 
-        File testfile = new File(testdatapath + "XMLMapTest_testGetAttribute.xml");
+        File testfile = new File(testdatapath, "XMLMapTest_testGetAttribute.xml");
 
         XMLMap xmap = new XMLMap(testfile);
         xmap.setXMLEntryPoint("xmlmap");
@@ -815,39 +758,33 @@ public class XMLMapTest {
 //        xmap.put("level3.level3.level3B", "level3");
 //        xmap.put("level3.level3.level3C", "level3");
 //        xmap.saveXML();
-
 //        logger.info(xmap.showDataEntries(false, true));
-
-
         xmap.getAttribute("level1", "myat");
 
         assertEquals("value1", xmap.get("level1"));
         assertEquals("12", xmap.getAttribute("level1", "myat"));
         assertEquals("435", xmap.getAttribute("level1", "myotherat"));
 
-
         assertEquals("2", xmap.getAttribute("level2.childlevel2", "level"));
         assertEquals("eins", xmap.getAttribute("level3.level3.level3A", "abc"));
 
-        File destfile = new File(testdatapath + "XMLMapTest_testGetAttributeOut_TMP.xml");
+        File destfile = new File(testdatapath, "XMLMapTest_testGetAttributeOut_TMP.xml");
         initFile(destfile);
         xmap.setXMLFileHandle(destfile);
         xmap.saveXML();
 
     }
 
-
     /**
      * Test of SetAttribute.
      */
     @Test
     public void testSetAttribute() throws Exception {
-        logger.info("testSetAttribute");
+        LOG.info("testSetAttribute");
 
-        File testfile = new File(testdatapath + "XMLMapTest_testSetAttribute_TMP.xml");
+        File testfile = new File(testdatapath, "XMLMapTest_testSetAttribute_TMP.xml");
         initFile(testfile);
         XMLMap xmap = new XMLMap(testfile);
-
 
         xmap.put("level1", "valuexy");
         xmap.put("level2.level2", "value999");
@@ -868,31 +805,31 @@ public class XMLMapTest {
 
     }
 
-
     @Test
     public void testConstructor() {
-        logger.info("testConstructor");
+        LOG.info("testConstructor");
         XMLMap xmap = new XMLMap();
         File xfile = xmap.getXMLFileHandle();
-        logger.info(xfile.getName());
+        LOG.info(xfile.getName());
         assertEquals("XMLMap.xml", xfile.getName());
     }
 
-
-    /** helper method to set that the generated xml-output-files should be deleted after jvm exit. */
+    /**
+     * helper method to set that the generated xml-output-files should be
+     * deleted after jvm exit.
+     */
     private static final void initFile(File file) {
         if (deleteOnExit) {
             file.deleteOnExit();
         }
     }
 
-
     @Test
     public void testXMLEntrypointReading() throws Exception {
-        logger.info("testXMLEntrypoint");
+        LOG.info("testXMLEntrypoint");
 
         //Create Test-XML-File:
-        File myfile = new File(testdatapath + "XMLMapTest_testXMLEntrypoint_TMP.xml");
+        File myfile = new File(testdatapath, "XMLMapTest_testXMLEntrypoint_TMP.xml");
         if (myfile.exists()) {
             myfile.delete();
         }
@@ -906,6 +843,7 @@ public class XMLMapTest {
 
         //1. No Entrypoint
         xmap.readXML();
+        LOG.info(xmap.showDataEntries(false, false));
         assertEquals("1", "4711", xmap.get("one.two.three.four.five"));
 
         //2. Entrypoint = one

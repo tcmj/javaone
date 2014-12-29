@@ -1,20 +1,37 @@
 package com.tcmj.common.tools.text;
 
 /**
- * Converts strings to camel case conform strings and also java properties
- * to setter or getter methods.
+ * Converts strings to camel case conform strings and also java properties to
+ * setter or getter methods.
+ *
  * @author Thomas Deutsch
  * @version $Revision: $
  */
 public class CamelCase {
 
     /**
-     * Converts any name to a java name (first letter capitalised).
-     * idea from middlegen's dbnameconverter.
-     * @param input eg.: junk_food
-     * @return eg.: JunkFood
+     * Helper class with only static methods.
      */
-    public static String toCamelCase(String input) {
+    private CamelCase() {
+    }
+
+    /**
+     * Converts any name to a java conform name (first letter capitalised). idea
+     * from middlegen's dbnameconverter.
+     * <pre>
+     * CamelCase.toCamelCase(null)                 = null
+     * CamelCase.toCamelCase("")                   = ""
+     * CamelCase.toCamelCase(" ")                  = ""
+     * CamelCase.toCamelCase("one")                = "One"
+     * CamelCase.toCamelCase("one_for_the_money")  = "OneForTheMoney"
+     * CamelCase.toCamelCase("oneforthemoney")     = "Oneforthemoney"
+     * CamelCase.toCamelCase("one-for-the-money")  = "OneForTheMoney"
+     * CamelCase.toCamelCase("one for the money")  = "OneForTheMoney"
+     * </pre>
+     * @param input the String to capitalise, may be null
+     * @return capitalised String, {@code null} if null String input
+     */
+    public static CharSequence toCamelCase(CharSequence input) {
         if ("".equals(input) || input == null) {
             return input;
         }
@@ -25,7 +42,7 @@ public class CamelCase {
         boolean lastDecapitalized = false;
         String p = null;
         for (int i = 0; i < input.length(); i++) {
-            String c = input.substring(i, i + 1);
+            String c = input.toString().substring(i, i + 1);
             if ("_".equals(c) || " ".equals(c) || "-".equals(c)) {
                 capitalize = true;
                 continue;
@@ -41,7 +58,6 @@ public class CamelCase {
             }
 
             //if(forceFirstLetter && result.length()==0) capitalize = false;
-
             if (capitalize) {
                 if (p == null || !p.equals("_")) {
                     sb.append(c.toUpperCase());
@@ -57,29 +73,32 @@ public class CamelCase {
                 lastDecapitalized = true;
                 p = c;
             }
-
         }
         return sb.toString();
     }
 
     /**
-     * Converts a java property to a get method.
-     * @param property input eg.: junk_food
-     * @return 
-     *  ALL_IN_UPPER_CASE = getAllInUpperCase</br>
+     * Converts a string to a java conform get method name.
+     * <pre>
+     * toGetter("ALL_IN_UPPER_CASE")   =  "getAllInUpperCase"
+     * </pre>
+     * @param text the String to transform
+     * @return getter String, {@code null} if null String input
      */
-    public static String toGetter(String property) {
-        return "get".concat(toCamelCase(property));
+    public static CharSequence toGetter(CharSequence text) {
+        return "get".concat(toCamelCase(text).toString());
     }
 
     /**
-     * Converts a java property to a set method.
-     * @param property input eg.: junk_food
-     * @return eg.: setJunkFood
+     * Converts a string to a java conform set method name.
+     * <pre>
+     * toSetter("ALL_IN_UPPER_CASE")   =  "setAllInUpperCase"
+     * </pre>
+     * @param text the String to transform
+     * @return setter String, {@code null} if null String input
      */
-    public static String toSetter(String property) {
-        return "set".concat(toCamelCase(property));
+    public static CharSequence toSetter(CharSequence text) {
+        return "set".concat(toCamelCase(text).toString());
     }
-
-
+    
 }

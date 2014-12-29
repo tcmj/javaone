@@ -40,7 +40,7 @@ public class XMLTool {
      * @return depending on the param returntype: Node or NodeList object
      * @throws XPathExpressionException on xpath compile errors
      */
-    private static final Object selectNode(Document document, String xpathexp,
+    private static Object selectNode(Document document, String xpathexp,
             final String prefix, QName returntype) throws XPathExpressionException {
 
         // 1. Instantiate an XPathFactory.
