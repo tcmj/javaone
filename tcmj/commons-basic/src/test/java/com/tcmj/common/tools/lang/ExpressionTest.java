@@ -1,4 +1,3 @@
-/* Copyright 2009 */
 package com.tcmj.common.tools.lang;
 
 import java.util.ArrayList;
