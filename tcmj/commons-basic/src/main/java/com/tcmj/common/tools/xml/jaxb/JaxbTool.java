@@ -1,4 +1,3 @@
-/* Copyright 2009 */
 package com.tcmj.common.tools.xml.jaxb;
 
 import java.io.InputStream;
@@ -8,7 +7,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import static com.tcmj.common.tools.lang.Check.*;
+import static com.tcmj.common.tools.lang.Check.notNull;
 
 /**
  * JaxbTool.
@@ -17,10 +16,8 @@ import static com.tcmj.common.tools.lang.Check.*;
  */
 public class JaxbTool {
 
-    /**
-     * default no-arg-constructor.
-     */
-    public JaxbTool() {
+    /** private no-arg-constructor. */
+    private JaxbTool() {
     }
 
 

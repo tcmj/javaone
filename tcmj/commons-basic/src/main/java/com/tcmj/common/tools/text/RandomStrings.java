@@ -12,32 +12,37 @@ import java.util.Random;
 public class RandomStrings extends Random {
 
     private static final long serialVersionUID = -3193018567428231419L;
+
     /**
      * Alle Ziffern des Hexadezimal-Systems.
      */
-    private static final char HEXCHARS[] = {
+    private static final char[] HEXCHARS = {
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+
     /**
      * Alle Ziffern des Alphabets (gross und klein).
      */
-    private static final char STRCHARS[] = {
+    private static final char[] STRCHARS = {
         'a', 'A', 'b', 'B', 'c', 'C', 'd', 'D', 'e', 'E', 'f', 'F', 'g', 'G', 'h', 'H', 'i', 'I',
         'j', 'J', 'k', 'K', 'l', 'L', 'm', 'M', 'n', 'N', 'o', 'O', 'p', 'P', 'q', 'Q', 'r', 'R',
         's', 'S', 't', 'T', 'u', 'U', 'v', 'V', 'w', 'W', 'x', 'X', 'y', 'Y', 'z', 'Z'};
+
     /**
      * Alle Kleinbuchstaben.
      */
-    private static final char SCHARS[] = {
+    private static final char[] SCHARS = {
         'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
         'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
         's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
+
     /**
      * alle Grossbuchstaben.
      */
-    private static final char BCHARS[] = {
+    private static final char[] BCHARS = {
         'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
         'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
         'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
+
     /**
      * Buchstaben zur Verwendung der Wortgenerierung.
      */
@@ -205,5 +210,5 @@ public class RandomStrings extends Random {
         }
         return new String(res);
     }
-    
+
 }

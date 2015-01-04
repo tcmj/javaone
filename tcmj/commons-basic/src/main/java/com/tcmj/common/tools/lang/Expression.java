@@ -1,4 +1,3 @@
-/* Copyright 2009 */
 package com.tcmj.common.tools.lang;
 
 import java.util.Collection;
@@ -12,12 +11,9 @@ import java.util.Map;
  */
 public final class Expression {
 
-    /**
-     * private no-arg-constructor.
-     */
+    /** private no-arg-constructor. */
     private Expression() {
     }
-
 
     /**
      * Ensures that the given collection is null or empty.
@@ -28,7 +24,6 @@ public final class Expression {
         return collection == null || collection.isEmpty();
     }
 
-
     /**
      * Ensures that the given map is null or empty.
      * @param map any list or set or map
@@ -37,7 +32,6 @@ public final class Expression {
     private static boolean isEmptyMap(Map map) {
         return map == null || map.isEmpty();
     }
-
 
     /**
      * checks if an object is null or empty.<br/>
@@ -65,7 +59,6 @@ public final class Expression {
         return empty;
     }
 
-
     /**
      * Negotiates the isEmpty method.<br/>
      * {@link #isEmpty(Object)}<br/>
@@ -75,9 +68,5 @@ public final class Expression {
     public static boolean isNotEmpty(Object obj) {
         return !(isEmpty(obj));
     }
-
-
-
-
 
 }

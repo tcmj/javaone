@@ -1,20 +1,3 @@
-/*
- *  Copyright (C) 2011 Thomas Deutsch <thomas-deutsch(a.t)tcmj.de>
- * 
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- * 
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- * 
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
 package com.tcmj.common.tools.lang;
 
 import java.text.MessageFormat;
@@ -25,7 +8,9 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  * Check Utility class (like apaches Validate or Googles Precondition class).
- * <p>All message strings can be formatted using the {@link java.text.MessageFormat} patterns
+ * <p>
+ * All message strings can be formatted using the {@link java.text.MessageFormat} patterns
+ *
  * @author tcmj - Thomas Deutsch
  * @see org.apache.commons.lang.Validate
  * @since 13.04.2011
@@ -38,16 +23,17 @@ public class Check {
     private Check() {
     }
 
-
     /**
-     * Checks that a object is not null and throws a NullPointerException with
-     * a custom message. <p>The message strings can be formatted using the {@link java.text.MessageFormat} patterns</p>
+     * Checks that a object is not null and throws a NullPointerException with a custom message.
+     * <p>
+     * The message strings can be formatted using the {@link java.text.MessageFormat} patterns</p>
      * <pre>
      *    notNull(name, "Name can not be Null!");
      *    String this.name = notNull(name, "Name can not be Null!");
      *    String this.name = notNull(name, "Name can not be Null! {0,date}", new Date());
      *    String this.name = notNull(name, "Dear {0} your name can not be Null! {1,date}", user, new Date());
      * </pre>
+     *
      * @param <T> typesafe
      * @param instance the object to check
      * @param msg a custom message used in the exception text
@@ -62,16 +48,16 @@ public class Check {
         return instance;
     }
 
-
     /**
-     * Ensures that a expression has to be true and throws a IllegalArgumentException with
-     * a custom message on failure.
-     * <p>The message strings can be formatted using the {@link java.text.MessageFormat} patterns</p>
+     * Ensures that a expression has to be true and throws a IllegalArgumentException with a custom message on failure.
+     * <p>
+     * The message strings can be formatted using the {@link java.text.MessageFormat} patterns</p>
      * <pre>
      *    ensure(!list.isEmpty(), "Your list cannot be empty!");
      *
      *    boolean connected = ensure(session.isConnected(), "Connection lost at {0,date}", new Date());
      * </pre>
+     *
      * @param condition expression which must be true or false
      * @param msg a custom message used in the exception text
      * @param params value objects to be placed into the message (starting with {0})
@@ -86,20 +72,22 @@ public class Check {
         return true;
     }
 
-
     /**
      * Ensures that a {@link String} has to be <b>not</b>
      * <li>null</li>
      * <li>empty ("")</li>
-     * <li>whitespace ("  ")</li>
-     * <p>and throws a IllegalArgumentException with</p>
+     * <li>whitespace (" ")</li>
+     * <p>
+     * and throws a IllegalArgumentException with</p>
      * a custom message on failure.
-     * <p>The message strings can be formatted using the {@link java.text.MessageFormat} patterns</p>
+     * <p>
+     * The message strings can be formatted using the {@link java.text.MessageFormat} patterns</p>
      * <pre>
      *    notBlank(parameterName, "Your have to provide a non-empty name to use this method!");
      *
      *    this.name = notBlank(parameterName, "Say your name or pay {0,number,currency}!", 25.50);
      * </pre>
+     *
      * @param string the string to check
      * @param message a message used by the thrown exception
      * @return the given string parameter (parameter no 1)
@@ -112,7 +100,6 @@ public class Check {
         return string;
     }
 
-    
     /**
      * checks if an object is null or empty.<br/>
      * Supports<br/>
@@ -124,6 +111,7 @@ public class Check {
      * <li>{@link java.util.zip.ZipFile} (size)</li>
      * </ul>
      * <b>All other classes will only be checked if they are null (=true) or not null (=false)!</b>
+     *
      * @param obj Object
      * @return bool
      */
@@ -132,26 +120,25 @@ public class Check {
             return true;
         } else {
             if (Collection.class.isAssignableFrom(obj.getClass())) {
-                return ((Collection)obj).isEmpty();
+                return ((Collection) obj).isEmpty();
             } else if (Map.class.isAssignableFrom(obj.getClass())) {
-                return ((Map)obj).isEmpty();
+                return ((Map) obj).isEmpty();
             } else if (Object[].class.isAssignableFrom(obj.getClass())) {
-                return ((Object[])obj).length==0;
+                return ((Object[]) obj).length == 0;
             } else if (CharSequence.class.isAssignableFrom(obj.getClass())) {
-                return ((CharSequence)obj).length()==0;
+                return ((CharSequence) obj).length() == 0;
             } else if (ZipFile.class.isAssignableFrom(obj.getClass())) {
-                return ((ZipFile)obj).size()==0;
+                return ((ZipFile) obj).size() == 0;
             } else {
                 return false;
 //                throw new UnsupportedOperationException("Empty check is not implemented for "+obj.getClass());
             }
         }
     }
-    
-    
-    
 
-    /** Internal method to produce strings filled with formatted values. */
+    /**
+     * Internal method to produce strings filled with formatted values.
+     */
     private static String buildMessage(String msg, Object... params) {
         if (params == null) {
             return msg;

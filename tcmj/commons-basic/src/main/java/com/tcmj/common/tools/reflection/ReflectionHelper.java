@@ -1,4 +1,3 @@
-/* Copyright(c) 2009 tcmj  All Rights Reserved. */
 package com.tcmj.common.tools.reflection;
 
 import java.lang.annotation.Annotation;
@@ -23,11 +22,9 @@ public final class ReflectionHelper {
     /** Cache for Method objects. */
     private static Map<String, Method> methodCache;
 
-
     /** Singleton. */
     private ReflectionHelper() {
     }
-
 
     /** Loads a class with the Class.forName(String) method.
      * Catches the ClassNotFoundException and throws a RunTimeException
@@ -57,7 +54,6 @@ public final class ReflectionHelper {
 
     }
 
-
     /**
      * Instantiates the given class with the given parameters
      * @param <T> type
@@ -69,7 +65,6 @@ public final class ReflectionHelper {
     @SuppressWarnings("unchecked")
     public static <T> T newObject(String className, Class<?>[] paramTypes, Object... parameters) {
         notBlank(className, "Name of the class cannot be blank!");
-
 
         Class<T> classinstance = loadClass(className);
 
@@ -83,7 +78,6 @@ public final class ReflectionHelper {
         }
 
     }
-
 
     /**
      * Instantiates the given class with a no-arg constructor.
@@ -109,11 +103,10 @@ public final class ReflectionHelper {
         }
     }
 
-
     /** Executes a method on the given instance object using exactly one parameter.
      * This function is designed to call set methods.<br>
      * Warning!: Do not use this function if you have more than one set methods
-     *           with same name (but different paramters) !!!
+     * with same name (but different paramters) !!!
      * @param instance the object on which the method should be invoked
      * @param setter name of the (set)method to invoke
      * @param value parameter of the (set)method
@@ -133,9 +126,7 @@ public final class ReflectionHelper {
             throw new RuntimeException("InvocationTargetException: " + invex.getMessage(), invex);
         }
 
-
     }
-
 
     /** Executes a method on the given instance object using NO parameters.
      * This function is designed to call get methods.
@@ -159,9 +150,7 @@ public final class ReflectionHelper {
             throw new RuntimeException("InvocationTargetException: " + invex.getMessage(), invex);
         }
 
-
     }
-
 
     /** extracts a specific Method object from the given Class object.
      * @param clazz Class object
@@ -205,7 +194,6 @@ public final class ReflectionHelper {
 
     }
 
-
     /**
      * Tries to find a {@link Field field} on the supplied {@link Class} with the
      * supplied <code>name</code> and/or {@link Class type}. Searches all superclasses
@@ -232,7 +220,6 @@ public final class ReflectionHelper {
         return null;
     }
 
-
     /**
      * reads a java annotation from a method.
      * @param <T> class object
@@ -247,7 +234,6 @@ public final class ReflectionHelper {
         return (T) annotation;
     }
 
-
     /** Prints size of the class/method cache. */
     public static String getCacheInfo() {
         StringBuilder bld = new StringBuilder("ReflectionHelper: ");
@@ -261,10 +247,10 @@ public final class ReflectionHelper {
         }
         return bld.toString();
     }
-    
+
     /**
      * Extracts all classes of the given objects using the getClass() method.
-     * 
+     * <p>
      * @param parameter any java objects
      * @return array containing each return value of the getClass method
      */
@@ -279,5 +265,5 @@ public final class ReflectionHelper {
         }
         return classes;
     }
-    
+
 }

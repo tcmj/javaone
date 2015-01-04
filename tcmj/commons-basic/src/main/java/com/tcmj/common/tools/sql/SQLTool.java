@@ -1,20 +1,3 @@
-/*
- * Copyright (C) 2011 tcmj development
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
 package com.tcmj.common.tools.sql;
 
 import java.sql.Connection;
@@ -29,18 +12,14 @@ import org.slf4j.LoggerFactory;
  * @author Thomas Deutsch <thomas-deutsch(a.t)tcmj.de>
  * @since 28.07.2011
  */
-public class SQLTool {
+public final class SQLTool {
 
     /** slf4j Logging API. */
-    private static final transient Logger logger = LoggerFactory.getLogger(SQLTool.class);
+    private static transient Logger logger = LoggerFactory.getLogger(SQLTool.class);
 
-
-    /**
-     * instantiation not allowed!
-     */
+    /** instantiation not allowed! */
     private SQLTool() {
     }
-
 
     /**
      * tries to close a {@link ResultSet}.
@@ -56,7 +35,6 @@ public class SQLTool {
         }
     }
 
-
     /**
      * tries to close a {@link Statement}.
      * @param stmt Statement/PreparedStatement object
@@ -71,7 +49,6 @@ public class SQLTool {
         }
     }
 
-    
     /**
      * tries to close a {@link Connection}.
      * @param connection jdbc connection object
@@ -85,8 +62,7 @@ public class SQLTool {
             }
         }
     }
-    
-    
+
     /**
      * tries to close the given ResultSet object and then the Statement.
      * @param stmt Statement/PreparedStatement object
@@ -96,10 +72,9 @@ public class SQLTool {
         close(rs);
         close(stmt);
     }
-    
-    
+
     /**
-     * tries to close the given ResultSet object and then the Statement and 
+     * tries to close the given ResultSet object and then the Statement and
      * then the connection object.
      * @param connection jdbc connection object
      * @param stmt Statement/PreparedStatement object
@@ -110,5 +85,5 @@ public class SQLTool {
         close(stmt);
         close(connection);
     }
-    
+
 }

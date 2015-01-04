@@ -9,9 +9,7 @@ package com.tcmj.common.tools.text;
  */
 public class CamelCase {
 
-    /**
-     * Helper class with only static methods.
-     */
+    /** Helper class with only static methods. */
     private CamelCase() {
     }
 
@@ -100,5 +98,5 @@ public class CamelCase {
     public static CharSequence toSetter(CharSequence text) {
         return "set".concat(toCamelCase(text).toString());
     }
-    
+
 }

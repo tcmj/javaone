@@ -1,4 +1,3 @@
-
 package com.tcmj.common.tools.xml.map;
 
 import java.io.File;
@@ -10,8 +9,6 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import static com.tcmj.common.tools.lang.Check.*;
 import com.tcmj.common.tools.xml.map.intern.XMLEntry;
 import com.tcmj.common.tools.xml.map.intern.XMLMapDomAccessor;
@@ -34,9 +31,9 @@ import com.tcmj.common.tools.xml.map.intern.XMLMapAccessor;
  *  model.put("dates", "lastrun", "1979-11-02");<br>
  *  model.saveXML();<br>
  * </code>
- * 
+ * <p>
  * @author Thomas Deutsch - thomas-deutsch@tcmj.de
- * 
+ * <p>
  * Created on 28. Mai 2005, 00:53
  * Modified on 16. April 2007, 23:53
  * Modified on 27. March 2008, 23:49
@@ -46,25 +43,25 @@ public class XMLMap implements Map<String, String>, Serializable {
 
     /** Universal version identifier. */
     private static final long serialVersionUID = -4723949967478064084L;
-    
+
     /** Default level separator (keys!). */
     public static final String DEFAULT_LEVEL_SEPARATOR = ".";
-    
+
     /** The Data backed by a Map. */
     private Map<String, XMLEntry> data;
-    
+
     /** The File handle of a XML-File. (does not have to exist). */
     private File xMLFileHandle;
-    
+
     /** The Name of the root node (default = 'tcmj'). */
     private String xMLRootNodeName = "tcmj";
-    
+
     /** The Name of the Roots child (default = 'xmlprop'). */
     private String xMLEntryPoint /*= "xmlmap"*/;
-    
-    /** Separator to concat levels to each other. Default = '.'  */
+
+    /** Separator to concat levels to each other. Default = '.' */
     private String levelSeparator;
-    
+
     /** compiled pattern to split the keys. */
     private Pattern rexpattern;
 
@@ -97,18 +94,16 @@ public class XMLMap implements Map<String, String>, Serializable {
     public String put(String key, String value) {
         notBlank(key, "Blank key not accepted!");
         validateEntry(key);
-        
+
         //TODO do not allow control characters (whitespace only)
         if (value != null) {
             for (char toChar : value.toCharArray()) {
                 if (Character.isISOControl(toChar)) {
-                    throw new XMLMapException("Cannot handle control characters! Code: "+(int)toChar);
+                    throw new XMLMapException("Cannot handle control characters! Code: " + (int) toChar);
                 }
             }
         }
-        
-        
-        
+
         XMLEntry oldentry = data.put(key, new XMLEntry(key, value));
         return (oldentry == null) ? null : oldentry.getValue();
     }
@@ -125,7 +120,7 @@ public class XMLMap implements Map<String, String>, Serializable {
      * </pre>
      * @param keytocheck full path of a xml entry to check.
      * @throws XMLMapException if a
-     *         keytocheck allready has a value on any of its levels.
+     * keytocheck allready has a value on any of its levels.
      */
     private void validateEntry(String keytocheck) throws XMLMapException {
 
@@ -172,7 +167,7 @@ public class XMLMap implements Map<String, String>, Serializable {
                  */
 
                 /* wenn die Keys auf der gleichen Ebene liegen muessen sie nur
-                ungleich sein um angelegt werden zu koennen (valide zu sein)  */
+                 ungleich sein um angelegt werden zu koennen (valide zu sein)  */
                 boolean samelevel = isSameLevel(entrykey, keytocheck);
 
                 if (entrykey.startsWith(keytocheck) && !samelevel) {
@@ -328,15 +323,16 @@ public class XMLMap implements Map<String, String>, Serializable {
     }
 
     private XMLMapDomAccessor accessor;
-       private XMLMapAccessor getXMLAccessor() {
-           if(accessor==null){
-                accessor = new XMLMapDomAccessor(getXMLRootNodeName(), getXMLEntryPoint(), getLevelSeparator(), this.rexpattern);
-           }
-           accessor.setLevelSeparator(getLevelSeparator());
-           accessor.setXmlRootNodeName(getXMLRootNodeName());
-           accessor.setXmlEntryPoint(getXMLEntryPoint());
-           accessor.setRexpattern(this.rexpattern);
-           return accessor;
+
+    private XMLMapAccessor getXMLAccessor() {
+        if (accessor == null) {
+            accessor = new XMLMapDomAccessor(getXMLRootNodeName(), getXMLEntryPoint(), getLevelSeparator(), this.rexpattern);
+        }
+        accessor.setLevelSeparator(getLevelSeparator());
+        accessor.setXmlRootNodeName(getXMLRootNodeName());
+        accessor.setXmlEntryPoint(getXMLEntryPoint());
+        accessor.setRexpattern(this.rexpattern);
+        return accessor;
     }
 
     /**
@@ -385,8 +381,6 @@ public class XMLMap implements Map<String, String>, Serializable {
 
         entry.addAttribute(attribname, value);
     }
-
-
 
     /** Clears all entries in the model.
      * if you save the model (after calling this method) you will get an empty
@@ -438,8 +432,6 @@ public class XMLMap implements Map<String, String>, Serializable {
         }
     }
 
-
-
     /**
      * Returns the Name of the Rootnode of the XML File.
      * @return property xMLRootNodeName
@@ -472,7 +464,6 @@ public class XMLMap implements Map<String, String>, Serializable {
     public void setXMLEntryPoint(String childnode) {
         this.xMLEntryPoint = childnode;
     }
-
 
     /**
      * Gets the separator which is used to split the key.

@@ -5,12 +5,12 @@
  *  modify it under the terms of the GNU General Public License
  *  as published by the Free Software Foundation; either version 2
  *  of the License, or (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -21,9 +21,8 @@ import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Integer.MIN_VALUE;
 
 /**
- * A range is defined by a begin and an end. It allows checking whether a value
- * is within the range or outside. A range can be open at one or both ends, i.
- * e. the range is assumed to be endless in that direction.
+ * A range is defined by a begin and an end. It allows checking whether a value is within the range or outside. A range can be open at one or both
+ * ends, i. e. the range is assumed to be endless in that direction.
  *
  * @author Markus KARG (markus@headcrashing.eu)
  * @version 1.2.1
@@ -36,18 +35,14 @@ public final class Range<T extends Comparable<T>> {
     private final T upperBound;
 
     /**
-     * Creates a range with the specified bounds. The bounds will be included,
-     * i. e. are part of the range. Bounds can be declared as being open, i. e.
-     * the range is assumed to be endless in that direction.
+     * Creates a range with the specified bounds. The bounds will be included, i. e. are part of the range. Bounds can be declared as being open, i.
+     * e. the range is assumed to be endless in that direction.
      *
-     * @param lowerBound The lowest possible value of the range, or {@code null}
-     * if there is no lower bound.
-     * @param upperBound The greatest possible value of the range, or
-     * {@code null} if there is no upper bound.
-     * @throws IllegalArgumentException if lower bound is greater than upper
-     * bound
+     * @param lowerBound The lowest possible value of the range, or {@code null} if there is no lower bound.
+     * @param upperBound The greatest possible value of the range, or {@code null} if there is no upper bound.
+     * @throws IllegalArgumentException if lower bound is greater than upper bound
      */
-    public Range(final T lowerBound, final T upperBound) throws IllegalArgumentException {
+    public Range(final T lowerBound, final T upperBound) {
         if (lowerBound != null && upperBound != null && lowerBound.compareTo(upperBound) > 0) {
             throw new IllegalArgumentException("lowerBound is greater than upperBound");
         }
@@ -57,15 +52,13 @@ public final class Range<T extends Comparable<T>> {
     }
 
     /**
-     * Checks whether the specified object is within the range, including
-     * bounds.
+     * Checks whether the specified object is within the range, including bounds.
      *
+     * throws IllegalArgumentException if {@code object} is {@code null}.
      * @param object The object to be checked. Must not be {@code null}.
-     * @return {@code false} if {@code object} is lower than the lower bound or
-     * greater than the upper bound; otherwise {@code true}.
-     * @throws IllegalArgumentException if {@code object} is {@code null}.
+     * @return {@code false} if {@code object} is lower than the lower bound or greater than the upper bound; otherwise {@code true}.
      */
-    public boolean contains(final T object) throws IllegalArgumentException {
+    public boolean contains(final T object) {
         if (object == null) {
             throw new IllegalArgumentException("object is null");
         }
@@ -82,18 +75,15 @@ public final class Range<T extends Comparable<T>> {
     }
 
     /**
-     * Checks whether the specified range is entirely contained in the range,
-     * including bounds.
+     * Checks whether the specified range is entirely contained in the range, including bounds.
      *
+     * throws IllegalArgumentException if {@code other} is {@code null}.
      * @param range The range to be checked. Must not be {@code null}.
-     * @return {@code false} if {@code range} has a lower bound lower than the
-     * lower bound of this or an upper bound greater than the upper bound of
-     * this (i. e. {@code other} overlaps or is completely outside); otherwise
-     * {@code true}.
-     * @throws IllegalArgumentException if {@code other} is {@code null}.
+     * @return {@code false} if {@code range} has a lower bound lower than the lower bound of this or an upper bound greater than the upper bound of
+     * this (i. e. {@code other} overlaps or is completely outside); otherwise {@code true}.
      * @since 1.1.0
      */
-    public boolean contains(final Range<T> range) throws IllegalArgumentException {
+    public boolean contains(final Range<T> range) {
         if (range == null) {
             throw new IllegalArgumentException("range is null");
         }
@@ -110,17 +100,15 @@ public final class Range<T extends Comparable<T>> {
     }
 
     /**
-     * Checks whether the specified range overlaps this range (i. e. whether the
-     * ranges intersect).
+     * Checks whether the specified range overlaps this range (i. e. whether the ranges intersect).
      *
+     * throws IllegalArgumentException if {@code range} is {@code null}.
      * @param range The {@code range} to be checked. Must not be {@code null}.
-     * @return {@code false} if {@code range} has an upper bound lower than the
-     * lower bound of this or a lower bound greater than the upper bound of
+     * @return {@code false} if {@code range} has an upper bound lower than the lower bound of this or a lower bound greater than the upper bound of
      * this; otherwise {@code true}.
-     * @throws IllegalArgumentException if {@code range} is {@code null}.
      * @since 1.2.0
      */
-    public boolean overlaps(final Range<T> range) throws IllegalArgumentException {
+    public boolean overlaps(final Range<T> range) {
         if (range == null) {
             throw new IllegalArgumentException("range is null");
         }

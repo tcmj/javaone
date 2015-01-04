@@ -1,12 +1,9 @@
 package com.tcmj.common.tools.xml.map.intern;
 
-import com.tcmj.common.tools.lang.Close;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -18,7 +15,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -35,22 +31,17 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 /**
- *
+ * XMLMapAccessor implementation
  * @author tcmj
  */
 public class XMLMapDomAccessor implements XMLMapAccessor {
 
-    /**
-     * slf4j Logging framework.
-     */
+    /** slf4j Logging framework. */
     private static final transient Logger LOG = LoggerFactory.getLogger(XMLMapDomAccessor.class);
 
-    /**
-     * JAXP XML Document.
-     */
+    /** JAXP XML Document. */
     private transient Document document = null;
 
-    
     private Map<String, XMLEntry> data;
     private File xmlFile;
 
@@ -62,7 +53,7 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
      */
     private Pattern rexpattern;
 
-    public XMLMapDomAccessor( String xmlRootNodeName, String xmlEntryPoint, String levelSeparator, Pattern rexpattern) {
+    public XMLMapDomAccessor(String xmlRootNodeName, String xmlEntryPoint, String levelSeparator, Pattern rexpattern) {
         this.xmlRootNodeName = xmlRootNodeName;
         this.xmlEntryPoint = xmlEntryPoint;
         this.levelSeparator = levelSeparator;
@@ -94,8 +85,9 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
                 document = builder.parse(xmlFile);
 
                 root = document.getDocumentElement();
-                
-            } catch (ParserConfigurationException | SAXException | IOException ex) {
+
+            }
+            catch (ParserConfigurationException | SAXException | IOException ex) {
                 LOG.error("Error reading XML: " + ex.getMessage(), ex);
             }
 
@@ -113,10 +105,12 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
                         startNode = searchNode(getXMLEntryPoint(), xmlFile.getPath());
                         //nimm den ersten knoten unter dem entrypoint
                         startNode = startNode.getFirstChild();
-                    } catch (XPathExpressionException xex) {
+                    }
+                    catch (XPathExpressionException xex) {
                         startNode = null;
                         LOG.error("XPath error: " + xex.getMessage(), xex);
-                    } catch (NullPointerException nex) {
+                    }
+                    catch (NullPointerException nex) {
                         startNode = null;
                         LOG.error("XMLEntryPoint not found!", nex);
                     }
@@ -182,9 +176,8 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
                 }
             };
             xpath.setNamespaceContext(nsc);
-            
+
 //            namespaces.put(prfix, uri);
-            
         }
 
         //2.1 create xpath expression:
@@ -204,7 +197,6 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
         javax.xml.xpath.XPathExpression expression = xpath.compile(xpathExp);
 
 //        String xmlFilePath = getXMLFile().getPath();
-
         // 4. Evaluate the XPath expression on an input document
         Node result = (Node) expression.evaluate(new org.xml.sax.InputSource(xmlFilePath), XPathConstants.NODE);
 
@@ -315,9 +307,9 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
                 factory.setNamespaceAware(true);
 
                 DocumentBuilder builder = factory.newDocumentBuilder();
-                
+
                 document = builder.newDocument();
-                
+
                 root = document.createElement(getXMLRootNodeName());
 
                 document.appendChild(root);
@@ -390,24 +382,18 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
                 //Attribute anlegen
                 Map<String, String> allattribs = xmlentry.getAttributes();
                 if (allattribs != null) {
-
                     for (Map.Entry<String, String> aentry : allattribs.entrySet()) {
-
                         element.setAttribute(aentry.getKey(), aentry.getValue());
-
                     }
-
                 }
 
                 //Value oder Values anlegen:
                 if (xmlentry.getValue() != null) {
-
                     if (xmlentry.getXmlNodeType() == Node.CDATA_SECTION_NODE) {
                         actualnode.appendChild(document.createCDATASection(xmlentry.getValue()));
                     } else {
                         actualnode.appendChild(document.createTextNode(xmlentry.getValue()));
                     }
-
                 } else {
 
                     String[] values = xmlentry.getListValue();
@@ -430,39 +416,49 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
                 }
             }
 
-            FileOutputStream outpt = new FileOutputStream(outputfile);
-            try {
+            try (FileOutputStream outpt = new FileOutputStream(outputfile)) {
 
                 TransformerFactory tfactory = TransformerFactory.newInstance();
-                tfactory.setAttribute("indent-number", 2);
+                try {
+                    tfactory.setAttribute("indent-number", 2);
+                }
+                catch (IllegalArgumentException e) {
+                }
                 Transformer transformer = tfactory.newTransformer();
 
-                try {
-
-                    transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-                    transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-                    transformer.setOutputProperty(OutputKeys.MEDIA_TYPE, "text/xml");
-                    transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-                    transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", "2");
-                } catch (Exception ex) {
-                    LOG.warn("Unsupported attribute in writing XML: {}", ex.getMessage());
-                }
+                initOutputProperties(transformer);
 
                 transformer.transform(new DOMSource(document), new StreamResult(new OutputStreamWriter(outpt, "UTF-8")));
 
-                outpt.flush();
-                outpt.getFD().sync();
-                Close.quiet(outpt);
-
-            } catch (IOException ioe) {
-                Close.quiet(outpt);
+            }
+            catch (IOException ioe) {
                 throw ioe;
             }
 
-        } catch (ParserConfigurationException | DOMException | TransformerException | IOException ex) {
+        }
+        catch (ParserConfigurationException | DOMException | TransformerException | IOException ex) {
             throw new XMLMapException(ex.getMessage(), ex);
         }
 
+    }
+
+    private void initOutputProperties(Transformer transformer) {
+        Map<String, String> outprops = new HashMap<>();
+
+        outprops.put(OutputKeys.METHOD, "xml");
+        outprops.put(OutputKeys.MEDIA_TYPE, "text/xml");
+        outprops.put(OutputKeys.ENCODING, "UTF-8");
+        outprops.put(OutputKeys.INDENT, "2");
+        outprops.put("{http://xml.apache.org/xalan}indent-amount", "2");
+
+        for (Map.Entry<String, String> entrySet : outprops.entrySet()) {
+            try {
+                transformer.setOutputProperty(entrySet.getKey(), entrySet.getValue());
+            }
+            catch (Exception ex) {
+                LOG.warn("Unsupported attribute in writing XML: {}", ex.getMessage());
+            }
+        }
     }
 
     /**
@@ -483,7 +479,6 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
         }
         return actnode;
     }
-
 
     @Override
     public String getXMLEntryPoint() {

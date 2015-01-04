@@ -1,15 +1,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
     <parent>
         <groupId>com.tcmj</groupId>
         <artifactId>tcmj-parent</artifactId>
         <version>6</version>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
+    
     <groupId>com.tcmj.common</groupId>
     <artifactId>commons-basic</artifactId>
-    <packaging>jar</packaging>
     <version>2.14.12</version>
+    <packaging>jar</packaging>
+    
     <name>tcmj-commons-basic</name>
     <description>
         This java package provides helper classes and functions which were needed
@@ -21,8 +24,6 @@
         - Tool zum prufen auf Nicht existente Files im Klassenpfad
         - File-Tool um sämtliche Pfade zu ermitteln inkl. Prufung auf das ende-zeichen etc.
         - Application Klasse soll wissen wenn start aus netbeans erfolgt und ggf. ein dummy manifest liefern (classpath durchsuchen)
-          
-        
     </description>
     <developers>
         <developer>
@@ -31,10 +32,7 @@
             <email>reg@tcmj.de</email>
         </developer>
     </developers>
-    
-    
     <build>
-        
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -53,19 +51,6 @@
                         <a>com.tcmj.common.tools.xml.jaxb.XMLRootObject</a>
                     </includes>
                     <packageName>com.example.myschema</packageName> <!-- The name of your generated source package -->
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.pitest</groupId>
-                <artifactId>pitest-maven</artifactId>
-                <version>1.1.2</version>
-                <configuration>
-                    <targetClasses>
-                        <param>com.tcmj.common*</param>
-                    </targetClasses>
-                    <targetTests>
-                        <param>com.tcmj.common*</param>
-                    </targetTests>
                 </configuration>
             </plugin>
         </plugins>
@@ -110,8 +95,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-
-
+    
 </project>
 

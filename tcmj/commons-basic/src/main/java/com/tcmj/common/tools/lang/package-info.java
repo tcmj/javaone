@@ -1,8 +1,4 @@
-
-
 /**
- * This is the core package for the application
- * @since 1.0
+ * This is the core package for the application.
  */
-
 package com.tcmj.common.tools.lang;

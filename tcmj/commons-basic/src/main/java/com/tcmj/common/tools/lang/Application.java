@@ -1,20 +1,3 @@
-/* 
- *  Copyright (C) 2011 Thomas Deutsch <thomas-deutsch(a.t)tcmj.de>
- * 
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- * 
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- * 
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
 package com.tcmj.common.tools.lang;
 
 import static com.tcmj.common.tools.lang.Check.notNull;
@@ -22,24 +5,25 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  * Common application tools.
+ *
  * @author tcmj - Thomas Deutsch
  * @since 23.01.2011
  */
 public class Application {
 
     /**
-     * default no-arg-constructor. 
+     * default no-arg-constructor.
      */
     private Application() {
     }
 
-
-    /** Tries to read the application title provided from the manifests implementation entries.
-     * The following order will be used to get the title
+    /**
+     * Tries to read the application title provided from the manifests implementation entries. The following order will be used to get the title
      * <ol>
      * <li>Manifest entry 'Implementation-Title</li>
      * <li>Manifest entry 'Specification-Title</li>
      * </ol>
+     *
      * @param context a class which is located in the same jarfile of the manifest.mf
      * @return the title or an empty string
      * @throws java.lang.IllegalArgumentException if the parameter 'context' is null
@@ -59,12 +43,13 @@ public class Application {
         return title;
     }
 
-    /** Tries to read the application version provided from the manifests implementation entries.
-     * The following order will be used to get it
+    /**
+     * Tries to read the application version provided from the manifests implementation entries. The following order will be used to get it
      * <ol>
      * <li>Manifest entry 'Implementation-Version</li>
      * <li>Manifest entry 'Specification-Version</li>
      * </ol>
+     *
      * @param context a class which is located in the same jarfile of the manifest.mf
      * @return the version or an empty string
      * @throws java.lang.IllegalArgumentException if the parameter 'context' is null
@@ -84,12 +69,13 @@ public class Application {
         return version;
     }
 
-    /** Tries to read the application vendor provided from the manifests implementation entries.
-     * The following order will be used to get the vendor
+    /**
+     * Tries to read the application vendor provided from the manifests implementation entries. The following order will be used to get the vendor
      * <ol>
      * <li>Manifest entry 'Implementation-Vendor</li>
      * <li>Manifest entry 'Specification-Vendor</li>
      * </ol>
+     *
      * @param context a class which is located in the same jarfile of the manifest.mf
      * @return the vendor or an empty string
      * @throws java.lang.IllegalArgumentException if the parameter 'context' is null
@@ -108,6 +94,5 @@ public class Application {
         }
         return title;
     }
-
 
 }

@@ -49,7 +49,6 @@ public class XMLTool {
         // 2. Use the XPathFactory to create a new XPath object
         javax.xml.xpath.XPath xpath = factory.newXPath();
 
-
         //Namespace-prefix-workaround
         if (prefix != null) {
             //search uri to the prefix
@@ -61,12 +60,10 @@ public class XMLTool {
                     return uri;
                 }
 
-
                 @Override
                 public String getPrefix(String namespaceURI) {
                     return prefix;
                 }
-
 
                 @Override
                 public Iterator<?> getPrefixes(String namespaceURI) {
@@ -76,10 +73,8 @@ public class XMLTool {
             xpath.setNamespaceContext(nsc);
         }
 
-
         // 3. Compile an XPath string into an XPathExpression
         javax.xml.xpath.XPathExpression expression = xpath.compile(xpathexp);
-
 
         // 4. Evaluate the XPath expression on an input document
         if (returntype == XPathConstants.NODE) {
@@ -92,8 +87,7 @@ public class XMLTool {
 
     }
 
-
-    /**searches some xml nodes via xpath.
+    /** searches some xml nodes via xpath.
      * @param document jaxp document
      * @param xpathexp XPath Expression
      * @param prefix namespaceprefix used in the xpath expression (or null if none)
@@ -105,8 +99,9 @@ public class XMLTool {
         return (NodeList) selectNode(document, xpathexp, prefix, XPathConstants.NODESET);
     }
 
-
-    /**searches a single xml node via xpath.
+    /**
+     * searches a single xml node via xpath.
+     *
      * @param document jaxp document
      * @param xpathexp XPath Expression
      * @param prefix namespaceprefix used in the xpath expression (or null if none)
@@ -118,8 +113,7 @@ public class XMLTool {
         return (Node) selectNode(document, xpathexp, prefix, XPathConstants.NODE);
     }
 
-
-    /**Validates a xml file.
+    /** Validates a xml file.
      * TODO implement Errorhandler
      * @param document jaxp dom document
      * @param xsdFile file handle to the xsd file
@@ -140,7 +134,6 @@ public class XMLTool {
         validator.validate(new DOMSource(document));
 
     }
-
 
     /**
      * Convert a xml document to a string.

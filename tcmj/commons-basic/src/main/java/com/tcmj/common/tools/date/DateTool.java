@@ -8,11 +8,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
-import static com.tcmj.common.tools.lang.Check.*;
+import static com.tcmj.common.tools.lang.Check.notNull;
 
 /**
  * Helper for simple time and date operations.
- * <p> use following import in your classes <br>import static com.tcmj.common.tools.date.DateTool.*;</p>
+ * <p>
+ * use following import in your classes <br>import static com.tcmj.common.tools.date.DateTool.*;</p>
  * For professional date and time operations consider using the Joda time library.
  * @see org.apache.commons.lang.time.DateUtils
  * @author tcmj - Thomas Deutsch
@@ -70,7 +71,7 @@ public final class DateTool extends DateUtils {
 
     /**
      * Creates a date by the given parameters.<br>
-     * minutes, seconds and milliseconds and  will be set to '0'
+     * minutes, seconds and milliseconds and will be set to '0'
      * @param year Year (eg. 2008)
      * @param month Month (1 to 12)
      * @param day Day (1 to 30/31) invalid days will be rolled to the next month
@@ -95,12 +96,12 @@ public final class DateTool extends DateUtils {
 
     /**
      * Checks if a date falls into a given time range.<br>
-     *       <code>Date &gt;=  StartDate AND Date &lt;=  EndDate</code>
+     * <code>Date &gt;=  StartDate AND Date &lt;=  EndDate</code>
      * @param dateToCheck the date to check
      * @param timeRangeStart the pStart of the time period
      * @param timeRangeEnd the finish of the time period
      * @param useTime false will ignore all time informations (hh:mm:ss)
-     *                true uses the original time informations
+     * true uses the original time informations
      * @return true if the date to check is between the period
      */
     public static boolean isDateInRange(Date dateToCheck, Date timeRangeStart, Date timeRangeEnd, boolean useTime) {
@@ -128,7 +129,7 @@ public final class DateTool extends DateUtils {
     public static boolean isDateEqual(Date source, Date target) {
         return !((source == null && target != null)
                 || (source != null && target == null)
-                || (source != null && target != null && !source.equals(target))); 
+                || (source != null && target != null && !source.equals(target)));
     }
 
     /**
@@ -142,11 +143,11 @@ public final class DateTool extends DateUtils {
     }
 
     /**
-     * Removes the whole time informations from a date.
-     * Resets (to '0'): hours, minutes, seconds, milliseconds
+     * Removes the whole time informations from a date.<br>
+     * Resets (to '0'): hours, minutes, seconds, milliseconds<br>
+     * throws java.lang.IllegalArgumentException if the Date parameter is null
      * @param source Date to remove times info
      * @return DateUtils.truncate(source, Calendar.DATE);
-     * @throws java.lang.IllegalArgumentException if the Date parameter is null
      */
     public static Date removeTime(Date source) {
         return DateUtils.truncate(source, Calendar.DATE);
@@ -184,10 +185,10 @@ public final class DateTool extends DateUtils {
      * the Start date and converts it from ms to days.<br>
      * <b>number of days between the same Day returns '0'<br>
      * 01.Jan to 10.Jan = 9 days (not 10!)</b><br>
+     * throws java.lang.IllegalArgumentException if any of the both parameters is null
      * @param start begin
      * @param end finish
      * @return amount of days between
-     * @throws java.lang.IllegalArgumentException if any of the both parameters is null
      */
     public static int daysbetween(Date start, Date end) {
         return (int) between(start, end, Calendar.DATE);
@@ -198,22 +199,22 @@ public final class DateTool extends DateUtils {
      * minute, second and millisecond. information will be deleted.
      * it subtracts the finish date from
      * the pStart date and converts it from ms to hours.<br>
+     * throws java.lang.IllegalArgumentException if any of the Date parameters are null
      * @param start begin
      * @param end finish
      * @return amount of hours between
-     * @throws java.lang.IllegalArgumentException if any of the Date parameters are null
      */
     public static long hoursbetween(Date start, Date end) {
         return between(start, end, Calendar.HOUR_OF_DAY);
     }
 
     /**
-     * Internal method to compute the time between two dates.
+     * Internal method to compute the time between two dates.<br>
+     * throws java.lang.IllegalArgumentException if any of the Date parameters are null
      * @param start begin
      * @param end finish
      * @param calendarConstant {@link java.util.Calendar}
      * @return milliseconds
-     * @throws java.lang.IllegalArgumentException if any of the Date parameters are null
      */
     private static long between(Date start, Date end, int calendarConstant) {
         notNull(start, "Parameter 'start' may not be null!");
@@ -245,13 +246,13 @@ public final class DateTool extends DateUtils {
     }
 
     /**
-     * Date formatter.
+     * Date formatter.<br>
      * Date formats are not synchronized. It is recommended to create
      * separate format instances for each thread. If multiple threads
-     * access a format concurrently, it must be synchronized externally.
+     * access a format concurrently, it must be synchronized externally.<br>
+     * throws java.lang.IllegalArgumentException if the Date parameter is null
      * @param date to format
      * @return "yyyy-MM-dd"
-     * @throws java.lang.IllegalArgumentException if the Date parameter is null
      */
     public static String formatDate(Date date) {
         notNull(date, "Cannot format a null Date object!");
@@ -259,13 +260,13 @@ public final class DateTool extends DateUtils {
     }
 
     /**
-     * Date and Time formatter.
+     * Date and Time formatter.<br>
      * Date formats are not synchronized. It is recommended to create
      * separate format instances for each thread. If multiple threads
-     * access a format concurrently, it must be synchronized externally.
+     * access a format concurrently, it must be synchronized externally.<br>
+     * throws java.lang.IllegalArgumentException if the Date parameter is null
      * @param date to format
      * @return "yyyy-MM-dd HH:mm"
-     * @throws java.lang.IllegalArgumentException if the Date parameter is null
      */
     public static String formatDateTime(Date date) {
         notNull(date, "Cannot format a null Date object!");
@@ -283,11 +284,11 @@ public final class DateTool extends DateUtils {
 //        return formatedDuration;
 
         String[] labels;
-        if (customlabels == null || customlabels.length==0 ) {
-            labels = new String[]{" ms"," sec"," min"," hours"," days"};
-        }else if (customlabels.length!=5) {
+        if (customlabels == null || customlabels.length == 0) {
+            labels = new String[]{" ms", " sec", " min", " hours", " days"};
+        } else if (customlabels.length != 5) {
             throw new IllegalArgumentException("Please provide 4 abbreviations! (eg.: {\" ms\",\" sec\",\" min\",\" hours\",\" days\"})");
-        }else{
+        } else {
             labels = customlabels;
         }
 
@@ -298,10 +299,8 @@ public final class DateTool extends DateUtils {
             durationMillis = roundDate(new Date(durationMillis)).getTime();
         }
 
-
         boolean suppressLeadingZeroElements = true;
         boolean suppressTrailingZeroElements = true;
-
 
 //        final String zeroMs = StringUtils.join(new String[]{"0", labels[0]});
         final String zeroSec = StringUtils.join(new String[]{" 0", labels[1]});
@@ -310,11 +309,9 @@ public final class DateTool extends DateUtils {
         final String zeroDays = StringUtils.join(new String[]{" 0", labels[4]});
 
         // This method is generally replaceable by the format method, but
-        
-
-        final String formatStrg =
-                StringUtils.join(new String[]{"d'", labels[4],"' H'", labels[3],"' m'", labels[2],"' s'", labels[1],"'"});
-        System.out.println("formatStrg = "+formatStrg);
+        final String formatStrg
+                = StringUtils.join(new String[]{"d'", labels[4], "' H'", labels[3], "' m'", labels[2], "' s'", labels[1], "'"});
+        System.out.println("formatStrg = " + formatStrg);
 
 //        String duration = DurationFormatUtils.formatDuration(durationMillis, "d' days 'H' hours 'm' min 's' sec'");
         String duration = DurationFormatUtils.formatDuration(durationMillis, formatStrg);
@@ -363,17 +360,16 @@ public final class DateTool extends DateUtils {
 
     }
 
-
     /**
      * Sets time informations to a date.
      * hours, minutes, seconds, milliseconds
+     * throws java.lang.IllegalArgumentException if the Date parameter is null
      * @param source Date to remove times info
      * @param hours24 0 to 23
      * @param minutes 0 to 59
      * @param seconds 0 to 59
-     * @param milis  0 to 999
+     * @param milis 0 to 999
      * @return a java long time value
-     * @throws java.lang.IllegalArgumentException if the Date parameter is null
      */
     public static long setTime(Date source, int hours24, int minutes, int seconds, int milis) {
         Calendar calendar = getCalendar(source);
@@ -388,13 +384,13 @@ public final class DateTool extends DateUtils {
     /**
      * Sets time informations to a date.
      * hours, minutes, seconds, milliseconds
+     * throws java.lang.IllegalArgumentException if the source date parameter is null
      * @param source Date to remove times info
      * @param hours24 0 to 23
      * @param minutes 0 to 59
      * @param seconds 0 to 59
-     * @param milis  0 to 999
+     * @param milis 0 to 999
      * @return a java util Date object
-     * @throws java.lang.IllegalArgumentException if the source date parameter is null
      */
     public static Date setTimeAsDate(Date source, int hours24, int minutes, int seconds, int milis) {
         return new Date(setTime(source, hours24, minutes, seconds, milis));
@@ -402,9 +398,9 @@ public final class DateTool extends DateUtils {
 
     /** Rounds a java date (up/down) to minutes.
      * rounds up if seconds >= 30 and rounds down if < 30.
+     * throws java.lang.IllegalArgumentException if the Date parameter is null
      * @param date 2009-04-04 23:23:43
      * @return 2009-04-04 23:24:00
-     * @throws java.lang.IllegalArgumentException if the Date parameter is null
      */
     public static Date roundDate(Date date) {
         return DateUtils.round(date, Calendar.MINUTE);
@@ -418,9 +414,9 @@ public final class DateTool extends DateUtils {
     }
 
     /** Method to retrieve a calendar.
+     * throws java.lang.IllegalArgumentException if the Date parameter is null
      * @param initialdate date to set to the calendar
      * @return a calendar object
-     * @throws java.lang.IllegalArgumentException if the Date parameter is null
      */
     public static Calendar getCalendar(Date initialdate) {
         notNull(initialdate, "Parameter 'initialdate' may not be null!");
@@ -429,7 +425,7 @@ public final class DateTool extends DateUtils {
         return calendar;
     }
 
-    /***
+    /**
      * Iterate over the days between start and end date (both inclusive).
      * @param from 2010-01-01
      * @param until 2010-01-03
