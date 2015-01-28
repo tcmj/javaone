@@ -40,8 +40,11 @@ Exceptions:
 
     <!-- Checks whether files end with a new line.                        -->
     <!-- See http://checkstyle.sf.net/config_misc.html#NewlineAtEndOfFile -->
-    <module name="NewlineAtEndOfFile"/>
-
+    <module name="NewlineAtEndOfFile">
+        <property name="lineSeparator" value="crlf"/>
+        <property name="fileExtensions" value="java, xml"/>
+    </module>
+    
     <!-- Checks that property files contain the same keys.         -->
     <!-- See http://checkstyle.sf.net/config_misc.html#Translation -->
     <module name="Translation"/>
@@ -119,7 +122,7 @@ Exceptions:
         <!-- Checks for Size Violations.                    -->
         <!-- See http://checkstyle.sf.net/config_sizes.html -->
         <module name="LineLength">
-            <property name="max" value="150"/>
+            <property name="max" value="300"/>
             <property name="severity" value="warning"/>
         </module>
         <module name="MethodLength"/>
@@ -193,10 +196,10 @@ Exceptions:
 
     <!-- Support @SuppressWarnings (added in Checkstyle 5.7) -->
     <!-- see http://checkstyle.sourceforge.net/config.html#SuppressWarningsFilter -->
-    <module name="SuppressWarningsFilter"/>
+<!--    <module name="SuppressWarningsFilter"/>-->
 
     <!-- Checks properties file for a duplicated properties. -->
     <!-- See http://checkstyle.sourceforge.net/config_misc.html#UniqueProperties -->
-    <module name="UniqueProperties"/>
+<!--    <module name="UniqueProperties"/>-->
 
 </module>
