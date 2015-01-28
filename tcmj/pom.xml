@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tcmj</groupId>
     <artifactId>tcmj-parent</artifactId>
-    <version>6</version>
+    <version>7</version>
     <packaging>pom</packaging>
     <name>tcmj-parent</name>
     <url>http://www.tcmj.de</url>
@@ -19,7 +19,7 @@
         <developer>
             <id>tcmj</id>
             <name>Thomas Deutsch</name>
-            <email>reg@tcmj.de</email>
+            <email>tomdeu@gmail.com</email>
             <organization>tcmj</organization>
             <organizationUrl>http://www.tcmj.de</organizationUrl>
             <roles>
@@ -47,7 +47,7 @@
         <url>http://code.google.com/p/tcmj/issues</url>
     </issueManagement>
     <prerequisites>
-        <maven>3.0.3</maven>
+        <maven>3.0.5</maven>
     </prerequisites>
     <repositories>
         <repository>
@@ -130,6 +130,43 @@
                     </dependency>
                 </dependencies>
             </plugin>
+            <plugin>
+                <groupId>com.mycila.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+                <version>1.9.0</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.tcmj</groupId>
+                        <artifactId>tcmj-development-resources</artifactId>
+                        <version>1.0</version>
+                    </dependency>
+                </dependencies>
+                <!--<executions>
+                        <execution>
+                                <phase>validate</phase>
+                                <goals>
+                                        <goal>format</goal>
+                                </goals>
+                        </execution>
+                </executions>-->
+                <configuration>
+                    <header>${maven.license.plugin.licensefile}</header>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <properties>
+                        <copyrightstring>${project.copyright}</copyrightstring>
+                    </properties>
+                    <includes>
+                        <!--
+                                alle .java Dateien im src-Ordner werden mit dem Lizenz-Header
+                                versehen
+                        -->
+                        <include>src/**/*.java</include>
+                    </includes>
+                    <excludes>
+                        <exclude>**/resources/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
@@ -178,11 +215,6 @@
                 <artifactId>logback-core</artifactId>
                 <version>1.1.2</version>
             </dependency>
-            <dependency>
-                <groupId>com.tcmj.common</groupId>
-                <artifactId>commons-basic</artifactId>
-                <version>2.14.07</version>
-            </dependency>
             <!-- Unit test framework -->
             <dependency>
                 <groupId>junit</groupId>
@@ -209,12 +241,12 @@
             <dependency>
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-module-junit4</artifactId>
-                <version>${powermock.version}</version>
+                <version>1.6.1</version>
             </dependency>
             <dependency>
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-api-mockito</artifactId>
-                <version>${powermock.version}</version>
+                <version>1.6.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -367,8 +399,9 @@
                         <artifactId>maven-checkstyle-plugin</artifactId>
                         <version>2.13</version>
                         <configuration>
+                            <cacheFile>target/checkstylecache</cacheFile>
                             <!-- <configLocation>config/sun_checks.xml</configLocation> -->
-                            <configLocation>checkstyle\tcmjstyle.xml</configLocation>
+                            <configLocation>${checkstyle.config.file}</configLocation>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -377,9 +410,9 @@
     </profiles>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.source.level.version>1.7</java.source.level.version>
-        <org.slf4j.version>1.7.7</org.slf4j.version>
-        <powermock.version>1.6.0</powermock.version>
-        <checkstyle.config.file>\coding-resources\src\main\resources\checkstyle\tcmjstyle.xml</checkstyle.config.file>
+        <java.source.level.version>1.8</java.source.level.version>
+        <org.slf4j.version>1.7.10</org.slf4j.version>
+        <checkstyle.config.file>checkstyle/tcmjstyle.xml</checkstyle.config.file>
+        <maven.license.plugin.licensefile>license/tcmj.license.txt</maven.license.plugin.licensefile>
     </properties>
 </project>
