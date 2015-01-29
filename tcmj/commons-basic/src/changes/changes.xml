@@ -3,10 +3,35 @@
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/xsd/changes-1.0.0.xsd">
     <properties>
-        <title>Changes for the tcmj commons project</title>
-        <author email="thomas-deutsch@tcmj.de">Thomas Deutsch</author>
+        <title>tcmj-commons-basic project</title>
+        <author email="tomdeu@gmail.com">Thomas Deutsch</author>
     </properties>
     <body>
+        <release version="2.15.02" date="2015-02-11" description="Java 8 Time!">
+            <action dev="tcmj" type="update">
+                Updated the whole library to JDK 8.
+            </action>
+            <action dev="tcmj" type="update">
+                XMLMap refactored
+            </action>
+            <action dev="tcmj" type="add">
+                ExceptionAdapter added to wrap checked exceptions into runtime exceptions
+            </action>
+        </release>
+        <release version="2.14.12" date="2014-12-24" description="Christmas Release">
+            <action dev="tdeut" type="add">
+                Added a new class 'ResourceBundleMerger'
+            </action>
+            <action dev="tdeut" type="add">
+                Added class com.tcmj.common.tools.date.Range with a nice range implementation
+            </action>
+            <action dev="tcmj" type="remove">
+                Removed a package level 'tools' in order to have a shorter path
+            </action>
+            <action dev="tdeut" type="update">
+                pom.xml updatet
+            </action>
+        </release>
         <release version="2.12.05" date="2012-05-01" description="Enhancements">
             <action dev="tdeut" type="add">
                 Added class com.tcmj.common.tools.lang.Close with methods to swallow exceptions or wrap exceptions to unchecked

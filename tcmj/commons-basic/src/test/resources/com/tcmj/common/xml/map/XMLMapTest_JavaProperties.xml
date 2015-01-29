@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<tcmj>
+  <java>
+    <path>
+      <separator>;</separator>
+    </path>
+    <test>com.tcmj.common.xml.map.XMLMapTestExtended</test>
+    <basedir>D:\gitwork\tcmjgoogle\svn\tcmj\commons-basic</basedir>
+    <maven>
+      <ext>
+        <class>
+          <path>C:\Program Files\NetBeans 8.0\java\maven-nblib\netbeans-eventspy.jar</path>
+        </class>
+      </ext>
+    </maven>
+    <surefire>
+      <real>
+        <class>
+          <path>D:\gitwork\tcmjgoogle\svn\tcmj\commons-basic\target\surefire\surefirebooter7308981570041879980.jar</path>
+        </class>
+      </real>
+      <test>
+        <class>
+          <path>D:\gitwork\tcmjgoogle\svn\tcmj\commons-basic\target\test-classes;D:\gitwork\tcmjgoogle\svn\tcmj\commons-basic\target\classes;C:\Users\tcmj\.m2\repository\org\slf4j\slf4j-api\1.7.7\slf4j-api-1.7.7.jar;C:\Users\tcmj\.m2\repository\org\apache\commons\commons-lang3\3.3.2\commons-lang3-3.3.2.jar;C:\Users\tcmj\.m2\repository\junit\junit\4.12\junit-4.12.jar;C:\Users\tcmj\.m2\repository\org\hamcrest\hamcrest-core\1.3\hamcrest-core-1.3.jar;C:\Users\tcmj\.m2\repository\org\slf4j\slf4j-simple\1.7.7\slf4j-simple-1.7.7.jar;</path>
+        </class>
+      </test>
+    </surefire>
+    <os>
+      <arch>amd64</arch>
+      <name>Windows 7</name>
+      <version>6.1</version>
+    </os>
+    <user>
+      <country>DE</country>
+      <dir>D:\gitwork\tcmjgoogle\svn\tcmj\commons-basic</dir>
+      <home>C:\Users\tcmj</home>
+      <name>tcmj</name>
+      <language>de</language>
+    </user>
+    <awt>
+      <toolkit>sun.awt.windows.WToolkit</toolkit>
+    </awt>
+    <java>
+      <vendor>
+        <url>http://java.oracle.com/</url>
+      </vendor>
+      <runtime>
+        <name>Java(TM) SE Runtime Environment</name>
+        <version>1.7.0_60-b19</version>
+      </runtime>
+      <endorsed>
+        <dirs>D:\java\jdk1.7.0_60\jre\lib\endorsed</dirs>
+      </endorsed>
+      <io>
+        <tmpdir>C:\Users\tcmj\AppData\Local\Temp\</tmpdir>
+      </io>
+      <library>
+        <path>D:\java\jdk1.7.0_60\jre\bin;C:\Windows\Sun\Java\bin;C:\Windows\system32;C:\Windows;D:\java\jdk1.7.0_60\bin;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\Git\cmd;C:\Program Files (x86)\Git\bin;C:\Program Files\Calibre2\;D:\java\putty;C:\Program Files\FileBot\;.</path>
+      </library>
+      <awt>
+        <graphicsenv>sun.awt.Win32GraphicsEnvironment</graphicsenv>
+        <printerjob>sun.awt.windows.WPrinterJob</printerjob>
+      </awt>
+      <class>
+        <version>51.0</version>
+        <path>D:\gitwork\tcmjgoogle\svn\tcmj\commons-basic\target\test-classes;D:\gitwork\tcmjgoogle\svn\tcmj\commons-basic\target\classes;C:\Users\tcmj\.m2\repository\org\slf4j\slf4j-api\1.7.7\slf4j-api-1.7.7.jar;C:\Users\tcmj\.m2\repository\org\apache\commons\commons-lang3\3.3.2\commons-lang3-3.3.2.jar;C:\Users\tcmj\.m2\repository\junit\junit\4.12\junit-4.12.jar;C:\Users\tcmj\.m2\repository\org\hamcrest\hamcrest-core\1.3\hamcrest-core-1.3.jar;C:\Users\tcmj\.m2\repository\org\slf4j\slf4j-simple\1.7.7\slf4j-simple-1.7.7.jar;</path>
+      </class>
+      <home>D:\java\jdk1.7.0_60\jre</home>
+      <specification>
+        <name>Java Platform API Specification</name>
+        <version>1.7</version>
+        <vendor>Oracle Corporation</vendor>
+      </specification>
+      <vm>
+        <version>24.60-b09</version>
+        <vendor>Oracle Corporation</vendor>
+        <name>Java HotSpot(TM) 64-Bit Server VM</name>
+        <specification>
+          <name>Java Virtual Machine Specification</name>
+          <vendor>Oracle Corporation</vendor>
+          <version>1.7</version>
+        </specification>
+        <info>mixed mode</info>
+      </vm>
+      <version>1.7.0_60</version>
+      <ext>
+        <dirs>D:\java\jdk1.7.0_60\jre\lib\ext;C:\Windows\Sun\Java\lib\ext</dirs>
+      </ext>
+    </java>
+    <localRepository>C:\Users\tcmj\.m2\repository</localRepository>
+    <file>
+      <encoding>
+        <pkg>sun.io</pkg>
+      </encoding>
+      <separator>\</separator>
+    </file>
+    <sun>
+      <os>
+        <patch>
+          <level>Service Pack 1</level>
+        </patch>
+      </os>
+      <jnu>
+        <encoding>Cp1252</encoding>
+      </jnu>
+      <management>
+        <compiler>HotSpot 64-Bit Tiered Compilers</compiler>
+      </management>
+      <java>
+        <launcher>SUN_STANDARD</launcher>
+        <command>D:\gitwork\tcmjgoogle\svn\tcmj\commons-basic\target\surefire\surefirebooter7308981570041879980.jar D:\gitwork\tcmjgoogle\svn\tcmj\commons-basic\target\surefire\surefire7536359644505108432tmp D:\gitwork\tcmjgoogle\svn\tcmj\commons-basic\target\surefire\surefire_0878211686526009662tmp</command>
+      </java>
+      <arch>
+        <data>
+          <model>64</model>
+        </data>
+      </arch>
+      <boot>
+        <library>
+          <path>D:\java\jdk1.7.0_60\jre\bin</path>
+        </library>
+        <class>
+          <path>D:\java\jdk1.7.0_60\jre\lib\resources.jar;D:\java\jdk1.7.0_60\jre\lib\rt.jar;D:\java\jdk1.7.0_60\jre\lib\sunrsasign.jar;D:\java\jdk1.7.0_60\jre\lib\jsse.jar;D:\java\jdk1.7.0_60\jre\lib\jce.jar;D:\java\jdk1.7.0_60\jre\lib\charsets.jar;D:\java\jdk1.7.0_60\jre\lib\jfr.jar;D:\java\jdk1.7.0_60\jre\classes</path>
+        </class>
+      </boot>
+      <io>
+        <unicode>
+          <encoding>UnicodeLittle</encoding>
+        </unicode>
+      </io>
+      <desktop>windows</desktop>
+      <cpu>
+        <endian>little</endian>
+        <isalist>amd64</isalist>
+      </cpu>
+    </sun>
+  </java>
+</tcmj>
