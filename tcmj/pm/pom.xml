@@ -12,11 +12,11 @@
     <packaging>pom</packaging>
     <name>tcmj-pm-parent-pom</name>
     <modules>
-        <module>common</module>
         <module>conflicts-core</module>
         <module>conflicts-jfreechart</module>
         <module>spread</module>
         <module>spread-jfreechart</module>
+        <module>mta</module>
   </modules>
     <description>
         tcmj project management api.
@@ -45,12 +45,11 @@
             <dependency>
                 <groupId>joda-time</groupId>
                 <artifactId>joda-time</artifactId>
-                <version>1.6.2</version>
+                <version>2.6</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
     <properties>
-        
         <checkstyle.config.location>..\coding-resources\src\main\resources\checkstyle\tcmjstyle.xml</checkstyle.config.location>
     </properties>
 </project>

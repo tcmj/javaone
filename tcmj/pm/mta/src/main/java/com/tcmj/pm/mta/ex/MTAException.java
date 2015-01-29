@@ -1,8 +1,7 @@
 /**
- * Copyright(c) 2003 - 2010 by INTECO GmbH
+ * Copyright(c) 2003 - 2015 by tcmj
  * All Rights Reserved.
  */
-
 package com.tcmj.pm.mta.ex;
 
 /**
@@ -30,6 +29,5 @@ public class MTAException extends Exception {
     /** {@inheritDoc} */
     public MTAException() {
     }
-
 
 }

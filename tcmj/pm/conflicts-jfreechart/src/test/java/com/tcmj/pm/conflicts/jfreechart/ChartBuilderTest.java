@@ -11,8 +11,8 @@ import org.jfree.chart.JFreeChart;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static com.tcmj.common.tools.date.DateTool.date;
-import static com.tcmj.common.tools.date.DateTool.formatDate;
+import static com.tcmj.common.date.DateTool.date;
+import static com.tcmj.common.date.DateTool.formatDate;
 
 
 /**

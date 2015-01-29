@@ -1,5 +1,5 @@
 /**
- * Copyright(c) 2003 - 2010 by INTECO GmbH
+ * Copyright(c) 2003 - 2015 by tcmj
  * All Rights Reserved.
  */
 package com.tcmj.pm.mta;
@@ -7,7 +7,7 @@ package com.tcmj.pm.mta;
 import com.tcmj.pm.mta.bo.DataPoint;
 import com.tcmj.pm.mta.bo.ChartData;
 import com.tcmj.pm.mta.bo.DataSeries;
-import static com.tcmj.common.tools.date.DateTool.*;
+import static com.tcmj.common.date.DateTool.*;
 import java.util.Date;
 import org.junit.Test;
 import static org.junit.Assert.*;

@@ -1,10 +1,10 @@
 /**
- * Copyright(c) 2003 - 2010 by INTECO GmbH
+ * Copyright(c) 2003 - 2015 by tcmj
  * All Rights Reserved.
  */
 package com.tcmj.pm.mta.bo;
 
-import com.tcmj.common.tools.date.DateTool;
+import com.tcmj.common.date.DateTool;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -12,7 +12,7 @@ import java.util.List;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static com.tcmj.common.tools.lang.Check.notNull;
+import static com.tcmj.common.lang.Check.notNull;
 
 /**
  * IMTAChart.
@@ -36,14 +36,12 @@ public class ChartData {
     /** max report date. */
     private Date maxReportDate;
 
-
     /** Standard constructor.
      * @param name chartName
      */
     public ChartData(String name) {
-        this.chartName = notNull(name,"Chartname may not be null");
+        this.chartName = notNull(name, "Chartname may not be null");
     }
-
 
     /**
      * Name of the chart. Has no further meaning.
@@ -53,7 +51,6 @@ public class ChartData {
         return chartName;
     }
 
-
     /**
      * Name of the chart. Has no further meaning.
      * @param chartName the chartName to set
@@ -62,16 +59,16 @@ public class ChartData {
         this.chartName = chartName;
     }
 
-
     /**
      * Returns a unmodifieable view to the series-list!
-     * <p>A serie is a single line in the chart
+     * <p>
+     * A serie is a single line in the chart
      * @return the taskSeriesList
      */
     public List<DataSeries> getTaskSeriesList() {
         return Collections.unmodifiableList(this.taskSeriesList);
     }
-    
+
     /**
      * Returns the amount of the series (lines)
      * @return size
@@ -79,7 +76,6 @@ public class ChartData {
     public int getSeriesCount() {
         return this.taskSeriesList.size();
     }
-
 
     /**
      * Add a line to the chart.
@@ -90,17 +86,15 @@ public class ChartData {
         this.taskSeriesList.add(series);
     }
 
-
     /**
      * Invalidates the min and max date. On the next
-     * call to {@link #getMinReportDate()} or {@link #getMaxReportDate()} a 
+     * call to {@link #getMinReportDate()} or {@link #getMaxReportDate()} a
      * recompution takes place!
      */
     private void resetMinMaxDates() {
         this.minReportDate = null;
         this.maxReportDate = null;
     }
-
 
     /**
      * The smallest date computed from all datapoints
@@ -111,7 +105,6 @@ public class ChartData {
         return minReportDate;
     }
 
-
     /**
      * The biggest date computed from all datapoints
      * @return the biggest milestone or report date
@@ -120,7 +113,6 @@ public class ChartData {
         computeMinMaxDates();
         return maxReportDate;
     }
-
 
     /**
      * compute the min and max dates.
@@ -146,11 +138,9 @@ public class ChartData {
         logger.trace("ReportRange computed! Min={}, Max={}", DateTool.formatDate(minReportDate), DateTool.formatDate(maxReportDate));
     }
 
-
     @Override
     public String toString() {
         return new ToStringBuilder(this).append(getChartName()).toString();
     }
-
 
 }

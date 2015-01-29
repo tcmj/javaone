@@ -1,5 +1,5 @@
-/*
- * Copyright(c) 2009 INTECO GmbH.
+/**
+ * Copyright(c) 2003 - 2015 by tcmj
  * All Rights Reserved.
  */
 package com.tcmj.pm.mta.dots;

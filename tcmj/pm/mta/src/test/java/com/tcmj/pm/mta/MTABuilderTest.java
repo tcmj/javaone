@@ -1,5 +1,5 @@
 /**
- * Copyright(c) 2003 - 2010 by INTECO GmbH
+ * Copyright(c) 2003 - 2015 by tcmj
  * All Rights Reserved.
  */
 package com.tcmj.pm.mta;
@@ -33,7 +33,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static com.tcmj.common.tools.date.DateTool.*;
+import static com.tcmj.common.date.DateTool.*;
 
 /**
  *
@@ -41,9 +41,8 @@ import static com.tcmj.common.tools.date.DateTool.*;
  */
 public class MTABuilderTest {
 
-    //default 
-    static String SYSP_OUTPUT_FOLDER = "com.inteco.common.imta.junit.outputfolder";
-    static String OUTPUT_FOLDER = System.getProperty("com.inteco.common.imta.junit.outputfolder", "C:\\");
+    static final String SYSP_OUTPUT_FOLDER = "com.tcmj.pm.mta.junit.outputfolder";
+    static String OUTPUT_FOLDER = System.getProperty(SYSP_OUTPUT_FOLDER, System.getProperty("user.home"));
 
     public MTABuilderTest() {
         System.out.println("output folder can be set through system property: '" + SYSP_OUTPUT_FOLDER + "'");
@@ -68,7 +67,6 @@ public class MTABuilderTest {
         System.out.println("shouldCreateSeriesWithSameSymbolsAndColors");
         //given
         ChartData chart = new ChartData("5 Same Symbols");
- 
 
         for (int i = 1; i <= 15; i++) {
             int modifier = (i + 1);
@@ -93,10 +91,9 @@ public class MTABuilderTest {
         //then
         assertNotNull(result);
         write(result, "shouldCreateSeriesWithSameSymbolsAndColors.png");
-        
-        
+
         outaspdf(instance);
-        
+
     }
 
     @Test
@@ -105,14 +102,12 @@ public class MTABuilderTest {
         //given
         ChartData chart = new ChartData("500 Milestones");
 
-
         for (int i = 1; i <= 50; i++) {
             int modifier = (i + 1);
             DataSeries serie = new DataSeries("Milestone " + i);
 
             //serie.setColor("0xff0000");
             //serie.setSymbol(IMTASymbol.No_18);
-
             serie.addDataPoint(new DataPoint(date(2011, 2, 1), date(2011, 5 + modifier, 1)));
             serie.addDataPoint(new DataPoint(date(2011, 4, 1), date(2011, 5 + modifier, 25)));
             serie.addDataPoint(new DataPoint(date(2011, 5, 1), date(2011, 5 + modifier, 26)));
@@ -135,23 +130,18 @@ public class MTABuilderTest {
         //given
         ChartData chart = new ChartData("500 Milestones");
 
-
-
         DataSeries serie = new DataSeries("Finished_in_Past ");
 
         /*
          * Linie: Finished_in_Past_10052e82067ed
-        Punkt: RD: 2011-03-25   MD: 2011-04-04
-        Punkt: RD: 2011-04-04   MD: 2011-04-04
-        Linie: Planned_in_Past_100530609d476
-        Punkt: RD: 2011-03-25   MD: 2011-04-04
+         Punkt: RD: 2011-03-25   MD: 2011-04-04
+         Punkt: RD: 2011-04-04   MD: 2011-04-04
+         Linie: Planned_in_Past_100530609d476
+         Punkt: RD: 2011-03-25   MD: 2011-04-04
         
          */
-
-
         //serie.setColor("0xff0000");
         //serie.setSymbol(IMTASymbol.No_18);
-
         serie.addDataPoint(new DataPoint(date(2011, 3, 25), date(2011, 4, 4)));
         serie.addDataPoint(new DataPoint(date(2011, 4, 4), date(2011, 4, 4)));
         chart.addTaskSeries(serie);
@@ -160,7 +150,6 @@ public class MTABuilderTest {
         serie2.addDataPoint(new DataPoint(date(2011, 3, 25), date(2011, 4, 4)));
         chart.addTaskSeries(serie2);
 
-
         MTABuilder instance = new MTABuilder(chart);
         //when
         BufferedImage result = instance.createImage();
@@ -168,75 +157,60 @@ public class MTABuilderTest {
         assertNotNull(result);
         write(result, "specialTest.png");
 
-
-
-
-
     }
 
-     private void outaspdf(MTABuilder instance ){
+    private void outaspdf(MTABuilder instance) {
         try {
-         
-        File file = File.createTempFile("test", "svg");
-        
-        OutputStreamWriter outputstreamwriter = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
-        instance.createSVG(outputstreamwriter);    
-        outputstreamwriter.flush();
-        outputstreamwriter.close();
-        
-        InputStream in = new FileInputStream(file);
-        
 
-        String reportDest = "mtareport1.pdf";
+            File file = File.createTempFile("test", "svg");
 
-        Map<String, Object> params = new HashMap<String, Object>();
+            OutputStreamWriter outputstreamwriter = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
+            instance.createSVG(outputstreamwriter);
+            outputstreamwriter.flush();
+            outputstreamwriter.close();
 
-        params.put("mtaimg", in);
-        
-         String strSVG =  (instance.createSVGString()); // convert chart to svg format
-        net.sf.jasperreports.renderers.BatikRenderer rend1 = net.sf.jasperreports.renderers.BatikRenderer.getInstance(in);
-        params.put("mtaimg", rend1);
+            InputStream in = new FileInputStream(file);
+
+            String reportDest = "mtareport1.pdf";
+
+            Map<String, Object> params = new HashMap<String, Object>();
+
+            params.put("mtaimg", in);
+
+            String strSVG = (instance.createSVGString()); // convert chart to svg format
+            net.sf.jasperreports.renderers.BatikRenderer rend1 = net.sf.jasperreports.renderers.BatikRenderer.getInstance(in);
+            params.put("mtaimg", rend1);
 //        InputStream ins = new ByteArrayInputStream(instance.createSVG().g)
 //                ImageIO.createInputStream(result);
-        //ImageIO.write(outImg, "png", file);
-        
-        
-        
-        
-//        InputStream mtastream = new InputStream() {}
-        
-        
-        
-        
-            InputStream jrxmlstream = MTABuilderTest.class.getResourceAsStream("mtareport1.jrxml");
-            
-            JasperReport jasperReport =
-                    JasperCompileManager.compileReport(jrxmlstream);
+            //ImageIO.write(outImg, "png", file);
 
-            JasperPrint jasperPrint =
-                    JasperFillManager.fillReport(
-                    jasperReport, params, new JREmptyDataSource());
+//        InputStream mtastream = new InputStream() {}
+            InputStream jrxmlstream = MTABuilderTest.class.getResourceAsStream("mtareport1.jrxml");
+
+            JasperReport jasperReport
+                    = JasperCompileManager.compileReport(jrxmlstream);
+
+            JasperPrint jasperPrint
+                    = JasperFillManager.fillReport(
+                            jasperReport, params, new JREmptyDataSource());
 
             JasperExportManager.exportReportToPdfFile(
                     jasperPrint, reportDest);
 
             JasperViewer.viewReport(jasperPrint);
-            
+
             Thread.sleep(2222);
-            
+
             String uuu = "ooo";
-            
+
         } catch (Exception ex) {
             ex.printStackTrace();
         }
 
-     }
-    
-    
-    
+    }
+
     private ChartData createTestData() {
         ChartData chart = new ChartData("MyJUnitTestChart");
-
 
         for (int i = 1; i <= 15; i++) {
             int modifier = (i + 5);
@@ -249,8 +223,6 @@ public class MTABuilderTest {
             serie.addDataPoint(new DataPoint(date(2011, 6, 1), date(2012, 5 + modifier, 2)));
             chart.addTaskSeries(serie);
         }
-
-
 
         return chart;
     }

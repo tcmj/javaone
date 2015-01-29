@@ -1,11 +1,11 @@
 /**
- * Copyright(c) 2003 - 2010 by INTECO GmbH
+ * Copyright(c) 2003 - 2015 by tcmj
  * All Rights Reserved.
  */
 package com.tcmj.pm.mta.bo;
 
 import com.tcmj.pm.mta.dots.Symbol;
-import com.tcmj.common.tools.date.DateTool;
+import com.tcmj.common.date.DateTool;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -47,9 +47,8 @@ public class DataSeries {
     /** Color to use if non default */
     private String color;
 
-
     /** Standard constructor.
-     * @param name 
+     * @param name
      */
     public DataSeries(String name) {
         if (name == null) {
@@ -58,7 +57,6 @@ public class DataSeries {
         this.taskName = name;
     }
 
-
     /**
      * Returns a unmodifieable view to the datalist!
      * @return the dataList
@@ -66,7 +64,6 @@ public class DataSeries {
     public List<DataPoint> getDataList() {
         return Collections.unmodifiableList(this.dataList);
     }
-
 
     /**
      * Adds a data point to this serie.
@@ -77,7 +74,6 @@ public class DataSeries {
         this.dataList.add(point);
     }
 
-
     /**
      * Name of the serie/line displayed in the legend.
      * @return the taskName
@@ -85,7 +81,6 @@ public class DataSeries {
     public String getTaskName() {
         return taskName;
     }
-
 
     /**
      * Name of the serie/line displayed in the legend.
@@ -95,10 +90,9 @@ public class DataSeries {
         this.taskName = taskName;
     }
 
-
     /**
      * Returns the smallest date (either milestone or report date!)
-     * @return 
+     * @return
      */
     public Date getMinDate() {
         if (minTaskDate == null) {
@@ -107,10 +101,9 @@ public class DataSeries {
         return minTaskDate;
     }
 
-
     /**
      * Returns the biggest date (either milestone or report date!)
-     * @return 
+     * @return
      */
     public Date getMaxDate() {
         if (maxTaskDate == null) {
@@ -119,25 +112,22 @@ public class DataSeries {
         return maxTaskDate;
     }
 
-
     /**
      * Invalidates the min and max date. On the next
-     * call to {@link #getMinDate()} or {@link #getMaxDate()} a 
+     * call to {@link #getMinDate()} or {@link #getMaxDate()} a
      * recompution takes place!
      */
     private void resetMinMaxDates() {
         this.minTaskDate = null;
         this.maxTaskDate = null;
     }
-    
-    
+
     private void computeMinMaxDates() {
-        
+
         if (this.dataList == null || this.dataList.isEmpty()) {
             throw new IllegalArgumentException("No data points defined to compute the date range for task '" + getTaskName() + "'! Add datapoints first!");
         }
-        
-        
+
         for (DataPoint point : dataList) {
 
             /* MINIMAL DATE */
@@ -162,7 +152,7 @@ public class DataSeries {
                 if (minTaskDate.after(smallest)) {
                     minTaskDate = smallest;
                 }
-                
+
             }
 
             /* MAXIMAL DATE */
@@ -187,26 +177,21 @@ public class DataSeries {
                 if (maxTaskDate.before(biggest)) {
                     maxTaskDate = biggest;
                 }
-                
+
             }
-            
+
         }
-        
-        
+
         if (logger.isTraceEnabled()) {//needed to avoid the call to formatDate
             logger.trace("Series Range computed for Task '{}': Min={}, Max={}", new Object[]{getTaskName(), DateTool.formatDate(minTaskDate), DateTool.formatDate(maxTaskDate)});
         }
-        
-        
-        
+
     }
-    
-    
+
     @Override
     public String toString() {
         return new ToStringBuilder(this).append(getTaskName()).toString();
     }
-
 
     /**
      * Override the default symbol.
@@ -216,7 +201,6 @@ public class DataSeries {
         return symbol;
     }
 
-
     /**
      * Current symbol used to draw for each point.
      * @param symbol the symbol to set
@@ -224,7 +208,6 @@ public class DataSeries {
     public void setSymbol(Symbol symbol) {
         this.symbol = symbol;
     }
-
 
     /**
      * Set a custom color for the line.
@@ -235,12 +218,12 @@ public class DataSeries {
         this.color = hex;
     }
 
-
     /**
-     * If the color is not set on this task it is necessary to provide your 
+     * If the color is not set on this task it is necessary to provide your
      * series number in order to use default line colors instead.
-     * <p>The first serie will get BLACK as line color, the second BLUE and soo on.
-     *    The color fits to the symbol!
+     * <p>
+     * The first serie will get BLACK as line color, the second BLUE and soo on.
+     * The color fits to the symbol!
      * @param currentIndex series index (only used if the default color should be used)
      * @return the color eg. BLUE or RED or 0x00ff00
      */
@@ -253,6 +236,5 @@ public class DataSeries {
         }
         return colorString;
     }
-    
-    
+
 }

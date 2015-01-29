@@ -1,6 +1,10 @@
+/**
+ * Copyright(c) 2003 - 2015 by tcmj
+ * All Rights Reserved.
+ */
 package com.tcmj.pm.mta.jfree;
 
-import com.tcmj.common.tools.date.DateTool;
+import com.tcmj.common.date.DateTool;
 import java.awt.Paint;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.AxisLocation;
@@ -142,8 +146,6 @@ public class ChartBuilder {
         return periodaxis;
     }
 
-
-
     public JFreeChart createChart(XYDataset dataset) {
 
         Color chartBGcolor = Color.WHITE;
@@ -152,13 +154,11 @@ public class ChartBuilder {
 
         plot.setDrawingSupplier(MTAColorsAndShapes.createDrawingSupplier(this.chartdata.getSeriesCount()));
 
-
         plot.setOrientation(PlotOrientation.VERTICAL);
         plot.setBackgroundPaint(chartBGcolor);
         plot.setRangeGridlinePaint(Color.LIGHT_GRAY);  //vertical
         plot.setDomainGridlinePaint(Color.LIGHT_GRAY); //horizontal
         plot.setOutlineVisible(false);
-
 
         //MTA Data
         XYItemRenderer renderer = new XYLineAndShapeRenderer(true, true);
@@ -171,17 +171,14 @@ public class ChartBuilder {
         plot.setDataset(1, createRectangleSerie());
         plot.setRenderer(1, arearenderer);
 
-
         //Axis (domain=x, range=y)
         plot.setDomainAxis(0, createDomainAxisReportDate());
         plot.setDomainAxisLocation(0, AxisLocation.TOP_OR_LEFT);
         plot.setRangeAxis(0, createRangeAxisMilestoneDate());
         plot.setRangeAxisLocation(0, AxisLocation.TOP_OR_LEFT);
 
-
         //Legend (only of MTA dataset)
         plot.setFixedLegendItems(createLegend(plot));
-
 
         //Current Time Marker
         if (Boolean.parseBoolean(getSetting(Settings.SHOW_TIME_NOW_AREA))) {
@@ -189,26 +186,18 @@ public class ChartBuilder {
             plot.addDomainMarker(marker, Layer.BACKGROUND);
         }
 
-
         //Diagonal
         double max = chartFinishDate.getTime();
         BasicStroke bstroke = new BasicStroke(0.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 1.0f, new float[]{3, 5}, 0);
         XYLineAnnotation lineano = new XYLineAnnotation(0, 0, max, max, bstroke, Color.LIGHT_GRAY);
         plot.addAnnotation(lineano);
 
-
         DefaultDrawingSupplier supplier = (DefaultDrawingSupplier) plot.getDrawingSupplier();
-
-
-
-
 
         System.out.println("drawingsupplier: " + plot.getDrawingSupplier());
         JFreeChart jfreechart = new JFreeChart(null, JFreeChart.DEFAULT_TITLE_FONT, plot, true);
 
         jfreechart.setBackgroundPaint(chartBGcolor);
-
-
 
         return jfreechart;
     }

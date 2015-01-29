@@ -4,7 +4,7 @@
           xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/xsd/changes-1.0.0.xsd">
   <properties>
     <title>Changes iMTA Module</title>
-    <author email="t.deutsch@inteco.de">Thomas Deutsch</author>
+    <author email="reg@tcmj.de">Thomas Deutsch</author>
   </properties>
   <body>
     <release version="1.2.00" date="2011-04-06" description="Feature Release">

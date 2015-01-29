@@ -16,8 +16,8 @@ import com.tcmj.pm.conflicts.bars.Bar;
 import com.tcmj.pm.conflicts.bars.OutputBar;
 import com.tcmj.pm.conflicts.bars.SimpleBar;
 import com.tcmj.pm.conflicts.jfreechart.ChartBuilder;
-import static com.tcmj.common.tools.date.DateTool.date;
-import static com.tcmj.common.tools.date.DateTool.formatDate;
+import static com.tcmj.common.date.DateTool.date;
+import static com.tcmj.common.date.DateTool.formatDate;
 
 /**
  *

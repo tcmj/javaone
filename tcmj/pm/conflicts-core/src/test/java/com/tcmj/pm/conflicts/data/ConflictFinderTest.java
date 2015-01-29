@@ -21,7 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
 
-import static com.tcmj.common.tools.date.DateTool.date;
+import static com.tcmj.common.date.DateTool.date;
 import static com.tcmj.pm.junit.BarAssert.*;
 
 import static org.junit.Assert.*;

@@ -1,5 +1,5 @@
 /**
- * Copyright(c) 2003 - 2010 by INTECO GmbH
+ * Copyright(c) 2003 - 2015 by tcmj
  * All Rights Reserved.
  */
 package com.tcmj.pm.mta;
@@ -40,11 +40,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
-import static com.tcmj.common.tools.lang.Check.notNull;
+import static com.tcmj.common.lang.Check.notNull;
 
 /**
- * Inteco Milestone Trend Analysis Chart.
- * This class takes data  {@see com.inteco.common.imta.bo.IMTAChart} and builds
+ * Milestone Trend Analysis Chart.
+ * This class takes data and builds
  * a milestone trend analysis from it.
  * RReport@Confluencia.net
  * @author tdeut
@@ -52,7 +52,7 @@ import static com.tcmj.common.tools.lang.Check.notNull;
 public class MTABuilder {
 
     /** slf4j Logging Framework. */
-    private static final Logger logger = LoggerFactory.getLogger(MTABuilder.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MTABuilder.class);
     /** data model. */
     private final ChartData imtaChart;
     private static final int DEFAULT_CHART_WIDTH = 650;
@@ -67,7 +67,7 @@ public class MTABuilder {
      * @param chart data model
      */
     public MTABuilder(ChartData chart) {
-        logger.debug("Instantiate a new MTA Chart: {}", chart);
+        LOG.debug("Instantiate a new MTA Chart: {}", chart);
 
         this.imtaChart = notNull(chart, "Parameter ChartData cannot be null");
 
@@ -81,96 +81,91 @@ public class MTABuilder {
         Writer out = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
         createSVG(out);
     }
-    
-    
+
     public void createSVG(Writer out) throws UnsupportedEncodingException, FileNotFoundException, SVGGraphics2DIOException, IOException {
-        
+
         ChartBuilder chartBuilder = new ChartBuilder(imtaChart);
-        
+
         JFreeChart chart = chartBuilder.createChart();
 
         DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
         Document document = domImpl.createDocument(null, "svg", null);
-        
+
         // Create an instance of the SVG Generator
         SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
-        
+
         // set the precision to avoid a null pointer exception in Batik 1.5
         svgGenerator.getGeneratorContext().setPrecision(6);
-        
+
         // Ask the chart to render into the SVG Graphics2D implementation
         chart.draw(svgGenerator, new Rectangle2D.Double(0, 0, getChartWidth(), getChartHeight()), null);
-        
+
         // Finally, stream out SVG to a file using UTF-8 character to byte encoding
         boolean useCSS = true;
         svgGenerator.stream(out, useCSS);
         out.flush();
     }
-    
-    
+
     public Graphics2D createSVG() throws UnsupportedEncodingException, FileNotFoundException, SVGGraphics2DIOException, IOException {
-        
+
         ChartBuilder chartBuilder = new ChartBuilder(imtaChart);
-        
+
         JFreeChart chart = chartBuilder.createChart();
 
         DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
         Document document = domImpl.createDocument(null, "svg", null);
-        
+
         // Create an instance of the SVG Generator
         SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
-        
+
         // set the precision to avoid a null pointer exception in Batik 1.5
         svgGenerator.getGeneratorContext().setPrecision(6);
-        
+
         // Ask the chart to render into the SVG Graphics2D implementation
         chart.draw(svgGenerator, new Rectangle2D.Double(0, 0, getChartWidth(), getChartHeight()), null);
-        
+
         // Finally, stream out SVG to a file using UTF-8 character to byte encoding
         return svgGenerator;
-        
+
     }
+
     public String createSVGString() throws UnsupportedEncodingException, FileNotFoundException, SVGGraphics2DIOException, IOException {
-        
+
         ChartBuilder chartBuilder = new ChartBuilder(imtaChart);
-        
+
         JFreeChart chart = chartBuilder.createChart();
 
         DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
         Document document = domImpl.createDocument(null, "svg", null);
-        
+
         // Create an instance of the SVG Generator
         SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
-        
+
         // set the precision to avoid a null pointer exception in Batik 1.5
         svgGenerator.getGeneratorContext().setPrecision(6);
-        
+
         // Ask the chart to render into the SVG Graphics2D implementation
         chart.draw(svgGenerator, new Rectangle2D.Double(0, 0, getChartWidth(), getChartHeight()), null);
-        
-        
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Writer svgOutput = new OutputStreamWriter( baos, "UTF-8" );
-        svgGenerator.stream( svgOutput, true );
-        
-        
-        String ggg =  baos.toString();
-        System.out.println(ggg);         
+        Writer svgOutput = new OutputStreamWriter(baos, "UTF-8");
+        svgGenerator.stream(svgOutput, true);
+
+        String ggg = baos.toString();
+        System.out.println(ggg);
         return ggg;
-        
     }
 
     /**
      * Creates JFreeChart.
      * @return a JFreeChart
      */
-    public JFreeChart createJFreeChart()  {
+    public JFreeChart createJFreeChart() {
         ChartBuilder chartBuilder = new ChartBuilder(imtaChart);
         JFreeChart chart = chartBuilder.createChart();
         return chart;
     }
-    
-    
+
     /**
      * Creates the iMTA image.
      * @return a buffered image
@@ -182,19 +177,13 @@ public class MTABuilder {
 
         return chart.createBufferedImage(chartWidth, chartHeight);
 
-        
 //        ChartUtilities.saveChartAsPNG(new File("freespace.png"), chart, 600, 400, info);
 //        PrintWriter pw = new PrintWriter(System.out);
 ////         ChartUtilities.writeImageMap(pw,"FreeSpace",info);
 //        pw.flush();
-
-
-
-
 //        BufferedImage image = buildIMTA(parameterMap);
 //        BufferedImage image = null;
 //        return image;
-
     }
 
 //            java.awt.image.BufferedImage ChartImage = new java.awt.image.BufferedImage(getChartWidth(), getChartHeight(),
