@@ -64,7 +64,7 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
     public Map<String, XMLEntry> read(File xmlFile) throws XMLMapException {
 
         data = new LinkedHashMap<>();
-        
+
         if (xmlFile.exists()) {
             LOG.debug("Start reading XML-File: {}", xmlFile);
 
@@ -86,8 +86,7 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
 
                 root = document.getDocumentElement();
 
-            }
-            catch (ParserConfigurationException | SAXException | IOException ex) {
+            } catch (ParserConfigurationException | SAXException | IOException ex) {
                 LOG.error("Error reading XML: " + ex.getMessage(), ex);
             }
 
@@ -105,12 +104,10 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
                         startNode = searchNode(getXMLEntryPoint(), xmlFile.getPath());
                         //nimm den ersten knoten unter dem entrypoint
                         startNode = startNode.getFirstChild();
-                    }
-                    catch (XPathExpressionException xex) {
+                    } catch (XPathExpressionException xex) {
                         startNode = null;
                         LOG.error("XPath error: " + xex.getMessage(), xex);
-                    }
-                    catch (NullPointerException nex) {
+                    } catch (NullPointerException nex) {
                         startNode = null;
                         LOG.error("XMLEntryPoint not found!", nex);
                     }
@@ -255,16 +252,13 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
                         } else {
                             entry.addValue(child.getNodeValue());
                         }
-
                         entry.setXmlNodeType(child.getNodeType());
-
                     }
 
                     child = child.getNextSibling();
                 }
             }
         } else {
-
             LOG.trace("!!!! no childs: {}", path);
             XMLEntry entry = new XMLEntry(path, node.getNodeValue());
             parseAttributes(node, entry);
@@ -279,13 +273,9 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
             NamedNodeMap nnm = node.getAttributes();
 
             for (int index = 0; index < nnm.getLength(); index++) {
-
                 Node attnode = nnm.item(index);
-
                 LOG.trace("reading attribute of element '{}': {} = {}", new Object[]{node, attnode.getNodeName(), attnode.getNodeValue()});
-
                 entry.addAttribute(attnode.getNodeName(), attnode.getNodeValue());
-
             }
         }
     }
@@ -421,8 +411,7 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
                 TransformerFactory tfactory = TransformerFactory.newInstance();
                 try {
                     tfactory.setAttribute("indent-number", 2);
-                }
-                catch (IllegalArgumentException e) {
+                } catch (IllegalArgumentException e) {
                 }
                 Transformer transformer = tfactory.newTransformer();
 
@@ -430,13 +419,11 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
 
                 transformer.transform(new DOMSource(document), new StreamResult(new OutputStreamWriter(outpt, "UTF-8")));
 
-            }
-            catch (IOException ioe) {
+            } catch (IOException ioe) {
                 throw ioe;
             }
 
-        }
-        catch (ParserConfigurationException | DOMException | TransformerException | IOException ex) {
+        } catch (ParserConfigurationException | DOMException | TransformerException | IOException ex) {
             throw new XMLMapException(ex.getMessage(), ex);
         }
 
@@ -454,8 +441,7 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
         for (Map.Entry<String, String> entrySet : outprops.entrySet()) {
             try {
                 transformer.setOutputProperty(entrySet.getKey(), entrySet.getValue());
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 LOG.warn("Unsupported attribute in writing XML: {}", ex.getMessage());
             }
         }

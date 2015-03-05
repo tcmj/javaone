@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
  * <b>ResourceBundleMerger.</b>
  * <pre>
  * new ResourceBundleMerger(input, output, true, false, false).start();
- * <p>
  * </pre>
  * @author tcmj - Thomas Deutsch
  */
