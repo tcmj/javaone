@@ -1,11 +1,12 @@
 package com.tcmj.common.io;
 
+import com.tcmj.common.lang.Check;
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,11 +25,54 @@ public class FileTool {
     /** slf4j Logging framework. */
     private static final Logger LOG = LoggerFactory.getLogger(FileTool.class);
 
-    
+    /** Tries to locate a given file.
+     * order:
+     * <ol>
+     * <li>User's home directory via jvm property 'user.home'</li>
+     * <li>User's current working directory via jvm property 'user.dir'</li>
+     * <li>Relative creating a File object without constructing additional path informations</li>
+     * </ol>
+     * @param filename to search for
+     * @return file handle or null if the file has not been physically found
+     */
+    public static File locateFile(String filename) {
+        int count = 0;
+
+        Path path = FileSystems.getDefault().getPath(filename);
+        if (path.isAbsolute()) {
+            if (checkFileExists(path)) {
+                return path.toFile();
+            }else{
+                return null;
+            }
+
+        }
+        
+        
+        LOG.trace("{}. Try to locate '{}' in 'user.home' directory...", ++count, filename);
+        File userHomeFile = FileSystems.getDefault().getPath(System.getProperty("user.home"), filename).toFile();
+        if (checkFileExists(userHomeFile)) {
+            return userHomeFile;
+        }
+        
+
+        LOG.trace("{}. Try to locate '{}' in current working directory...", ++count, filename);
+        File workingDirFile = FileSystems.getDefault().getPath(System.getProperty("user.dir"), filename).toFile();
+        if (checkFileExists(workingDirFile)) {
+            return workingDirFile;
+        }
+
+        LOG.trace("{}. find file '{}' without constructing a path...", ++count, filename);
+        File filetofind = new File(filename);
+        if (checkFileExists(filetofind)) {
+            return filetofind;
+        }
+        return null;
+    }
+
     /** searches the given file.
      * in following order:
      * <ol>
-     * <li>A specific jvm property namely 'app.files'</li>
      * <li>User's home directory via jvm property 'user.home'</li>
      * <li>User's current working directory via jvm property 'user.dir'</li>
      * <li>Relative creating a File object without path informations</li>
@@ -42,43 +86,15 @@ public class FileTool {
      * @return file handle or null if not found
      */
     public static File locateFile(String filename, Class parentClassJar) {
-        int count = 0;
-        
-        LOG.trace("{}. Try to locate '{}' via jvm property: 'app.files'...", ++count, filename);
-        String appFileDir = System.getProperty("app.files");
-        if (appFileDir != null) {
-            File appFilesFile = new File(appFileDir, filename);
-            if (checkFileExists(appFilesFile)) {
-                return appFilesFile;
-            }
-        }else{
-            LOG.trace("JVM property 'app.files' not defined! (Pattern: -Dapp.files=File)");
-        }
 
-        LOG.trace("{}. Try to locate '{}' in 'user.home' directory...", ++count, filename);
-        String userDir = System.getProperty("user.home");
-        if (userDir != null) {
-            File userHomeFile = new File(userDir, filename);
-            if (checkFileExists(userHomeFile)) {
-                return userHomeFile;
-            }
-        }
-        
-        LOG.trace("{}. Try to locate '{}' in current working directory...", ++count, filename);
-        String workingDir = System.getProperty("user.dir");
-        if (workingDir != null) {
-            File workingDirFile = new File(workingDir, filename);
-            if (checkFileExists(workingDirFile)) {
-                return workingDirFile;
-            }
-        }
-
-        LOG.trace("{}. find file '{}' relative without path (should be classpath)...", ++count, filename);
-        File filetofind = new File(filename);
-        if (checkFileExists(filetofind)) {
+        File filetofind = locateFile(filename);
+        if (filetofind != null) {
             return filetofind;
         }
-
+        
+        Path path = FileSystems.getDefault().getPath(filename);
+        
+        int count = 3;
         //try to find the application path manually
         LOG.trace("{}. find file '{}' via ProtectionDomain-CodeSource-Location...", ++count, filename);
         URL url = parentClassJar.getProtectionDomain().getCodeSource().getLocation();
@@ -90,45 +106,38 @@ public class FileTool {
             if (checkFileExists(filetofind2)) {
                 return filetofind2;
             }
-        } catch (UnsupportedEncodingException ex) {
+        } catch (Exception ex) {
             LOG.debug(ex.getMessage());
-        }
-
-        //special case for the service wrapper installation (/conf directory)
-        LOG.trace("{}. find file '{}' relative in a conf directory...", ++count, filename);
-        File fileInServiceConf = new File("conf", filename);
-        if (checkFileExists(fileInServiceConf)) {
-            return fileInServiceConf;
         }
 
         //try to find the application path manually one level higher
-        LOG.trace("{}. find file '{}' try to find the path manually one level higher...", ++count, filename);
+        LOG.trace("{}. try to locate '{}' manually one level higher...", ++count, filename);
 
-        URL url2 = parentClassJar.getProtectionDomain().getCodeSource().getLocation();
-        File filetofindhigher1 = new File(url2.getPath()).getParentFile();
-        String urlPath;
         try {
-            urlPath = URLDecoder.decode(filetofindhigher1.getParent(), "UTF-8");
-            File filetofindhigher2 = new File(urlPath, filename);
-            if (checkFileExists(filetofindhigher2)) {
-                return filetofindhigher2;
+            File filetofindhigher1 = new File(path.toAbsolutePath().getParent().getParent().toFile(), filename);
+            if (checkFileExists(filetofindhigher1)) {
+                return filetofindhigher1;
             }
-        } catch (UnsupportedEncodingException ex) {
-            LOG.debug(ex.getMessage());
+        } catch (Exception ex) {
+            LOG.debug("Exception locating the file in parent directory: {}", ex.getMessage());
         }
-        
-        
+
         //TODO load stream out of the jar
-        
         return null;
     }
-    
+
     private static boolean checkFileExists(File file) {
-        if (file.exists()) {
-            LOG.debug("{} successfully found in '{}'!", file.getName(), file.getAbsolutePath());
+        Check.notNull(file, "Cannot perform check on a null reference!");
+        return checkFileExists(file.toPath());
+    }
+    
+    private static boolean checkFileExists(Path file) {
+        Check.notNull(file, "Cannot perform check on a null reference!");
+        if (Files.isRegularFile(file)) {
+            LOG.debug("{} successfully found in '{}'!", file.getFileName(), file);
             return true;
         } else {
-            LOG.trace("File does not exist: '{}'!", file.getAbsolutePath());
+            LOG.trace("File does not exist or is a directory: '{}'!", file);
             return false;
         }
     }
@@ -142,9 +151,11 @@ public class FileTool {
      */
     public static final String read(String file) {
         LOG.info("reading file {}...", file);
-        try (Scanner scanner = new Scanner( FileTool.class.getResourceAsStream(file), StandardCharsets.UTF_8.name()).useDelimiter("\\Z")) {  //'\Z' means EOF
-            String theString = scanner.hasNext() ? scanner.next() : "";
-            LOG.debug("content of file {}: {}", file, theString);
+        String theString = null;
+        try (Scanner scanner = new Scanner(FileTool.class.getResourceAsStream(file), StandardCharsets.UTF_8.name()).useDelimiter("\\Z")) {  //'\Z' means EOF
+            theString = scanner.hasNext() ? scanner.next() : "";
+//            LOG.debug("content of file {}: {}", file, theString);
+        } finally {
             return theString;
         }
     }
@@ -165,7 +176,7 @@ public class FileTool {
             } else {
                 content = new String(Files.readAllBytes(file), charset[0]);
             }
-            LOG.trace("content of file {}: {}", file, content);
+            LOG.trace("content of file {}: {}", file, content.length());
             return content;
         } catch (IOException ex) {
             LOG.error("error reading all bytes from {}", file, ex);

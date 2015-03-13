@@ -17,7 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ *        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
+
  * @author tcmj
  */
 public class FileToolTest {
@@ -27,12 +28,10 @@ public class FileToolTest {
 
 
     public FileToolTest() {
-        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
     }
     
     @BeforeClass
     public static void setUpClass() {
-        
     }
     
     @AfterClass
@@ -47,19 +46,33 @@ public class FileToolTest {
     public void tearDown() {
     }
 
-    
-
-    /**
-     * Test of read method, of class FileTool.
-     */
     @Test
     public void testFindFile() throws Exception {
-        LOG.info("testFindFile");
+        LOG.info("*** testFindFile ***");
         File result = FileTool.locateFile("FileToolTest.class", FileTool.class);
-        System.out.println("\t"+result);
-//        assertNotNull(result);
-//        assertTrue(result.length()>0);
+        assertNull(result);
         //todo fix
+    }
+    @Test
+    public void testFindFile2() throws Exception {
+        LOG.info("*** testFindFile2 ***");
+        assertNotNull(FileTool.locateFile("C:\\bootmgr", FileTool.class));
+        
+    }
+    @Test
+    public void testFindFile3() throws Exception {
+        LOG.info("*** testFindFile3 ***");
+        assertNull(FileTool.locateFile("C:\\", FileTool.class));
+    }
+    @Test
+    public void testFindFile4() throws Exception {
+        LOG.info("*** testFindFile4 ***");
+        assertNotNull(FileTool.locateFile("pom.xml", FileTool.class));
+    }
+    @Test
+    public void testFindFile5() throws Exception {
+        LOG.info("*** testFindFile5 ***");
+        assertNotNull(FileTool.locateFile("read.me", FileTool.class));
     }
 
     /**
