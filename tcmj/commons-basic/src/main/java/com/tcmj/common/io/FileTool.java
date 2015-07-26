@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -17,7 +18,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * FileTool.
+ * FileTool - Utility class for easier handling file access.
+ * <p>
+ * Uses slf4j log messages.
+ * <p>
+ * Test and usage: {@link com.tcmj.common.io.FileToolTest}
  * @author tcmj
  */
 public class FileTool {
@@ -28,6 +33,7 @@ public class FileTool {
     /** Tries to locate a given file.
      * order:
      * <ol>
+     * <li>absolute locations will be identified first using {@link Path#isAbsolute()}</li>
      * <li>User's home directory via jvm property 'user.home'</li>
      * <li>User's current working directory via jvm property 'user.dir'</li>
      * <li>Relative creating a File object without constructing additional path informations</li>
@@ -37,34 +43,30 @@ public class FileTool {
      */
     public static File locateFile(String filename) {
         int count = 0;
-
         Path path = FileSystems.getDefault().getPath(filename);
         if (path.isAbsolute()) {
-            if (checkFileExists(path)) {
+            if (FileTool.checkIsFileAndExists(path)) {
                 return path.toFile();
-            }else{
+            } else {
                 return null;
             }
-
         }
-        
-        
+
         LOG.trace("{}. Try to locate '{}' in 'user.home' directory...", ++count, filename);
         File userHomeFile = FileSystems.getDefault().getPath(System.getProperty("user.home"), filename).toFile();
-        if (checkFileExists(userHomeFile)) {
+        if (checkIsFileAndExists(userHomeFile)) {
             return userHomeFile;
         }
-        
 
         LOG.trace("{}. Try to locate '{}' in current working directory...", ++count, filename);
         File workingDirFile = FileSystems.getDefault().getPath(System.getProperty("user.dir"), filename).toFile();
-        if (checkFileExists(workingDirFile)) {
+        if (checkIsFileAndExists(workingDirFile)) {
             return workingDirFile;
         }
 
         LOG.trace("{}. find file '{}' without constructing a path...", ++count, filename);
         File filetofind = new File(filename);
-        if (checkFileExists(filetofind)) {
+        if (checkIsFileAndExists(filetofind)) {
             return filetofind;
         }
         return null;
@@ -91,10 +93,11 @@ public class FileTool {
         if (filetofind != null) {
             return filetofind;
         }
-        
+
         Path path = FileSystems.getDefault().getPath(filename);
-        
-        int count = 3;
+
+        int count = path.isAbsolute() ? 0 : 3;
+
         //try to find the application path manually
         LOG.trace("{}. find file '{}' via ProtectionDomain-CodeSource-Location...", ++count, filename);
         URL url = parentClassJar.getProtectionDomain().getCodeSource().getLocation();
@@ -103,7 +106,7 @@ public class FileTool {
             decodedPath = URLDecoder.decode(url.getPath(), "UTF-8");
             File parentfilePath = new File(decodedPath);
             File filetofind2 = new File(parentfilePath.getParent(), filename);
-            if (checkFileExists(filetofind2)) {
+            if (checkIsFileAndExists(filetofind2)) {
                 return filetofind2;
             }
         } catch (Exception ex) {
@@ -115,7 +118,7 @@ public class FileTool {
 
         try {
             File filetofindhigher1 = new File(path.toAbsolutePath().getParent().getParent().toFile(), filename);
-            if (checkFileExists(filetofindhigher1)) {
+            if (checkIsFileAndExists(filetofindhigher1)) {
                 return filetofindhigher1;
             }
         } catch (Exception ex) {
@@ -126,18 +129,30 @@ public class FileTool {
         return null;
     }
 
-    private static boolean checkFileExists(File file) {
-        Check.notNull(file, "Cannot perform check on a null reference!");
-        return checkFileExists(file.toPath());
+    /**
+     * see {@link FileTool#checkIsFileAndExists(Path)}
+     */
+    public static boolean checkIsFileAndExists(File file) {
+        Check.notNull(file, "Cannot perform file check on a null reference!");
+        return checkIsFileAndExists(file.toPath());
     }
-    
-    private static boolean checkFileExists(Path file) {
-        Check.notNull(file, "Cannot perform check on a null reference!");
+
+    /**
+     * Checks if a file is not a directory and physically exists in the file system.
+     * @param file Java 7 path object (NullPointerException if null)
+     * @return true if file is a regular file and not a directory
+     */
+    public static boolean checkIsFileAndExists(Path file) {
+        Check.notNull(file, "Cannot perform file check on a null reference!");
         if (Files.isRegularFile(file)) {
-            LOG.debug("{} successfully found in '{}'!", file.getFileName(), file);
+            LOG.debug("Successfully found: '{}'!", file.toAbsolutePath());
             return true;
         } else {
-            LOG.trace("File does not exist or is a directory: '{}'!", file);
+            if (Files.isDirectory(file)) {
+                LOG.trace("Given parameter is a directory: '{}'!", file.toAbsolutePath());
+            } else {
+                LOG.trace("File does not exist: '{}'!", file.toAbsolutePath());
+            }
             return false;
         }
     }
@@ -150,11 +165,10 @@ public class FileTool {
      * @return file content as String or null on any exceptions.
      */
     public static final String read(String file) {
-        LOG.info("reading file {}...", file);
+        LOG.debug("Reading file {}...", file);
         String theString = null;
         try (Scanner scanner = new Scanner(FileTool.class.getResourceAsStream(file), StandardCharsets.UTF_8.name()).useDelimiter("\\Z")) {  //'\Z' means EOF
             theString = scanner.hasNext() ? scanner.next() : "";
-//            LOG.debug("content of file {}: {}", file, theString);
         } finally {
             return theString;
         }
@@ -169,17 +183,19 @@ public class FileTool {
      */
     public static final String read(Path file, String... charset) {
         try {
-            LOG.debug("reading file {} to string...", file);
+            LOG.debug("Reading all bytes of file '{}'...{}", file, charset);
             String content;
+            Charset cset;
             if (charset == null || charset.length == 0 || charset[0] == null) {
-                content = new String(Files.readAllBytes(file), StandardCharsets.UTF_8);
+                cset = StandardCharsets.UTF_8;
             } else {
-                content = new String(Files.readAllBytes(file), charset[0]);
+                cset = Charset.forName(charset[0]);
             }
-            LOG.trace("content of file {}: {}", file, content.length());
+            content = new String(Files.readAllBytes(file), cset);
+            LOG.trace("Content of file {}: {}", file, content.length());
             return content;
         } catch (IOException ex) {
-            LOG.error("error reading all bytes from {}", file, ex);
+            LOG.error("Error reading all bytes from {}", file, ex);
             return null;
         }
     }
