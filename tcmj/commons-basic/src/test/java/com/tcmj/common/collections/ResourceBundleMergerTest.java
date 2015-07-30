@@ -1,27 +1,23 @@
 package com.tcmj.common.collections;
 
-import com.tcmj.common.lang.Check;
+import com.tcmj.common.lang.Objects;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @todo Test rename feature (data-loss)
+ * @todo Test rename feature (data-loss).
  * @author tcmj
  */
 public class ResourceBundleMergerTest {
@@ -35,21 +31,19 @@ public class ResourceBundleMergerTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        for (String file : testfiles) {
-            if (!deleteFile(file)) {
-                System.err.println("cannot delete testfile " + file);
-            }
-        }
+        testfiles.stream().filter((file) -> (!deleteFile(file))).forEach((file) -> {
+            LOG.error("cannot delete testfile {}", file);
+        });
     }
 
     /** Deletes a file. */
-    private static final boolean deleteFile(String filename) {
+    private static boolean deleteFile(String filename) {
         return new File(filename).delete();
     }
 
     /** Creates a properties file. */
-    private static final String createPropFile(String filename, String... keyvalues) {
-        Check.notBlank(filename, "empty filename");
+    private static String createPropFile(String filename, String... keyvalues) {
+        Objects.notBlank(filename, "empty filename");
         if (keyvalues.length % 2 != 0) {
             throw new UnsupportedOperationException("you can only set key,value,key,value....");
         }
@@ -61,7 +55,7 @@ public class ResourceBundleMergerTest {
                 w.println(keyvalues[i] + "=" + keyvalues[++i]);
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOG.error("Exception", ex);
         }
         return filename;
     }
@@ -159,7 +153,7 @@ public class ResourceBundleMergerTest {
     @Test
     public void testGetInput() {
         ResourceBundleMerger rbm = new ResourceBundleMerger.Builder().input(new String[]{"one", "two"}).build();
-        String[] expResult = new String[]{"one", "two"};;
+        String[] expResult = new String[]{"one", "two"};
         String[] result = rbm.getInputFileNames();
         assertArrayEquals(expResult, result);
 

@@ -1,6 +1,6 @@
 package com.tcmj.common.collections;
 
-import com.tcmj.common.lang.Check;
+import com.tcmj.common.lang.Objects;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -54,34 +54,19 @@ public class ResourceBundleMerger {
         this.delta = delta;
     }
 
-//    /**
-//     * close or flush and close readers/writers.
-//     * @param toclose
-//     */
-//    private static final void closeIt(Closeable toclose) {
-//
-//        try {
-//todo            if (Flushable.class.isAssignableFrom(toclose.getClass())) {
-//                Flushable writer = (Flushable) toclose;
-//                writer.flush();
-//            }
-//        } catch (Exception e) { /* ignore! */ }
-//
-//
-//        try {
-//            toclose.close();
-//        } catch (Exception e) { /* ignore! */ }
-//
-//
-//    }
+
+    /**
+     * Start merging.
+     * @throws Exception on any error
+     */
     public final void start() throws Exception {
 
         if (!quiet) {
-            System.out.println("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ");
-            System.out.println("* * Input: " + Arrays.toString(input));
-            System.out.println("* * Output: " + output);
-            System.out.println("* * Sort: " + sort);
-            System.out.println("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ");
+            LOG.info("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ");
+            LOG.info("* * Input: {}", Arrays.toString(input));
+            LOG.info("* * Output: {}", output);
+            LOG.info("* * Sort: {}", sort);
+            LOG.info("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ");
         }
 
         //Create a new Properties object to collect all key/value-pairs
@@ -113,7 +98,7 @@ public class ResourceBundleMerger {
                 }
             } else {
                 if (!quiet) {
-                    System.err.println(String.format("Skipping input file: '%s' (not a file or does not exist)", inputFileName));
+                    LOG.error("Skipping input file: '{}' (not a file or does not exist)", inputFileName);
                 }
             }
         }
@@ -123,34 +108,30 @@ public class ResourceBundleMerger {
             Properties deltafile = new Properties();
 
             //durchlaufe alle keys ...in allen anderen auch enthalten sind
-            for (String key : allprops.stringPropertyNames()) {
-
-                System.err.println("key:" + key);
-
+            allprops.stringPropertyNames().stream().map((key) -> {
+                LOG.debug("key: '{}'", key);
+                return key;
+            }).map((String key) -> {
                 //Nutze die eindeutigkeit eines Sets
                 Set unique = new HashSet();
-                for (int i = 0; i < inputFiles.length; i++) { //ab dem zweiten file..
-
-                    unique.add(inputFiles[i].getProperty(key));
-
+                for (Properties inputFile : inputFiles) {
+                    //ab dem zweiten file..
+                    unique.add(inputFile.getProperty(key));
                     StringBuilder bu = new StringBuilder();
-                    for (Object value : unique) {
-                        if (value != null) {
-
-                            if (bu.length() > 0) {
-                                bu.append(";");
-                            }
-                            bu.append(value);
+                    unique.stream().filter((value) -> (value != null)).forEach((value) -> {
+                        if (bu.length() > 0) {
+                            bu.append(";");
                         }
-                    }
+                        bu.append(value);
+                    });
                     deltafile.setProperty(key, bu.toString());
-
                 }
-
-                System.err.println("deltafile:" + deltafile);
+                return key;
+            }).forEach((_item) -> {
+                LOG.error("deltafile: '{}'", deltafile);
 //            File outputFile = new File(output);
 //            write(deltafile, outputFile);
-            }
+            });
         }
 
         if (this.delta) {
@@ -173,7 +154,7 @@ public class ResourceBundleMerger {
 //        }
 
         if (!quiet) {
-            System.out.println("Successfully finished!");
+            LOG.info("Successfully finished!");
         }
     }
 
@@ -186,16 +167,16 @@ public class ResourceBundleMerger {
         //rename existing files to prevent data-loss
         File fileRenamed = null;
         if (file.isFile()) {
-            String renamee = file.getName() + "." + System.currentTimeMillis() + ".bakup";
+            String renamee = file.getName() + "." + System.currentTimeMillis() + ".backup";
             fileRenamed = new File(file.getParent(), renamee);
             file.renameTo(fileRenamed);
         }
         return fileRenamed;
     }
 
-    private void write(Properties properties, File outputFile) throws Exception {
+    private void write(final Properties properties, final File outputFile) throws Exception {
         if (!quiet) {
-            System.out.println("Start writing to '" + outputFile + "'...");
+            LOG.info("Start writing to '{}'...", outputFile);
         }
         File fileRenamed = null;
         try {
@@ -228,14 +209,12 @@ public class ResourceBundleMerger {
      * @throws IOException
      */
     private void sort(File file) throws IOException {
-
+        Objects.notNull(file, "No file object set for method 'sort(File)'!");
         if (!quiet) {
-            LOG.info("Sorting {}...", file);
-            System.out.println("Sorting " + file + "...");
-
+            LOG.info("Sorting '{}'...", file);
         }
 
-        Set<String> tmpset = new HashSet<String>();
+        Set<String> tmpset = new HashSet<>();
         String thisLine;
         File fileRenamed = null;
         try {
@@ -247,7 +226,7 @@ public class ResourceBundleMerger {
             }
 
             //sort
-            Set<String> sortedSet = new TreeSet<String>(tmpset);
+            Set<String> sortedSet = new TreeSet<>(tmpset);
 
             //rename existing files to prevent data-loss
             fileRenamed = rename(file);
@@ -255,9 +234,9 @@ public class ResourceBundleMerger {
             //write again
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(file));
                     PrintWriter pw = new PrintWriter(bw)) {
-                for (String line : sortedSet) {
+                sortedSet.stream().forEach((line) -> {
                     pw.println(line);
-                }
+                });
             }
 
             //delete the previously renamed bakup-file
@@ -326,9 +305,9 @@ public class ResourceBundleMerger {
          * @return Builder pattern object.
          */
         public Builder input(String... input) {
-            Check.notNull(input, "No input files set!");
-            Check.ensure(!Check.isEmpty(input), "no inputfiles set!");
-            Check.ensure(input.length > 1, "need at least 2 inputfiles!");
+            Objects.notNull(input, "No input files set!");
+            Objects.ensure(!Objects.isEmpty(input), "no inputfiles set!");
+            Objects.ensure(input.length > 1, "need at least 2 inputfiles!");
             binput = input;
             return this;
         }
@@ -340,13 +319,13 @@ public class ResourceBundleMerger {
         }
 
         public ResourceBundleMerger build() {
-            Check.notNull(binput, "No input files set!");
+            Objects.notNull(binput, "No input files set!");
 
             if (boutput == null) {
                 boutput = computeOutputFileName();
             }
 
-            Check.notNull(boutput, "No output file set!");
+            Objects.notNull(boutput, "No output file set!");
             return new ResourceBundleMerger(binput, boutput, bsort, bquiet, bdelta);
         }
 
