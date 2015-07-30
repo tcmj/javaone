@@ -1,24 +1,25 @@
 package com.tcmj.common.lang;
 
-import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Map;
 import java.util.zip.ZipFile;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * Check Utility class (like apaches Validate or Googles Precondition class).
+ * Check Utility class (like apaches Validate or Googles Precondition class or java.util.Objects).
  * <p>
- * All message strings can be formatted using the {@link java.text.MessageFormat} patterns
+ * All message strings can be formatted using the {@link org.slf4j.helpers.MessageFormatter} patterns
  *
  * @author tcmj - Thomas Deutsch
+ * @see java.util.Objects
  * @see org.apache.commons.lang.Validate
+ * @see com.google.common.base.Preconditions
  * @since 13.04.2011
  */
 public class Check {
 
     /**
-     * private no-arg-constructor.
+     * private no-arg-constructor because we have only static methods.
      */
     private Check() {
     }
@@ -26,24 +27,23 @@ public class Check {
     /**
      * Checks that a object is not null and throws a NullPointerException with a custom message.
      * <p>
-     * The message strings can be formatted using the {@link java.text.MessageFormat} patterns</p>
+     * The message strings can be formatted using the {@link org.slf4j.helpers.MessageFormatter} patterns</p>
      * <pre>
      *    notNull(name, "Name can not be Null!");
      *    String this.name = notNull(name, "Name can not be Null!");
-     *    String this.name = notNull(name, "Name can not be Null! {0,date}", new Date());
-     *    String this.name = notNull(name, "Dear {0} your name can not be Null! {1,date}", user, new Date());
+     *    String this.name = notNull(name, "Name can not be Null! {}", new Date());
+     *    String this.name = notNull(name, "Dear {} your name can not be Null! {}", user, new Date());
      * </pre>
      *
      * @param <T> typesafe
      * @param instance the object to check
      * @param msg a custom message used in the exception text
-     * @param params value objects to be placed into the message (starting with {0})
+     * @param params value objects to be placed into the message (placeholder: '{}')
      * @return passes through the instance in order to do the assignment in the same line
      */
     public static <T> T notNull(T instance, String msg, Object... params) {
         if (instance == null) {
-            String emsg = buildMessage(msg, params);
-            throw new NullPointerException(emsg);
+            throw new NullPointerException(format(msg, params));
         }
         return instance;
     }
@@ -51,23 +51,22 @@ public class Check {
     /**
      * Ensures that a expression has to be true and throws a IllegalArgumentException with a custom message on failure.
      * <p>
-     * The message strings can be formatted using the {@link java.text.MessageFormat} patterns</p>
+     * The message strings can be formatted using the {@link org.slf4j.helpers.MessageFormatter} patterns</p>
      * <pre>
      *    ensure(!list.isEmpty(), "Your list cannot be empty!");
      *
-     *    boolean connected = ensure(session.isConnected(), "Connection lost at {0,date}", new Date());
+     *    boolean connected = ensure(session.isConnected(), "Connection lost at {}", new Date());
      * </pre>
      *
      * @param condition expression which must be true or false
      * @param msg a custom message used in the exception text
-     * @param params value objects to be placed into the message (starting with {0})
+     * @param params value objects to be placed into the message (set placeholders using {})
      * @return true if the condition is true
      * @throws IllegalArgumentException if the condition is false
      */
     public static boolean ensure(boolean condition, String msg, Object... params) {
         if (condition == false) {
-            String emsg = buildMessage(msg, params);
-            throw new IllegalArgumentException(emsg);
+            throw new IllegalArgumentException(format(msg, params));
         }
         return true;
     }
@@ -81,11 +80,11 @@ public class Check {
      * and throws a IllegalArgumentException with</p>
      * a custom message on failure.
      * <p>
-     * The message strings can be formatted using the {@link java.text.MessageFormat} patterns</p>
+     * The message strings can be formatted using the {@link org.slf4j.helpers.MessageFormatter} patterns</p>
      * <pre>
      *    notBlank(parameterName, "Your have to provide a non-empty name to use this method!");
      *
-     *    this.name = notBlank(parameterName, "Say your name or pay {0,number,currency}!", 25.50);
+     *    this.name = notBlank(parameterName, "Say your name or pay {}!", 25.50);
      * </pre>
      *
      * @param string the string to check
@@ -95,7 +94,7 @@ public class Check {
      */
     public static String notBlank(String string, String message, Object... params) {
         if (StringUtils.isBlank(string)) {
-            throw new IllegalArgumentException(buildMessage(message, params));
+            throw new IllegalArgumentException(format(message, params));
         }
         return string;
     }
@@ -104,11 +103,11 @@ public class Check {
      * checks if an object is null or empty.<br/>
      * Supports<br/>
      * <ul>
-     * <li>{@link java.util.Collection} (isEmpty)</li>
-     * <li>{@link java.util.Map} (isEmpty)</li>
-     * <li>Primitive arrays (length)</li>
-     * <li>{@link java.lang.CharSequence} (length)</li>
-     * <li>{@link java.util.zip.ZipFile} (size)</li>
+     * <li>{@link java.util.Collection#isEmpty() }</li>
+     * <li>{@link java.util.Map#isEmpty() } (isEmpty)</li>
+     * <li>Primitive arrays (length == 0)</li>
+     * <li>{@link java.lang.CharSequence#length() == 0} (length)</li>
+     * <li>{@link java.util.zip.ZipFile#size() } (size)</li>
      * </ul>
      * <b>All other classes will only be checked if they are null (=true) or not null (=false)!</b>
      *
@@ -131,19 +130,23 @@ public class Check {
                 return ((ZipFile) obj).size() == 0;
             } else {
                 return false;
-//                throw new UnsupportedOperationException("Empty check is not implemented for "+obj.getClass());
             }
         }
     }
 
     /**
      * Internal method to produce strings filled with formatted values.
+     * This method uses the slf4j formatting method using '{}'.
      */
-    private static String buildMessage(String msg, Object... params) {
+    private static String format(String msg, Object... params) {
         if (params == null) {
             return msg;
+        } else if (params.length == 1) {
+            return org.slf4j.helpers.MessageFormatter.format(msg, params[0]).getMessage();
+        } else if (params.length == 2) {
+            return org.slf4j.helpers.MessageFormatter.format(msg, params[0], params[1]).getMessage();
         } else {
-            return MessageFormat.format(msg, params);
+            return org.slf4j.helpers.MessageFormatter.arrayFormat(msg, params).getMessage();
         }
     }
 }
