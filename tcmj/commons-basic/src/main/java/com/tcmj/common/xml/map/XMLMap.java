@@ -9,7 +9,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
-import static com.tcmj.common.lang.Check.*;
+import com.tcmj.common.lang.Objects;
 import com.tcmj.common.xml.map.intern.XMLEntry;
 import com.tcmj.common.xml.map.intern.XMLMapDomAccessor;
 import com.tcmj.common.xml.map.intern.XMLMapException;
@@ -78,8 +78,8 @@ public class XMLMap implements Map<String, String>, Serializable {
      * @param xml File handle to a XML File (does not have to exist).
      */
     public XMLMap(final File xml) {
-        this.data = new LinkedHashMap<String, XMLEntry>();
-        this.xMLFileHandle = notNull(xml, "XML File handle cannot be null!");
+        this.data = new LinkedHashMap<>();
+        this.xMLFileHandle = Objects.notNull(xml, "XML File handle cannot be null!");
         setLevelSeparator(DEFAULT_LEVEL_SEPARATOR);
     }
 
@@ -92,7 +92,7 @@ public class XMLMap implements Map<String, String>, Serializable {
      */
     @Override
     public String put(String key, String value) {
-        notBlank(key, "Blank key not accepted!");
+        Objects.notBlank(key, "Blank key not accepted!");
         validateEntry(key);
 
         //TODO do not allow control characters (whitespace only)

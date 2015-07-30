@@ -7,7 +7,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-import static com.tcmj.common.lang.Check.*;
+import com.tcmj.common.lang.Objects;
 
 /**
  * Helper for reflection operations (Cached!).
@@ -33,7 +33,7 @@ public final class ReflectionHelper {
      * @return Class object on success
      */
     public static <T> Class<T> loadClass(String className) {
-        notBlank(className, "Name of the class cannot be blank!");
+        Objects.notBlank(className, "Name of the class cannot be blank!");
         if (classCache == null) {
             classCache = new HashMap<String, Class>();
         }
@@ -64,7 +64,7 @@ public final class ReflectionHelper {
      */
     @SuppressWarnings("unchecked")
     public static <T> T newObject(String className, Class<?>[] paramTypes, Object... parameters) {
-        notBlank(className, "Name of the class cannot be blank!");
+        Objects.notBlank(className, "Name of the class cannot be blank!");
 
         Class<T> classinstance = loadClass(className);
 
@@ -86,7 +86,7 @@ public final class ReflectionHelper {
      */
     @SuppressWarnings("unchecked")
     public static <T> T newObject(String className) {
-        notBlank(className, "Name of the class cannot be blank!");
+        Objects.notBlank(className, "Name of the class cannot be blank!");
         Class<T> classinstance = loadClass(className);
 
         try {
@@ -112,8 +112,8 @@ public final class ReflectionHelper {
      * @param value parameter of the (set)method
      */
     public static void setValue(Object instance, String setter, Object value) {
-        notNull(instance, "Parameter Object must not be null! (1)");
-        notBlank(setter, "Name of the setter cannot be blank (Parameter 2)");
+        Objects.notNull(instance, "Parameter Object must not be null! (1)");
+        Objects.notBlank(setter, "Name of the setter cannot be blank (Parameter 2)");
 
         Class classObj = instance.getClass();
 
@@ -135,8 +135,8 @@ public final class ReflectionHelper {
      * @return return value of the (get)method
      */
     public static <T> T getValue(Object instance, String getter) {
-        notNull(instance, "Parameter Object must not be null! (1)");
-        notBlank(getter, "Name of the getter cannot be blank (Parameter 2)");
+        Objects.notNull(instance, "Parameter Object must not be null! (1)");
+        Objects.notBlank(getter, "Name of the getter cannot be blank (Parameter 2)");
 
         Class classObj = instance.getClass();
 
@@ -158,10 +158,10 @@ public final class ReflectionHelper {
      * @return Method object if found (or null if not)
      */
     public static Method getMethod(Class<?> clazz, String methodName) {
-        notNull(clazz, "Parameter Class<?> must not be null! (1)");
-        notBlank(methodName, "Name of the method cannot be blank!");
+        Objects.notNull(clazz, "Parameter Class<?> must not be null! (1)");
+        Objects.notBlank(methodName, "Name of the method cannot be blank!");
         if (methodCache == null) {
-            methodCache = new HashMap<String, Method>();
+            methodCache = new HashMap<>();
         }
 
         StringBuilder bld = new StringBuilder(String.valueOf(clazz.hashCode()));
@@ -185,7 +185,6 @@ public final class ReflectionHelper {
                 }
 
             }
-
 //            throw new RuntimeException("No method: '" + methodName + "' found in class: " + clazz);
             return null;
         } else {
@@ -204,8 +203,8 @@ public final class ReflectionHelper {
      * @return the corresponding Field object, or <code>null</code> if not found
      */
     public static Field getField(Class<?> clazz, String fieldname, Class<?> fieldtype) {
-        notNull(clazz, "Parameter Class<?> must not be null! (1)");
-        ensure(fieldname != null || fieldtype != null, "Either name or type of the field must be specified");
+        Objects.notNull(clazz, "Parameter Class<?> must not be null! (1)");
+        Objects.ensure(fieldname != null || fieldtype != null, "Either name or type of the field must be specified");
         Class<?> currentClass = clazz;
         while (!Object.class.equals(currentClass) && currentClass != null) {
             Field[] fields = currentClass.getDeclaredFields();

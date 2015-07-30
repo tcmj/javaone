@@ -8,7 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
-import static com.tcmj.common.lang.Check.notNull;
+import static com.tcmj.common.lang.Objects.notNull;
 
 /**
  * Helper for simple time and date operations.

@@ -1,6 +1,6 @@
 package com.tcmj.common.net;
 
-import com.tcmj.common.lang.Check;
+import com.tcmj.common.lang.Objects;
 import com.tcmj.common.lang.Close;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -34,8 +34,8 @@ class Download {
      * @param target a file handle where you want to save your file. <br/>
      */
     public static void aFile(URL url, File target) throws IOException {
-        Check.notNull(url, "URL parameter may not be null!");
-        Check.notNull(target, "Target file parameter may not be null!");
+        Objects.notNull(url, "URL parameter may not be null!");
+        Objects.notNull(target, "Target file parameter may not be null!");
 
         InputStream stream = null;
         ReadableByteChannel rbc = null;

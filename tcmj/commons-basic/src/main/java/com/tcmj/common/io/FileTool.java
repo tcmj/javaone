@@ -1,6 +1,6 @@
 package com.tcmj.common.io;
 
-import com.tcmj.common.lang.Check;
+import com.tcmj.common.lang.Objects;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -133,7 +133,7 @@ public class FileTool {
      * see {@link FileTool#checkIsFileAndExists(Path)}
      */
     public static boolean checkIsFileAndExists(File file) {
-        Check.notNull(file, "Cannot perform file check on a null reference!");
+        Objects.notNull(file, "Cannot perform file check on a null reference!");
         return checkIsFileAndExists(file.toPath());
     }
 
@@ -143,7 +143,7 @@ public class FileTool {
      * @return true if file is a regular file and not a directory
      */
     public static boolean checkIsFileAndExists(Path file) {
-        Check.notNull(file, "Cannot perform file check on a null reference!");
+        Objects.notNull(file, "Cannot perform file check on a null reference!");
         if (Files.isRegularFile(file)) {
             LOG.debug("Successfully found: '{}'!", file.toAbsolutePath());
             return true;

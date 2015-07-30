@@ -1,6 +1,5 @@
 package com.tcmj.common.lang;
 
-import static com.tcmj.common.lang.Check.notNull;
 import com.tcmj.common.text.HumanReadable;
 import org.apache.commons.lang3.StringUtils;
 
@@ -45,7 +44,7 @@ public class Application {
      * @throws java.lang.IllegalArgumentException if the parameter 'context' is null
      */
     public String getApplicationTitle(Class<?> context) {
-        notNull(context, "Parameter 'context' may not be null!");
+        Objects.notNull(context, "Parameter 'context' may not be null!");
         String title = "";
         String implementationTitle = context.getPackage().getImplementationTitle();
         if (StringUtils.isNotBlank(implementationTitle)) {
@@ -83,7 +82,7 @@ public class Application {
      * @throws java.lang.IllegalArgumentException if the parameter 'context' is null
      */
     public String getApplicationVersion(Class<?> context) {
-        notNull(context, "Parameter 'context' may not be null!");
+        Objects.notNull(context, "Parameter 'context' may not be null!");
         String version = "";
         String implementationVersion = context.getPackage().getImplementationVersion();
         if (StringUtils.isNotBlank(implementationVersion)) {
@@ -109,7 +108,7 @@ public class Application {
      * @throws java.lang.IllegalArgumentException if the parameter 'context' is null
      */
     public String getApplicationVendor(Class<?> context) {
-        notNull(context, "Parameter 'context' may not be null!");
+        Objects.notNull(context, "Parameter 'context' may not be null!");
         String title = "";
         String implementationVendor = context.getPackage().getImplementationVendor();
         if (StringUtils.isNotBlank(implementationVendor)) {
