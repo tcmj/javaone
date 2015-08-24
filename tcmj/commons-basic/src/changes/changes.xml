@@ -7,6 +7,12 @@
         <author email="tomdeu@gmail.com">Thomas Deutsch</author>
     </properties>
     <body>
+        <release version="2.15.08" date="2015-08-01" description="Java 8 Updates!">
+            <action dev="tcmj" type="update">
+                Further updates of JDK 8 including Lambdas.
+            </action>
+            <action dev="tcmj" type="update">com.tcmj.common.io.FileTool : Helper for file access</action>
+        </release>
         <release version="2.15.02" date="2015-02-11" description="Java 8 Time!">
             <action dev="tcmj" type="update">
                 Updated the whole library to JDK 8.

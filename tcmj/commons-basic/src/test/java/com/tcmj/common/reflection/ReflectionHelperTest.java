@@ -1,6 +1,8 @@
 package com.tcmj.common.reflection;
 
 import com.tcmj.common.reflection.ReflectionHelper;
+
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Date;
 import javax.xml.bind.annotation.XmlElement;
@@ -52,7 +54,8 @@ public class ReflectionHelperTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldThrowExceptionWhenCalledWithNullParameter_newObject_P1() {
-        ReflectionHelper.newObject(null, new Class<?>[]{int.class}, 30);
+        String className = null;
+        ReflectionHelper.newObject(className, new Class<?>[]{int.class}, 30);
     }
     @Test(expected = IllegalArgumentException.class)
     public void shouldThrowExceptionWhenCalledWithNullParameter_newObject_P2() {
@@ -70,7 +73,7 @@ public class ReflectionHelperTest {
      * Test of 'public static <T> T newObject(String className, Class<?>[] paramTypes, Object... parameters)' method, of class ReflectionHelper.
      */
     @Test
-    public void newObject() {
+    public void shouldCreateNewObjects() {
         System.out.println("public static <T> T newClass(String className, Class<?>[] paramTypes, Object... parameters)");
         String clazzName = "java.math.BigDecimal";
         Class<?>[] parameterTypes = new Class<?>[]{int.class};
@@ -84,6 +87,25 @@ public class ReflectionHelperTest {
         assertNotNull(result2);
         System.out.println(" result = " + result2);
 
+    }
+
+    @Test
+    public void shouldCreateANewExceptionUsingAStringParameter() throws Exception {
+        System.out.println("public static <T extends Exception> T newException(Class<T> clazz, Object... parameters)");
+        IOException exception = ReflectionHelper.newException(IOException.class, "AnyMessageForOurIOException");
+        assertThat("IOException is not null", exception, notNullValue());
+        assertThat("MessageText", exception.getMessage(), equalTo("AnyMessageForOurIOException"));
+        System.out.println(exception);
+
+    }
+
+    @Test
+    public void shouldCreateANewExceptionUsingAnEmptyConstructor() throws Exception {
+        System.out.println("public static <T extends Exception> T newException(Class<T> clazz, Object... parameters)");
+        IOException exception = ReflectionHelper.newException(IOException.class);
+        assertThat("IOException is not null", exception, notNullValue());
+        assertThat("MessageText is not null", exception.getMessage(), nullValue());
+        System.out.println(exception);
     }
 
 
@@ -181,9 +203,9 @@ public class ReflectionHelperTest {
         assertEquals(extracted[2], SimplePojo.class);
     }
 
-    
-    
-    
+
+
+
     static class SimplePojo {
 
         private String valueA;

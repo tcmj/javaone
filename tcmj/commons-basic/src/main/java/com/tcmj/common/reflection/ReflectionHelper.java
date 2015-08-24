@@ -35,7 +35,7 @@ public final class ReflectionHelper {
     public static <T> Class<T> loadClass(String className) {
         Objects.notBlank(className, "Name of the class cannot be blank!");
         if (classCache == null) {
-            classCache = new HashMap<String, Class>();
+            classCache = new HashMap<>();
         }
 
         Class<T> cclass = classCache.get(className);
@@ -65,19 +65,50 @@ public final class ReflectionHelper {
     @SuppressWarnings("unchecked")
     public static <T> T newObject(String className, Class<?>[] paramTypes, Object... parameters) {
         Objects.notBlank(className, "Name of the class cannot be blank!");
+        Class<T> classInstance = loadClass(className);
+        return newObject(classInstance, paramTypes, parameters);
+    }
 
-        Class<T> classinstance = loadClass(className);
-
+    /**
+     * Instantiates the given class with the given parameters
+     * @param <T> type safety
+     * @param clazz the class to be instantiated
+     * @param paramTypes the constructor parameters types
+     * @param parameters the constructor parameters
+     * @return <T> instance of given type
+     */
+    public static <T> T newObject(Class<T> clazz, Class<?>[] paramTypes, Object... parameters) {
+        Objects.notNull(clazz, "Class object cannot be null!");
         try {
-            Constructor<T> constructor = classinstance.getConstructor(paramTypes);
+            Constructor<T> constructor = clazz.getConstructor(paramTypes);
+            return constructor.newInstance(parameters);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException ex) {
+            throw new RuntimeException("Exception: " + ex.getMessage(), ex);
+        }
+    }
+
+    public static <T extends Exception> T newException(Class<T> clazz, Object... parameters) {
+        Objects.notNull(clazz, "Exception class object cannot be null!");
+        try {
+            Constructor<T> constructor;
+
+            if(parameters.length == 0){
+                constructor = clazz.getConstructor(new Class[]{});
+            }else if(parameters.length == 1){
+                constructor = clazz.getConstructor(new Class[]{String.class});
+            }else  if(parameters.length == 2){
+                constructor = clazz.getConstructor(new Class[]{String.class, Exception.class});
+            }else{
+                throw new IllegalArgumentException("Cannot guess constructor! Try a String as parameter!");
+            }
 
             return constructor.newInstance(parameters);
 
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException ex) {
             throw new RuntimeException("Exception: " + ex.getMessage(), ex);
         }
-
     }
+
 
     /**
      * Instantiates the given class with a no-arg constructor.
@@ -164,9 +195,7 @@ public final class ReflectionHelper {
             methodCache = new HashMap<>();
         }
 
-        StringBuilder bld = new StringBuilder(String.valueOf(clazz.hashCode()));
-        bld.append(methodName);
-        String key = bld.toString();
+        String key = String.valueOf(clazz.hashCode()) + methodName;
 
         Method method = methodCache.get(key);
 
@@ -229,8 +258,7 @@ public final class ReflectionHelper {
      */
     public static <T extends Annotation> T getMethodAnnotation(Class<?> clz, String methodName, Class<T> annotationClazz) {
         Method method = getMethod(clz, methodName);
-        Annotation annotation = method.getAnnotation(annotationClazz);
-        return (T) annotation;
+        return method.getAnnotation(annotationClazz);
     }
 
     /** Prints size of the class/method cache. */

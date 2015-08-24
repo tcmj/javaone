@@ -3,6 +3,8 @@ package com.tcmj.common.lang;
 import java.util.Collection;
 import java.util.Map;
 import java.util.zip.ZipFile;
+
+import com.tcmj.common.reflection.ReflectionHelper;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -12,7 +14,7 @@ import org.apache.commons.lang3.StringUtils;
  *
  * @author tcmj - Thomas Deutsch
  * @see java.util.Objects
- * @see org.apache.commons.lang.Validate
+ * @see org.apache.commons.lang3.Validate
  * @see com.google.common.base.Preconditions
  * @since 13.04.2011
  */
@@ -49,6 +51,32 @@ public class Objects {
     }
 
     /**
+     * Checks that a object is not null and throws a NullPointerException with a custom message.
+     * <p>
+     * The message strings can be formatted using the {@link org.slf4j.helpers.MessageFormatter} patterns</p>
+     * <pre>
+     *    notNull(name, "Name can not be Null!");
+     *    String this.name = notNull(name, "Name can not be Null!");
+     *    String this.name = notNull(name, "Name can not be Null! {}", new Date());
+     *    String this.name = notNull(name, "Dear {} your name can not be Null! {}", user, new Date());
+     * </pre>
+     *
+     * @param <T> typesafe
+     * @param instance the object to check
+     * @param exception the exception we want to throw
+     * @param msg a custom message used in the exception text
+     * @param params value objects to be placed into the message (placeholder: '{}')
+     * @return passes through the instance in order to do the assignment in the same line
+     */
+    public static <T> T notNull(T instance, Class<? extends Exception> exception, String msg, Object... params)  {
+        if (instance == null) {
+            throwUnchecked(ReflectionHelper.newException(exception, format(msg, params)));
+        }
+        return instance;
+    }
+
+
+    /**
      * Ensures that a expression has to be true and throws a IllegalArgumentException with a custom message on failure.
      * <p>
      * The message strings can be formatted using the {@link org.slf4j.helpers.MessageFormatter} patterns</p>
@@ -62,11 +90,11 @@ public class Objects {
      * @param msg a custom message used in the exception text
      * @param params value objects to be placed into the message (set placeholders using {})
      * @return true if the condition is true
-     * @throws IllegalArgumentException if the condition is false
+     * @throws IllegalStateException if the condition is false
      */
     public static boolean ensure(boolean condition, String msg, Object... params) {
         if (condition == false) {
-            throw new IllegalArgumentException(format(msg, params));
+            throw new IllegalStateException(format(msg, params));
         }
         return true;
     }
@@ -90,9 +118,9 @@ public class Objects {
      * @param string the string to check
      * @param message a message used by the thrown exception
      * @return the given string parameter (parameter no 1)
-     * @throws IllegalArgumentException if the string is blank {@link org.apache.commons.lang.StringUtils#isBlank(java.lang.String) }
+     * @throws IllegalArgumentException if the string is blank {@link org.apache.commons.lang3.StringUtils#isBlank(CharSequence)}  }
      */
-    public static String notBlank(String string, String message, Object... params) {
+    public static CharSequence notBlank(CharSequence string, String message, Object... params) {
         if (StringUtils.isBlank(string)) {
             throw new IllegalArgumentException(format(message, params));
         }
@@ -148,5 +176,14 @@ public class Objects {
         } else {
             return org.slf4j.helpers.MessageFormatter.arrayFormat(msg, params).getMessage();
         }
+    }
+
+
+    public static void throwUnchecked(Throwable e) {
+        Objects.<RuntimeException>throwAny(e);
+    }
+    @SuppressWarnings("unchecked")
+    private static <E extends Throwable> void throwAny(Throwable e) throws E {
+        throw (E)e;
     }
 }

@@ -7,33 +7,36 @@
 package com.tcmj.common.xml.map;
 
 import com.tcmj.common.xml.map.intern.XMLMapException;
-import java.net.URL;
-import java.util.HashMap;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
-
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import static junit.framework.Assert.*;
-import static org.hamcrest.core.Is.is;
-import org.hamcrest.core.IsEqual;
-import static org.hamcrest.core.IsEqual.equalTo;
-import org.hamcrest.core.IsNull;
-import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.Assert.assertThat;
 
 /**
  * JUnit Test for class {@link com.tcmj.common.xml.map.XMLMap}
@@ -505,7 +508,7 @@ public class XMLMapTest {
 
     /**
      * Test of containsValue method, of class com.tcmj.tools.xml.model.XMLMap.
-     *
+     * <p/>
      * // XMLMap.XMLEntry a = null; // a = new
      * XMLMap.XMLEntry("key1","value1"){}; // // XMLMap.XMLEntry b = new
      * XMLEntry(null,"value1"); // // logger.info("equals "+a.equals(b)); // //
@@ -709,8 +712,8 @@ public class XMLMapTest {
         File testfile = new File(testdatapath, "XMLMapTest_testLevelSeparators_TMP.xml");
         initFile(testfile);
         String[] cases = new String[]{
-            ".", "-", "\\", ",", "*", "_", "ooo", "@", "/", "|", "=", "?",
-            "...", "x", "-|-", "||", "+"};
+                ".", "-", "\\", ",", "*", "_", "ooo", "@", "/", "|", "=", "?",
+                "...", "x", "-|-", "||", "+"};
         LOG.info(" Separators to Test: {}", Arrays.asList(cases));
 
         for (int i = 0; i < cases.length; i++) {

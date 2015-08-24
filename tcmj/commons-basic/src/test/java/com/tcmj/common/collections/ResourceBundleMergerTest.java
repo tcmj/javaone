@@ -86,7 +86,7 @@ public class ResourceBundleMergerTest {
      * <p>
      * use of input with empty content
      */
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalStateException.class)
     public void shouldThrowExceptionOnWrongBuilderPatternInputFileIsEmpty() {
         String[] inp = new String[0];
         new ResourceBundleMerger.Builder().input(inp).build();
@@ -97,7 +97,7 @@ public class ResourceBundleMergerTest {
      * <p>
      * use of only one input file
      */
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalStateException.class)
     public void shouldThrowExceptionOnWrongBuilderPatternOnlyOneInputFile() {
         String[] inp = new String[]{"onlyone"};
         new ResourceBundleMerger.Builder().input(inp).build();

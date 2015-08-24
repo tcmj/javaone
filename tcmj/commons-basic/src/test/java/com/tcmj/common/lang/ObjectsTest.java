@@ -1,5 +1,7 @@
 package com.tcmj.common.lang;
 
+import java.io.IOException;
+import java.util.Date;
 import java.util.Map;
 import java.util.HashSet;
 import java.util.Set;
@@ -50,9 +52,28 @@ public class ObjectsTest {
     }
 
     /**
+     * Test of notNull method, of class Objects.
+     */
+    @Test(expected = java.io.IOException.class)
+    public void testNotNullWithCustomCheckedException() {
+        Date nullInstance = null;
+        Objects.notNull(nullInstance, IOException.class, "Here we have a custom i/o exception in {}", this);
+    }
+
+    /**
+     * Test of notNull method, of class Objects.
+     */
+    @Test(expected = RuntimeException.class)
+    public void testNotNullWithCustomRuntimeException()  {
+        Date nullInstance = null;
+        Objects.notNull(nullInstance, RuntimeException.class, "Here we have a custom RuntimeException in {}", this);
+    }
+
+
+    /**
      * Test of ensure method, of class Objects.
      */
-    @Test(expected = java.lang.IllegalArgumentException.class)
+    @Test(expected = java.lang.IllegalStateException.class)
     public void testEnsure() {
         System.out.println("ensure");
         boolean condition = false;
@@ -107,4 +128,6 @@ public class ObjectsTest {
         assertThat("Non-Empty String", Objects.isEmpty("1"), is(false));
 
     }
+
+
 }
