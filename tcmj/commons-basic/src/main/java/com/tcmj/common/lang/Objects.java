@@ -3,15 +3,13 @@ package com.tcmj.common.lang;
 import java.util.Collection;
 import java.util.Map;
 import java.util.zip.ZipFile;
-
 import com.tcmj.common.reflection.ReflectionHelper;
 import org.apache.commons.lang3.StringUtils;
 
 /**
  * Objects Utility class (like apaches Validate or Googles Precondition class or java.util.Objects).
- * <p>
+ * <p/>
  * All message strings can be formatted using the {@link org.slf4j.helpers.MessageFormatter} patterns
- *
  * @author tcmj - Thomas Deutsch
  * @see java.util.Objects
  * @see org.apache.commons.lang3.Validate
@@ -20,9 +18,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class Objects {
 
-    /**
-     * private no-arg-constructor because we have only static methods.
-     */
+    /** private no-arg-constructor because we have only static methods. */
     private Objects() {
     }
 
@@ -36,7 +32,6 @@ public class Objects {
      *    String this.name = notNull(name, "Name can not be Null! {}", new Date());
      *    String this.name = notNull(name, "Dear {} your name can not be Null! {}", user, new Date());
      * </pre>
-     *
      * @param <T> typesafe
      * @param instance the object to check
      * @param msg a custom message used in the exception text
@@ -56,11 +51,10 @@ public class Objects {
      * The message strings can be formatted using the {@link org.slf4j.helpers.MessageFormatter} patterns</p>
      * <pre>
      *    notNull(name, "Name can not be Null!");
-     *    String this.name = notNull(name, "Name can not be Null!");
-     *    String this.name = notNull(name, "Name can not be Null! {}", new Date());
-     *    String this.name = notNull(name, "Dear {} your name can not be Null! {}", user, new Date());
+     *    String this.name = notNull(name, IOException.class, "Name can not be Null!");
+     *    String this.name = notNull(name, RuntimeException.class, "Name can not be Null today on {}!", new Date());
+     *    String this.name = notNull(name, Exception.class, "Dear {} your name can not be Null! {}", user, new Date());
      * </pre>
-     *
      * @param <T> typesafe
      * @param instance the object to check
      * @param exception the exception we want to throw
@@ -68,7 +62,7 @@ public class Objects {
      * @param params value objects to be placed into the message (placeholder: '{}')
      * @return passes through the instance in order to do the assignment in the same line
      */
-    public static <T> T notNull(T instance, Class<? extends Exception> exception, String msg, Object... params)  {
+    public static <T> T notNull(T instance, Class<? extends Exception> exception, String msg, Object... params) {
         if (instance == null) {
             throwUnchecked(ReflectionHelper.newException(exception, format(msg, params)));
         }
@@ -85,7 +79,6 @@ public class Objects {
      *
      *    boolean connected = ensure(session.isConnected(), "Connection lost at {}", new Date());
      * </pre>
-     *
      * @param condition expression which must be true or false
      * @param msg a custom message used in the exception text
      * @param params value objects to be placed into the message (set placeholders using {})
@@ -114,7 +107,6 @@ public class Objects {
      *
      *    this.name = notBlank(parameterName, "Say your name or pay {}!", 25.50);
      * </pre>
-     *
      * @param string the string to check
      * @param message a message used by the thrown exception
      * @return the given string parameter (parameter no 1)
@@ -131,16 +123,15 @@ public class Objects {
      * checks if an object is null or empty.<br/>
      * Supports<br/>
      * <ul>
-     * <li>{@link java.util.Collection#isEmpty() }</li>
-     * <li>{@link java.util.Map#isEmpty() } (isEmpty)</li>
+     * <li>{@link java.util.Collection} (isEmpty())</li>
+     * <li>{@link java.util.Map} (isEmpty)</li>
      * <li>Primitive arrays (length == 0)</li>
-     * <li>{@link java.lang.CharSequence#length() == 0} (length)</li>
-     * <li>{@link java.util.zip.ZipFile#size() } (size)</li>
+     * <li>Strings or {@link CharSequence} (length)</li>
+     * <li>{@link java.util.zip.ZipFile} (size)</li>
      * </ul>
      * <b>All other classes will only be checked if they are null (=true) or not null (=false)!</b>
-     *
-     * @param obj Object
-     * @return bool
+     * @param obj insert the Object to check for emptyness here
+     * @return boolean
      */
     public static boolean isEmpty(Object obj) {
         if (obj == null) {
@@ -179,11 +170,17 @@ public class Objects {
     }
 
 
+    /**
+     * Throws any exception as a unchecked exception!
+     * <pre>Objects.throwUnchecked(new java.io.IOException("abc"));</pre>
+     * @param e any checked or unchecked exception object
+     */
     public static void throwUnchecked(Throwable e) {
         Objects.<RuntimeException>throwAny(e);
     }
+
     @SuppressWarnings("unchecked")
     private static <E extends Throwable> void throwAny(Throwable e) throws E {
-        throw (E)e;
+        throw (E) e;
     }
 }
