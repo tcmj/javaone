@@ -6,9 +6,6 @@
  */
 package com.tcmj.common.xml.map;
 
-import com.tcmj.common.xml.map.XMLMap;
-import com.tcmj.common.lang.Close;
-import com.tcmj.common.xml.map.intern.XMLMapException;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -18,15 +15,19 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Map;
 import java.util.Random;
+import com.tcmj.common.lang.Close;
+import com.tcmj.common.xml.map.intern.XMLMapException;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static junit.framework.Assert.*;
-import org.junit.Assert;
+
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 /**
  * XMLMapTestExtended.
  *
@@ -86,11 +87,11 @@ public class XMLMapTestExtended {
 
         ObjectOutputStream objOut = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(serFilename)));
         objOut.writeObject(xmap);
-        Close.quiet(objOut);
+        Close.inSilence(objOut);
 
         ObjectInputStream objIn = new ObjectInputStream(new BufferedInputStream(new FileInputStream(serFilename)));
         XMLMap xmap2 = (XMLMap) objIn.readObject();
-        Close.quiet(objIn);
+        Close.inSilence(objIn);
         LOG.info(xmap2.toString());
         assertEquals("123", xmap2.get("a"));
         assertEquals("456", xmap2.get("b.c"));
@@ -145,7 +146,7 @@ public class XMLMapTestExtended {
         assertNotNull("i:one.i:two not available", xmap.get("i:one.i:two"));
 
         //        xmap.setXMLRootNodeName("tcmj");
-//        
+//
 //        xmap.put("one.two", testdatapathOut);
         xmap.saveXML();
     }
@@ -236,11 +237,11 @@ public class XMLMapTestExtended {
         return new String(res);
     }
 
-    
+
     /**
      * Test case to check multiple values belonging to a single key
      * including file access.
-     * @throws Exception 
+     * @throws Exception
      */
     @Test
     public void testMultiNodes() throws Exception {
@@ -262,8 +263,8 @@ public class XMLMapTestExtended {
 
         assertEquals(3, lst.length);
     }
-    
-    
+
+
     @Test
     public void testJavaProperties() throws Exception {
         LOG.info("testJavaProperties");
@@ -275,7 +276,7 @@ public class XMLMapTestExtended {
         XMLMap map = new XMLMap(jvpfile);
         map.setXMLEntryPoint("java");
 
-        
+
         for (Map.Entry<Object, Object> entrySet : System.getProperties().entrySet()) {
             try {
                 if (! "".equals(entrySet.getValue().toString().trim())) {
@@ -286,30 +287,30 @@ public class XMLMapTestExtended {
                 LOG.error("PUT-Error: {}",e.getMessage());
             }
         }
-        
+
         LOG.info("Map.1.size = {}", map.size());
         map.saveXML();
-        
+
         XMLMap mapReloaded = new XMLMap(jvpfile);
         mapReloaded.setXMLEntryPoint("java");
         mapReloaded.readXML();
         LOG.info("Map.2.size = {}", mapReloaded.size());
-        
+
         LOG.info("Map.2.content = {}", mapReloaded.showDataEntries(false, false));
-        
+
 //        for (Map.Entry<String, String> entrySet : mapReloaded.entrySet()) {
 //            map.remove(entrySet.getKey());
 //        }
 //        LOG.info("Map.3.content = {}", map.showDataEntries(false, false));
-        
-        
+
+
         assertThat("Same Size",mapReloaded.size(),is(map.size()));
-        
+
 
 
     }
-    
-    
+
+
     @Test(expected = XMLMapException.class)
     public void testLineSeparator() throws Exception {
         LOG.info("testLineSeparator");
@@ -320,7 +321,7 @@ public class XMLMapTestExtended {
         }
         LOG.info("Put line.separator in a new map and save it...");
         XMLMap map = new XMLMap(testfile);
-        
+
         //Exception at this point:
         map.put("line.separator", System.getProperty("line.separator"));
 
@@ -330,10 +331,10 @@ public class XMLMapTestExtended {
         mapReloaded.readXML();
         assertThat("Same Size",mapReloaded.size(),is(map.size()));
         assertThat("Same Content",mapReloaded.get("line.separator"), equalTo(System.getProperty("line.separator")));
-        
+
 
 
     }
-    
-    
+
+
 }//eof

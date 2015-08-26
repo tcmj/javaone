@@ -1,118 +1,68 @@
 package com.tcmj.common.lang;
 
-import com.tcmj.common.lang.Close;
-import java.io.Closeable;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.StringWriter;
-import java.sql.ResultSet;
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
- * CloseTest.
- * 
- * TODO think about how to test them!
- * 
+ * Test of com.tcmj.common.lang.Close.
  * @author tcmj - Thomas Deutsch
  */
 public class CloseTest {
-    
-    public CloseTest() {
-    }
 
-    /**
-     * Test of quiet method, of class Close.
-     */
     @Test
-    public void testQuiet() {
-        System.out.println("* quiet");
+    public void testInSilenceWithoutThrowingException() {
         StringReader reader = new StringReader("abc");
-        Close.quiet(reader);
+        Close.inSilence(reader);
+        try {
+            reader.ready();
+            fail("The IOException has not been thrown! This happens only if closing fails!");
+        } catch (IOException e) {
+        }
     }
 
-    /**
-     * Successful close test of a StringReader.
-     */
     @Test
-    public void testSuccessful()throws Exception {
-        System.out.println("* successful");
-        Close.unchecked(new StringReader("abc"));
-        Close.checked(new StringReader("abc"));
-        Close.quiet(new StringReader("abc"));
+    public void testInSilenceThrowingAException() {
+        Close.inSilence(() -> {
+            throw new IOException("We choose a checked one!");
+        });
     }
-    
+
     @Test
-    public void testNullCheckedA()throws Exception{
-        System.out.println("* checked null A");
-        AutoCloseable acble = null;
-        Close.checked(acble);
+    public void testInSilenceNullCase() {
+        Close.inSilence(null);
     }
-    
+
     @Test
-    public void testNullCheckedC()throws Exception{
-        System.out.println("* checked null C");
-        Closeable clble = null;
-        Close.checked(clble);
-    }
-    
-    @Test
-    public void testNullUnchecked(){
-        System.out.println("* unchecked null");
+    public void testUncheckedNullCase() {
         Close.unchecked(null);
     }
-    
+
     @Test
-    public void testNullQuiet(){
-        System.out.println("* quiet null");
-        Close.quiet(null);
+    public void testUncheckedWithoutThrowingException() {
+        StringReader reader = new StringReader("abc");
+        Close.unchecked(reader);
+        try {
+            reader.ready();
+            fail("The IOException has not been thrown! This happens only if closing fails!");
+        } catch (IOException e) {
+        }
     }
-    
-    @Test(expected = RuntimeException.class)
-    public void testUncheckedClose() {
-        System.out.println("* uncheck a unchecked close");
-        Close.unchecked(new UncheckedCloseResource());
-    }
-    
-    @Test(expected = RuntimeException.class)
-    public void testUncheckedClose2() {
-        System.out.println("* uncheck a checked close");
-        Close.unchecked(new CheckedCloseResource());
-    }
-    
+
     @Test(expected = IOException.class)
-    public void testCheckedClose()throws Exception {
-        System.out.println("* check a checked close");
-        Close.checked(new CheckedCloseResource());
+    public void testUncheckedThrowingACheckedException() {
+        Close.unchecked(() -> {
+            throw new IOException("We choose a checked one!");
+        });
     }
-    
-    @Test(expected = Exception.class)
-    public void testCheckedClose2()throws Exception {
-        System.out.println("* check a unchecked close");
-        Close.checked(new UncheckedCloseResource());
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testUncheckedThrowingARuntimeException() {
+        Close.unchecked(() -> {
+            throw new IllegalArgumentException("We choose a unchecked one!");
+        });
     }
-    
-    @Test
-    public void testCheckedQuietClose()throws Exception {
-        System.out.println("* quiet close");
-        Close.quiet(new CheckedCloseResource());
-        Close.quiet(new UncheckedCloseResource());
-    }
-    
-    class UncheckedCloseResource implements AutoCloseable{
-        @Override
-        public void close(){
-            throw new UnsupportedOperationException("Unchecked-Close-Error!");
-        }
-    }
-    
-    class CheckedCloseResource implements Closeable{
-        @Override
-        public void close() throws IOException {
-            throw new IOException("Checked-Close-Error!");
-        }
-        
-    }
-    
+
 }

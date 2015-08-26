@@ -50,11 +50,11 @@ class Download {
             throw e;
         } finally { //cleanup:
             if (fos != null) {
-                Close.quiet(fos.getChannel());
+                Close.inSilence(fos.getChannel());
             }
-            Close.quiet(fos);
-            Close.quiet(rbc);
-            Close.quiet(stream);
+            Close.inSilence(fos);
+            Close.inSilence(rbc);
+            Close.inSilence(stream);
         }
 
     }

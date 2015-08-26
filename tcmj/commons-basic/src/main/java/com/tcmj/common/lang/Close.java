@@ -1,19 +1,18 @@
 package com.tcmj.common.lang;
 
-import java.io.Closeable;
-import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Provides a bunch of closing methods for streams, readers, writers, channels.
- * Take a look at {@link java.io.Closeable} !
- * @author tcmj
+ * Provides a bunch of closing methods for all classes implementing {@link java.lang.AutoCloseable} !
+ * Consider using try-with-resources !
+ * @author tcmj - Thomas Deutsch
+ * @test com.tcmj.common.lang.CloseTest
  */
 public class Close {
 
     /** slf4j Logging framework. */
-    private static final Logger logger = LoggerFactory.getLogger(Close.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Close.class);
 
     /**
      * instantiation not allowed!
@@ -23,61 +22,37 @@ public class Close {
 
     /**
      * Internal method which provides the ability to swallow the exception or to
-     * wrap the exception to an unchecked exception.
+     * throw any exception in an unchecked way {@link com.tcmj.common.lang.Objects#throwUnchecked(Throwable)}
+     * @param object The object to be closed
+     * @param throwException if the Exception should be thrown
      */
-    private static void closeIntern(AutoCloseable object, boolean throwUnchecked) {
+    private static void closeIntern(AutoCloseable object, boolean throwException) {
         if (object != null) {
             try {
                 object.close();
             } catch (Exception e) {
-                if (throwUnchecked) {
-                    logger.error("Cannot close {}", object);
-                    throw new RuntimeException(e);
+                if (throwException) {
+                    LOG.debug("Cannot close {} because of {}", object, e.getMessage());
+                    Objects.throwUnchecked(e);
                 }
             }
         }
     }
 
     /**
-     * Closes the object quietly swallowing any exception!
+     * Closes the object quietly by swallowing any exception without any logging!
      * @param object to be closed
      */
-    public static void quiet(AutoCloseable object) {
+    public static void inSilence(AutoCloseable object) {
         closeIntern(object, false);
     }
 
     /**
-     * Closes the object wrapping exceptions to unchecked runtime exception!
+     * Closes the object removing the need of catching exceptions but throwing them!
      * @param object to be closed
      */
     public static void unchecked(AutoCloseable object) {
         closeIntern(object, true);
     }
 
-    /**
-     * Closes the object the 'normal' way using a checked exception!<br>
-     * Closes this stream and releases any system resources associated with it. If the stream is already closed then invoking this method has no effect.
-     * @param object to be closed
-     * @throws input / output errors from the system
-     */
-    public static void checked(Closeable object) throws IOException {
-        if (object != null) {
-            object.close();
-        }
-    }
-
-    /**
-     * Transform a unchecked exception to a checked one
-     * @param object to be closed
-     * @throws Exception containing any exception thrown by the close method.
-     */
-    public static void checked(AutoCloseable object) throws Exception {
-        if (object != null) {
-            try {
-                object.close();
-            } catch (Exception e) {
-                throw new Exception(e);
-            }
-        }
-    }
 }
