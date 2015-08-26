@@ -156,8 +156,10 @@ public class Objects {
     /**
      * Internal method to produce strings filled with formatted values.
      * This method uses the slf4j formatting method using '{}'.
+     * @param msg The message which can contain placeholders optionally
+     * @param params The optional possible parameters
      */
-    private static String format(String msg, Object... params) {
+    public static String format(String msg, Object... params) {
         if (params == null) {
             return msg;
         } else if (params.length == 1) {
