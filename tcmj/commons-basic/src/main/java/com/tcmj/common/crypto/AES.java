@@ -273,8 +273,6 @@ public class AES {
      * @param password password to use for encryption
      * @param input an arbitrary byte stream to encrypt
      * @param output stream to which encrypted data will be written
-     * @throws Delete_AES.InvalidKeyLengthException if keyLength is not 128, 192, or 256
-     * @throws Delete_AES.StrongEncryptionNotAvailableException if keyLength is 192 or 256, but the Java runtime's jurisdiction policy files do not allow 192- or 256-bit encryption
      * @todo keyLength key length to use for AES encryption (must be 128, 192, or 256)
      */
     public static void encryptStream(char[] password, InputStream input, OutputStream output) throws Exception {
