@@ -7,11 +7,14 @@ import java.nio.file.Paths;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.function.Consumer;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.StopWatch;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,4 +135,45 @@ public class FileToolTest {
             }
         }
     }
+
+    @Test
+    public void testDelete() throws Exception {
+        LOG.info("*** testDelete ***");
+        assertThat("Success case", FileTool.delete(File.createTempFile("prefix", "suffix")), is(true));
+        assertThat("Null case", FileTool.delete(null), is(false));
+        assertThat("Non existing case", FileTool.delete(new File("nonexistant")), is(false));
+    }
+
+    @Test
+    public void testCopyFile() throws Exception {
+        LOG.info("*** testCopyFile ***");
+        File src = FileTool.locateFile("/src/main/java/com/tcmj/common/io/FileTool.java");
+        File dest = new File("copy_of_FileTool.java");
+        FileTool.copy(src, dest);
+        assertThat(src.length(), is(dest.length()));
+        assertThat("File length must be equal!", src.length(), is(dest.length()));
+        FileTool.delete(dest);
+        LOG.info("FileTool.delete({})",dest);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testCopyFileOnNonExistantSource() throws Exception {
+        LOG.info("*** testCopyFileOnNonExistantSource ***");
+        File src = new File("non-existant.file");
+        File dest = new File("does-not-matter");
+        FileTool.copy(src, dest);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testCopyFileOnNullSource() throws Exception {
+        LOG.info("*** testCopyFileOnNonExistantSource ***");
+        FileTool.copy(null, new File("does-not-matter"));
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testCopyFileOnNullDestination() throws Exception {
+        LOG.info("*** testCopyFileOnNonExistantSource ***");
+        FileTool.copy(new File("does-not-matter"), null);
+    }
+
 }

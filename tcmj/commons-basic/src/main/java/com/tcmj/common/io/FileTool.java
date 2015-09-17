@@ -2,9 +2,18 @@ package com.tcmj.common.io;
 
 import com.tcmj.common.lang.Objects;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
@@ -18,12 +27,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * FileTool - Utility class for easier handling file access.
- * <p>
- * Uses slf4j log messages.
- * <p>
- * Test and usage: {@link com.tcmj.common.io.FileToolTest}
- * @author tcmj
+ * FileTool - Utility class for easier handling of file access.
+ * @test com.tcmj.common.io.FileToolTest
+ * @author tcmj - Thomas Deutsch
  */
 public class FileTool {
 
@@ -133,7 +139,6 @@ public class FileTool {
      * see {@link FileTool#checkIsFileAndExists(Path)}
      */
     public static boolean checkIsFileAndExists(File file) {
-        Objects.notNull(file, "Cannot perform file check on a null reference!");
         return checkIsFileAndExists(file.toPath());
     }
 
@@ -215,5 +220,42 @@ public class FileTool {
             LOG.error("Error executing action {} on file {}!", action, path, ex);
         }
     }
+
+    /**
+     * Try to delete a file catching all exceptions.
+     * @return true only on a successfull deletion otherwise false
+     */
+    public static boolean delete(File file) {
+        try {
+            if(file!=null) {
+                return file.delete();
+            }
+        } catch (Exception ex) {
+            LOG.trace("Delete on file '{}' results in: {}!", file, ex.getMessage());
+        }
+        return false;
+    }
+
+
+    /**
+     * Very fast, native way to copy a file.
+     * @param inputFile source file which has to exist
+     * @param outputFile destination file which must be a non null file reference. Overwrites the destination unasked!
+     */
+    public static void copy(File inputFile, File outputFile) {
+        Objects.notNull(inputFile, "Parameter 'inputFile' (1) cannot be null!");
+        Objects.notNull(outputFile, "Parameter 'outputFile' (2) cannot be null!");
+        Objects.ensure(checkIsFileAndExists(inputFile), "Cannot perform copy because source file does not exist!");
+        try (FileChannel in = new FileInputStream(inputFile).getChannel();
+             FileChannel out = new FileOutputStream(outputFile).getChannel()) {
+            in.transferTo(0, in.size(), out); //native I/O operation
+            LOG.debug("Successfully created file '{}'!", outputFile.getAbsolutePath());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
 
 }
