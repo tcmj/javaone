@@ -108,9 +108,9 @@ public class AESTest {
     @Test
     public void checkMaxAllowedKeySize() {
         //Standard Java installation (Standard JCE)
-        assertThat("Check AES keysize 128", AES.isKeySizeAllowed(128), is(true)); //this is the only allowed one by default
-        assertThat("Check AES keysize 192", AES.isKeySizeAllowed(192), is(false)); //valid but locked
-        assertThat("Check AES keysize 256", AES.isKeySizeAllowed(256), is(false)); //valid but locked
+        assertThat("Check AES keysize 128", AES.isKeySizeAllowed(AES.Defaults.KEY_SIZE_128_BITS), is(true)); //this is the only allowed one by default
+        assertThat("Check AES keysize 192", AES.isKeySizeAllowed(AES.Defaults.KEY_SIZE_192_BITS), is(false)); //valid but locked
+        assertThat("Check AES keysize 256", AES.isKeySizeAllowed(AES.Defaults.KEY_SIZE_256_BITS), is(false)); //valid but locked
 
         //Extended Java installation (JCE jurisdiction policy files)
         Crypto.removeCryptographyRestrictions();
