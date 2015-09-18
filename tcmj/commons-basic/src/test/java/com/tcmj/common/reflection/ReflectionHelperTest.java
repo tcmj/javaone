@@ -2,9 +2,12 @@ package com.tcmj.common.reflection;
 
 import com.tcmj.common.reflection.ReflectionHelper;
 
+import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Map;
 import javax.xml.bind.annotation.XmlElement;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -17,6 +20,23 @@ import static org.hamcrest.CoreMatchers.*;
 public class ReflectionHelperTest {
 
     public ReflectionHelperTest() {
+    }
+
+
+    /**
+     * Test of 'public static Field getField(Class<?> clazz, String fieldname, Class<?> fieldtype)' method, of class ReflectionHelper.
+     */
+    @Test
+    public void shouldGetAField() throws Exception{
+        System.out.println("public static Field getField(Class<?> clazz, String fieldname, Class<?> fieldtype)");
+
+        File cut = new File("pom.xml");
+        Field pathField = ReflectionHelper.getField(File.class, "path", String.class);
+        assertThat(pathField, notNullValue());
+        assertThat(pathField.getName(), equalTo("path"));
+
+        pathField.setAccessible(true);
+        assertThat(pathField.get(cut), equalTo("pom.xml"));
     }
 
 
@@ -180,7 +200,7 @@ public class ReflectionHelperTest {
 
     }
 
-    
+
     @Test
     public void shouldFindAllMethods(){
         assertThat(ReflectionHelper.getMethod(SimplePojo.class, "toString"), notNullValue());
@@ -193,10 +213,10 @@ public class ReflectionHelperTest {
         Class two = Double.class;
         SimplePojo three = new SimplePojo();
         Object[] anything = new Object[]{one, two, three};
-        
+
         //when
         Class[] extracted = ReflectionHelper.extractClasses(anything);
-        
+
         //then
         assertEquals(extracted[0], String.class);
         assertEquals(extracted[1], Double.class);

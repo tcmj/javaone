@@ -10,8 +10,9 @@ import java.util.Map;
 import com.tcmj.common.lang.Objects;
 
 /**
- * Helper for reflection operations (Cached!).
+ * Helper for reflection operations. Uses a cache for classes and methods internally.
  * <img alt="tcmj" src="doc-files/tcmjbg.gif" align="right">
+ * @test com.tcmj.common.reflection.ReflectionHelperTest
  * @author tdeut - Thomas Deutsch
  */
 public final class ReflectionHelper {
