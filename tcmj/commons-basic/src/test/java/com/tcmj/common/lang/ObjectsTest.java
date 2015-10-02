@@ -1,16 +1,20 @@
 package com.tcmj.common.lang;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.Map;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.*;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 /**
  * com.tcmj.common.lang.Objects
@@ -64,7 +68,7 @@ public class ObjectsTest {
      * Test of notNull method, of class Objects.
      */
     @Test(expected = RuntimeException.class)
-    public void testNotNullWithCustomRuntimeException()  {
+    public void testNotNullWithCustomRuntimeException() {
         Date nullInstance = null;
         Objects.notNull(nullInstance, RuntimeException.class, "Here we have a custom RuntimeException in {}", this);
     }
@@ -98,10 +102,9 @@ public class ObjectsTest {
      */
     @Test
     public void testIsEmpty() {
-        //when
-        Integer five = null;
+
         assertThat("Any object", Objects.isEmpty(11), is(false));
-        assertThat("Any null object", Objects.isEmpty(five), is(true));
+        assertThat("Any null object", Objects.isEmpty(null), is(true));
 
         List<String> list = new ArrayList<>();
         assertThat("Empty List", Objects.isEmpty(list), is(true));
@@ -127,7 +130,9 @@ public class ObjectsTest {
         assertThat("Whitespace String", Objects.isEmpty(" "), is(false));
         assertThat("Non-Empty String", Objects.isEmpty("1"), is(false));
 
+        assertThat("Empty Stream", Objects.isEmpty(Stream.empty()), is(true));
+
+        //@todo add ResultSet test!
+
     }
-
-
 }

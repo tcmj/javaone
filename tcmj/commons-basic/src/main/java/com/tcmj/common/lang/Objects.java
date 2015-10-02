@@ -1,14 +1,18 @@
 package com.tcmj.common.lang;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.util.Collection;
 import java.util.Map;
+import java.util.stream.Stream;
 import java.util.zip.ZipFile;
 import com.tcmj.common.reflection.ReflectionHelper;
 import org.apache.commons.lang3.StringUtils;
 
 /**
  * Objects Utility class (like apaches Validate or Googles Precondition class or java.util.Objects).
- * <p/>
+ * <p>
  * All message strings can be formatted using the {@link org.slf4j.helpers.MessageFormatter} patterns
  * @author tcmj - Thomas Deutsch
  * @see java.util.Objects
@@ -86,7 +90,7 @@ public class Objects {
      * @throws IllegalStateException if the condition is false
      */
     public static boolean ensure(boolean condition, String msg, Object... params) {
-        if (condition == false) {
+        if (!condition) {
             throw new IllegalStateException(format(msg, params));
         }
         return true;
@@ -123,10 +127,11 @@ public class Objects {
      * checks if an object is null or empty.<br/>
      * Supports<br/>
      * <ul>
+     * <li>any 'null' object will be returned as 'false'</li>
      * <li>{@link java.util.Collection} (isEmpty())</li>
      * <li>{@link java.util.Map} (isEmpty)</li>
-     * <li>Primitive arrays (length == 0)</li>
-     * <li>Strings or {@link CharSequence} (length)</li>
+     * <li>Primitive arrays return true if obj.length == 0</li>
+     * <li>Strings or {@link CharSequence} return true if obj.length == 0</li>
      * <li>{@link java.util.zip.ZipFile} (size)</li>
      * </ul>
      * <b>All other classes will only be checked if they are null (=true) or not null (=false)!</b>
@@ -134,23 +139,50 @@ public class Objects {
      * @return boolean
      */
     public static boolean isEmpty(Object obj) {
+
         if (obj == null) {
             return true;
-        } else {
-            if (Collection.class.isAssignableFrom(obj.getClass())) {
-                return ((Collection) obj).isEmpty();
-            } else if (Map.class.isAssignableFrom(obj.getClass())) {
-                return ((Map) obj).isEmpty();
-            } else if (Object[].class.isAssignableFrom(obj.getClass())) {
-                return ((Object[]) obj).length == 0;
-            } else if (CharSequence.class.isAssignableFrom(obj.getClass())) {
-                return ((CharSequence) obj).length() == 0;
-            } else if (ZipFile.class.isAssignableFrom(obj.getClass())) {
-                return ((ZipFile) obj).size() == 0;
-            } else {
-                return false;
+        }
+        if (Collection.class.isAssignableFrom(obj.getClass())) {
+            return ((Collection) obj).isEmpty();
+        }
+        if (Map.class.isAssignableFrom(obj.getClass())) {
+            return ((Map) obj).isEmpty();
+        }
+        if (Object[].class.isAssignableFrom(obj.getClass())) {
+            return ((Object[]) obj).length == 0;
+        }
+        if (CharSequence.class.isAssignableFrom(obj.getClass())) {
+            return ((CharSequence) obj).length() == 0;
+        }
+        if (Number.class.isAssignableFrom(obj.getClass())) {
+            return ((Number) obj).longValue() == 0L;
+        }
+        if (Stream.class.isAssignableFrom(obj.getClass())) {
+            return ((Stream) obj).count() <= 0;
+        }
+        if (ZipFile.class.isAssignableFrom(obj.getClass())) {
+            return ((ZipFile) obj).size() == 0;
+        }
+        if (ResultSet.class.isAssignableFrom(obj.getClass())) {
+            try {
+                //true if the cursor is before the first row; false if the cursor is at any other position or the result set contains no rows
+                return !((ResultSet) obj).isBeforeFirst();
+            } catch (SQLFeatureNotSupportedException sqlfnsex) {
+                Objects.throwUnchecked(sqlfnsex); // Feature not supported by the jdbc driver
+            } catch (SQLException sqlex) {
+                return true;
             }
         }
+        throw new UnsupportedOperationException("Class " + obj.getClass() + " not supported for empty checks!");
+
+    }
+
+    /**
+     * Inverted version of {@link #isEmpty(Object)}
+     */
+    public static boolean isNotEmpty(Object obj) {
+        return !isEmpty(obj);
     }
 
     /**
