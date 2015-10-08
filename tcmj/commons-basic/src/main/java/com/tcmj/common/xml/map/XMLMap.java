@@ -89,6 +89,14 @@ public class XMLMap implements Map<String, String>, Serializable {
     }
 
     /**
+     * Constructor which takes a String passing it to the File constructor.
+     * @param xmlFilePath which goes to: 'new XMLMap(new File(String)).
+     */
+    public XMLMap(final String xmlFilePath) {
+        this(new File(xmlFilePath));
+    }
+
+    /**
      * Adds a Property without a Java-Object.
      * This Property can be saved with {@link #saveXML }
      * @param key Key Name
