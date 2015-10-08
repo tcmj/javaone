@@ -7,71 +7,49 @@
         <author email="tomdeu@gmail.com">Thomas Deutsch</author>
     </properties>
     <body>
+        <release version="2.15.10" date="2015-10-01" description="More goodies!">
+            <action dev="tcmj" type="fix">com.tcmj.common.xml.map.XMLMap fixed reading and writing and added some more features</action>
+        </release>
         <release version="2.15.08" date="2015-08-01" description="Java 8 Updates!">
-            <action dev="tcmj" type="update">
-                Further updates of JDK 8 including Lambdas.
-            </action>
+            <action dev="tcmj" type="update">com.tcmj.common.lang.Objects extended</action>
+            <action dev="tcmj" type="update">com.tcmj.common.reflection.ReflectionHelper added unit test</action>
+            <action dev="tcmj" type="update">com.tcmj.common.io.FileTool performance optimizations</action>
+            <action dev="tcmj" type="add">com.tcmj.common.crypto.AES cryptography tool added</action>
+            <action dev="tcmj" type="add">added dependency to com.google.guava:guava</action>
+            <action dev="tcmj" type="add">com.tcmj.common.mem.MemoryUtils ram usage tools added</action>
+            <action dev="tcmj" type="add">com.tcmj.common.text.HumanReadable tool to nicely format numbers and other values</action>
+            <action dev="tcmj" type="remove">removed test dependency org.slf4j:slf4j-simple</action>
+            <action dev="tcmj" type="add">added test dependency ch.qos.logback:logback-core and ch.qos.logback:logback-classic</action>
+            <action dev="tcmj" type="update">Further updates of JDK 8 including Lambdas.</action>
             <action dev="tcmj" type="update">com.tcmj.common.io.FileTool : Helper for file access</action>
         </release>
         <release version="2.15.02" date="2015-02-11" description="Java 8 Time!">
-            <action dev="tcmj" type="update">
-                Updated the whole library to JDK 8.
-            </action>
-            <action dev="tcmj" type="update">
-                XMLMap refactored
-            </action>
-            <action dev="tcmj" type="add">
-                ExceptionAdapter added to wrap checked exceptions into runtime exceptions
-            </action>
+            <action dev="tcmj" type="update">Updated the whole library to JDK 8.</action>
+            <action dev="tcmj" type="update">XMLMap refactored</action>
+            <action dev="tcmj" type="add">ExceptionAdapter added to wrap checked exceptions into runtime exceptions</action>
         </release>
         <release version="2.14.12" date="2014-12-24" description="Christmas Release">
-            <action dev="tdeut" type="add">
-                Added a new class 'ResourceBundleMerger'
-            </action>
-            <action dev="tdeut" type="add">
-                Added class com.tcmj.common.tools.date.Range with a nice range implementation
-            </action>
-            <action dev="tcmj" type="remove">
-                Removed a package level 'tools' in order to have a shorter path
-            </action>
-            <action dev="tdeut" type="update">
-                pom.xml updatet
-            </action>
+            <action dev="tdeut" type="add">Added a new class 'ResourceBundleMerger'</action>
+            <action dev="tdeut" type="add">Added class com.tcmj.common.tools.date.Range with a nice range implementation</action>
+            <action dev="tcmj" type="remove">Removed a package level 'tools' in order to have a shorter path</action>
+            <action dev="tdeut" type="update">pom.xml updatet</action>
         </release>
         <release version="2.12.05" date="2012-05-01" description="Enhancements">
-            <action dev="tdeut" type="add">
-                Added class com.tcmj.common.tools.lang.Close with methods to swallow exceptions or wrap exceptions to unchecked
-            </action>
-            <action dev="tdeut" type="add">
-                Added class com.tcmj.common.tools.lang.Download with methods to download files from URLs
-            </action>
+            <action dev="tdeut" type="add">Added class com.tcmj.common.tools.lang.Close with methods to swallow exceptions or wrap exceptions to unchecked</action>
+            <action dev="tdeut" type="add">Added class com.tcmj.common.tools.lang.Download with methods to download files from URLs</action>
         </release>
         <release version="2.11.04" date="2011-04-01" description="Enhancements">
-            <action dev="tdeut" type="add">
-                Added class com.tcmj.common.tools.lang.Check as a check utility class (like apaches Validate or Googles Precondition class)
-            </action>
-            <action dev="tdeut" type="update">
-                minor improvements
-            </action>
+            <action dev="tdeut" type="add">Added class com.tcmj.common.tools.lang.Check as a check utility class (like apaches Validate or Googles Precondition class)</action>
+            <action dev="tdeut" type="update">minor improvements</action>
         </release>
         <release version="2.11.01" date="2011-01-25" description="Enhancements">
-            <action dev="tdeut" type="add">
-                Added class com.tcmj.common.lang.Application with new methods to access some manifest entries
-            </action>
-            <action dev="tdeut" type="update">
-                improvements in the com.tcmj.common.tools.date.DateUtil class
-            </action>
+            <action dev="tdeut" type="add">Added class com.tcmj.common.lang.Application with new methods to access some manifest entries</action>
+            <action dev="tdeut" type="update">improvements in the com.tcmj.common.tools.date.DateUtil class</action>
         </release>
         <release version="2.10.06" date="2010-06-01" description="Subsequent release">
-            <action dev="tdeut" type="add">
-                 rebuilt the whole class structure
-            </action>
-            <action dev="tdeut" type="fix" issue="tcmj-common-001">
-                DateUtils calculation of the between method can handle calculations within different timezones now.
-            </action>
-            <action dev="tdeut" type="remove" due-to="Mr. X" due-to-email="x@exist.com">
-                Removed database access classes and moved them in a new maven artifact
-            </action>
+            <action dev="tdeut" type="add">rebuilt the whole class structure</action>
+            <action dev="tdeut" type="fix" issue="tcmj-common-001">DateUtils calculation of the between method can handle calculations within different timezones now.</action>
+            <action dev="tdeut" type="remove" due-to="Mr. X" due-to-email="x@exist.com">Removed database access classes and moved them in a new maven artifact</action>
         </release>
     </body>
 </document>
