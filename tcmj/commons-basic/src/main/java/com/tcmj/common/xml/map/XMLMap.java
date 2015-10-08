@@ -16,14 +16,17 @@ import com.tcmj.common.xml.map.intern.XMLMapException;
 import com.tcmj.common.xml.map.intern.XMLMapAccessor;
 
 /**
- * This class is a Map implementation for a XML-File.
- * The data will be stored in a map like structure where
- * the key can consist of one or more levels (separated) and the value.
- * Both (key and value) are strings (to write them into xml).
- * As a third part there is an option to append any java object to a key.
- * The XML File will be created if necessary or you can use an existing xml file
- * where you specify the node name into which your data will be stored. <br><br>
- * <b>Example</b><br>
+ * This class is a standard java collections 'Map' implementation to work with XML files.
+ * The data will be hel in the map whereas the key is the path/address of the xml element.
+ *
+ * <p>The key can consist of one or more levels (separated) and the value.<br/>
+ * Both (key and value) are strings (to be able to write them as xml).<br/>
+ * As a third part there is an option to append any java object to a key, which is useful for further processing in the
+ * application logic. These additonal objects of course cannot be persisted to the physical file.<br/>
+ * You can start from scratch to create new xml files or try to load existing ones, update some values and save them. <br/>
+ * Another nice feature is to read only a specific part of an xml file by using a so called xml entry point.</p>
+ *
+ * <p><b>Simple Example</b><br>
  * <code>
  *  File file = new File("filename.xml");<br>
  *  XMLMap model = new XMLMap(file);<br>
@@ -31,13 +34,15 @@ import com.tcmj.common.xml.map.intern.XMLMapAccessor;
  *  model.put("dates", "lastrun", "1979-11-02");<br>
  *  model.saveXML();<br>
  * </code>
- * <p>
+ * <p/>
+ * <p>To investigate all the features please have a look at the unit tests !</p>
  * @author Thomas Deutsch - thomas-deutsch@tcmj.de
  * <p>
  * Created on 28. Mai 2005, 00:53
  * Modified on 16. April 2007, 23:53
  * Modified on 27. March 2008, 23:49
  * Modified on 28. December 2014, 23:50
+ * Modified on 09. October 2015, 00:15
  */
 public class XMLMap implements Map<String, String>, Serializable {
 
@@ -126,7 +131,7 @@ public class XMLMap implements Map<String, String>, Serializable {
 
         /* Fehlerbehandlung fuer Fall 1:
          * put("oben","11");
-         * put("oben.unten","22");  
+         * put("oben.unten","22");
          */
         String[] keyparts = rexpattern.split(keytocheck);
 
@@ -148,7 +153,7 @@ public class XMLMap implements Map<String, String>, Serializable {
 
         /* Fehlerbehandlung fuer Fall 2:
          * put("oben.unten","22");
-         * put("oben","11"); 
+         * put("oben","11");
          */
         Iterator<String> itdata = data.keySet().iterator();
         while (itdata.hasNext()) {

@@ -6,16 +6,6 @@
  */
 package com.tcmj.common.xml.map;
 
-import com.tcmj.common.xml.map.intern.XMLMapException;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -27,6 +17,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import com.tcmj.common.xml.map.intern.XMLMapException;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
@@ -40,34 +39,23 @@ import static org.junit.Assert.assertThat;
 
 /**
  * JUnit Test for class {@link com.tcmj.common.xml.map.XMLMap}
- *
- * @author tcmj
+ * @author tcmj - Thomas Deutsch
  */
 public class XMLMapTest {
 
-    /**
-     * slf4j Logging framework.
-     */
+    /** slf4j Logging framework. */
     private static final transient Logger LOG = LoggerFactory.getLogger(XMLMap.class);
 
-    /**
-     * Path to the xml test files (IN/OUT).
-     */
+    /** Path to the xml test files (IN/OUT). */
     private static final String testdatapath = "src\\test\\resources\\com\\tcmj\\common\\xml\\map\\";
 
-    /**
-     * delete test files after exiting this test.
-     */
+    /** delete test files after exiting this test. */
     private static final boolean deleteOnExit = false;
 
-    /**
-     * Model.
-     */
+    /** Model. */
     private XMLMap xmlMap;
 
-    /**
-     * File handle to an XML file.
-     */
+    /** File handle to an XML file. */
     private static File file;
 
     @BeforeClass
@@ -82,7 +70,7 @@ public class XMLMapTest {
     public void beforeEachTest() {
         LOG.info("-------------------------------------------------------------------------------------------------------");
 
-        //2. New instance of XMLPropertyModels 
+        //2. New instance of XMLPropertyModels
         xmlMap = new XMLMap(file);
     }
 
@@ -508,7 +496,7 @@ public class XMLMapTest {
 
     /**
      * Test of containsValue method, of class com.tcmj.tools.xml.model.XMLMap.
-     * <p/>
+     * <p>
      * // XMLMap.XMLEntry a = null; // a = new
      * XMLMap.XMLEntry("key1","value1"){}; // // XMLMap.XMLEntry b = new
      * XMLEntry(null,"value1"); // // logger.info("equals "+a.equals(b)); // //
