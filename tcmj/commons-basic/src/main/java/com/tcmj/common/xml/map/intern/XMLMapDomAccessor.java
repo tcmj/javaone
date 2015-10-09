@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
@@ -282,7 +283,11 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
 
     @Override
     public void save(Map<String, XMLEntry> data, File outputfile) throws XMLMapException {
+        Objects.requireNonNull(outputfile, "Output file handle may not be null!");
+
         try {
+            //ensure existing dirs
+            outputfile.getParentFile().mkdirs();
 //        private void saveXML(File outputfile)
 //            throws FileNotFoundException, TransformerConfigurationException,
 //            UnsupportedEncodingException, TransformerException, IOException, ParserConfigurationException {
