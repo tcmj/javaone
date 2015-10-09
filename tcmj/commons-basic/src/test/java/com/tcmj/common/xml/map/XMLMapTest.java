@@ -7,23 +7,18 @@
 package com.tcmj.common.xml.map;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
 import com.tcmj.common.xml.map.intern.XMLMapException;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,44 +29,28 @@ import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 
 /**
  * JUnit Test for class {@link com.tcmj.common.xml.map.XMLMap}
+ * <b>In-Memory test cases</b>
  * @author tcmj - Thomas Deutsch
  */
+@FixMethodOrder(MethodSorters.DEFAULT)
 public class XMLMapTest {
 
     /** slf4j Logging framework. */
-    private static final transient Logger LOG = LoggerFactory.getLogger(XMLMap.class);
-
-    /** Path to the xml test files (IN/OUT). */
-    private static final String testdatapath = "src\\test\\resources\\com\\tcmj\\common\\xml\\map\\";
-
-    /** delete test files after exiting this test. */
-    private static final boolean deleteOnExit = false;
+    private static final transient Logger LOG = LoggerFactory.getLogger(XMLMapTest.class);
 
     /** Model. */
     private XMLMap xmlMap;
 
-    /** File handle to an XML file. */
-    private static File file;
-
-    @BeforeClass
-    public static final void initTestData() throws Exception {
-        URL resource = XMLMapTest.class.getResource("XMLMapTest.xml");
-        LOG.info("URL resource: {}", resource);
-        file = new File(resource.toURI());
-        LOG.info("Using file: {}", file);
-    }
-
     @Before
     public void beforeEachTest() {
-        LOG.info("-------------------------------------------------------------------------------------------------------");
-
-        //2. New instance of XMLPropertyModels
-        xmlMap = new XMLMap(file);
+        LOG.info(StringUtils.repeat('-', 130));
+        xmlMap = new XMLMap();
     }
 
     /**
@@ -285,34 +264,6 @@ public class XMLMapTest {
         assertEquals(size, xmlMap.size());
     }
 
-    /**
-     * Test of readXML method, of class com.tcmj.tools.xml.model.XMLMap.
-     */
-    @Test
-    public void testReadXMLSaveXML() throws FileNotFoundException, TransformerConfigurationException, UnsupportedEncodingException, TransformerException, IOException, XMLMapException, ParserConfigurationException {
-        LOG.info("testReadXMLSaveXML");
-        int size = xmlMap.size();
-        LOG.info("size: " + size);
-
-        xmlMap.saveXML();
-
-        xmlMap.readXML();
-
-        int size2 = xmlMap.size();
-
-        assertEquals(size, size2);
-
-        xmlMap.put("a", "a");
-        xmlMap.put("b", "b");
-        xmlMap.put("c", "c");
-        xmlMap.put("x.y.z", "myvalueXYZ");
-        xmlMap.saveXML();
-        xmlMap.readXML();
-
-        size2 = xmlMap.size();
-
-        assertEquals(4, size2);
-    }
 
     /**
      * Test of clear method, of class com.tcmj.tools.xml.model.XMLMap.
@@ -422,13 +373,11 @@ public class XMLMapTest {
     @Test
     public void testGetXMLFileHandle() {
         LOG.info("getXMLFileHandle");
-        assertNotNull(xmlMap.getXMLFileHandle());
+        assertThat("Expect default file handle", xmlMap.getXMLFileHandle(), notNullValue());
 
-        File a = new File(testdatapath + "file.xml");
-        xmlMap.setXMLFileHandle(a);
-
-        assertEquals(a, xmlMap.getXMLFileHandle());
-
+        File anyFile = new File("memoryfile.xml");
+        xmlMap.setXMLFileHandle(anyFile);
+        assertThat("Expect the handle set", xmlMap.getXMLFileHandle(), equalTo(anyFile));
     }
 
     /**
@@ -691,110 +640,6 @@ public class XMLMapTest {
 
     }
 
-    /**
-     * Test of LevelSeparators.
-     */
-    @Test
-    public void testLevelSeparators() throws Exception {
-        LOG.info("testLevelSeparators");
-        File testfile = new File(testdatapath, "XMLMapTest_testLevelSeparators_TMP.xml");
-        initFile(testfile);
-        String[] cases = new String[]{
-                ".", "-", "\\", ",", "*", "_", "ooo", "@", "/", "|", "=", "?",
-                "...", "x", "-|-", "||", "+"};
-        LOG.info(" Separators to Test: {}", Arrays.asList(cases));
-
-        for (int i = 0; i < cases.length; i++) {
-            if (testfile.exists()) {
-                testfile.delete();
-            }
-            String sep = cases[i];
-            String separatormsg = "Separator[" + sep + "]";
-
-            XMLMap xmap = new XMLMap(testfile);
-            xmap.setLevelSeparator(sep);
-
-            xmap.put("a" + sep + "b" + sep + "one", "xmap");
-
-            assertEquals(separatormsg, 1, xmap.size());
-
-            xmap.put("a" + sep + "b" + sep + "two", "xmap");
-
-            assertEquals(separatormsg, 2, xmap.size());
-
-            xmap.saveXML();
-            xmap.readXML();
-
-            assertEquals(separatormsg, 2, xmap.size());
-
-        }
-    }
-
-    /**
-     * Test of LevelSeparators.
-     */
-    @Test
-    public void testGetAttribute() throws Exception {
-        LOG.info("testGetAttribute");
-
-        File testfile = new File(testdatapath, "XMLMapTest_testGetAttribute.xml");
-
-        XMLMap xmap = new XMLMap(testfile);
-        xmap.setXMLEntryPoint("xmlmap");
-        xmap.readXML();
-
-//        xmap.put("level1", "level1");
-//        xmap.put("level2.level2", "level2");
-//        xmap.put("level3.level3.level3A", "level3");
-//        xmap.put("level3.level3.level3B", "level3");
-//        xmap.put("level3.level3.level3C", "level3");
-//        xmap.saveXML();
-//        logger.info(xmap.showDataEntries(false, true));
-        xmap.getAttribute("level1", "myat");
-
-        assertEquals("value1", xmap.get("level1"));
-        assertEquals("12", xmap.getAttribute("level1", "myat"));
-        assertEquals("435", xmap.getAttribute("level1", "myotherat"));
-
-        assertEquals("2", xmap.getAttribute("level2.childlevel2", "level"));
-        assertEquals("eins", xmap.getAttribute("level3.level3.level3A", "abc"));
-
-        File destfile = new File(testdatapath, "XMLMapTest_testGetAttributeOut_TMP.xml");
-        initFile(destfile);
-        xmap.setXMLFileHandle(destfile);
-        xmap.saveXML();
-
-    }
-
-    /**
-     * Test of SetAttribute.
-     */
-    @Test
-    public void testSetAttribute() throws Exception {
-        LOG.info("testSetAttribute");
-
-        File testfile = new File(testdatapath, "XMLMapTest_testSetAttribute_TMP.xml");
-        initFile(testfile);
-        XMLMap xmap = new XMLMap(testfile);
-
-        xmap.put("level1", "valuexy");
-        xmap.put("level2.level2", "value999");
-//        xmap.put("level3.level3.level3A", "level3");
-//        xmap.put("level3.level3.level3B", "level3");
-//        xmap.put("level3.level3.level3C", "level3");
-
-        xmap.setAttribute("level1", "myat", "435");
-        xmap.setAttribute("level1", "myotherat", "888");
-
-        xmap.setAttribute("level2.level2", "type", "ProjectCode");
-        xmap.saveXML();
-        xmap.readXML();
-
-        assertEquals("435", xmap.getAttribute("level1", "myat"));
-        assertEquals("888", xmap.getAttribute("level1", "myotherat"));
-        assertEquals("ProjectCode", xmap.getAttribute("level2.level2", "type"));
-
-    }
 
     @Test
     public void testConstructor() {
@@ -805,58 +650,5 @@ public class XMLMapTest {
         assertEquals("XMLMap.xml", xfile.getName());
     }
 
-    /**
-     * helper method to set that the generated xml-output-files should be
-     * deleted after jvm exit.
-     */
-    private static final void initFile(File file) {
-        if (deleteOnExit) {
-            file.deleteOnExit();
-        }
-    }
-
-    @Test
-    public void testXMLEntrypointReading() throws Exception {
-        LOG.info("testXMLEntrypoint");
-
-        //Create Test-XML-File:
-        File myfile = new File(testdatapath, "XMLMapTest_testXMLEntrypoint_TMP.xml");
-        if (myfile.exists()) {
-            myfile.delete();
-        }
-        initFile(myfile);
-
-        XMLMap xmap = new XMLMap(myfile);
-        xmap.put("anderer.pre", "dieser Eintrag darf nicht beruerhrt werden!");
-        xmap.put("one.two.three.four.five", "4711");
-        xmap.put("irgendwas.post", "dieser Eintrag darf nicht beruerhrt werden!");
-        xmap.saveXML();
-
-        //1. No Entrypoint
-        xmap.readXML();
-        LOG.info(xmap.showDataEntries(false, false));
-        assertEquals("1", "4711", xmap.get("one.two.three.four.five"));
-
-        //2. Entrypoint = one
-        xmap.setXMLEntryPoint("one");
-        xmap.readXML();
-        assertEquals("2", "4711", xmap.get("two.three.four.five"));
-
-        //3. Entrypoint = one
-        xmap.setXMLEntryPoint("one.two");
-        xmap.readXML();
-        assertEquals("3", "4711", xmap.get("three.four.five"));
-
-        //4. Entrypoint = one
-        xmap.setXMLEntryPoint("one.two.three");
-        xmap.readXML();
-        assertEquals("4", "4711", xmap.get("four.five"));
-
-        //5. Entrypoint = one
-        xmap.setXMLEntryPoint("one.two.three.four");
-        xmap.readXML();
-        assertEquals("5", "4711", xmap.get("five"));
-
-    }
 
 }

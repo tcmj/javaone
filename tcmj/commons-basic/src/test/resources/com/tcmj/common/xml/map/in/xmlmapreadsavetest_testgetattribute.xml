@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tcmj>
+    <xmlmap>
+        <level1 myat="12" myotherat="435">value1</level1>
+        <level2>
+            <childlevel2 level="2">value2</childlevel2>
+        </level2>
+        <level3>
+            <level3>
+                <level3A abc="eins">level3</level3A>
+                <level3B>level3</level3B>
+                <level3C>level3</level3C>
+            </level3>
+        </level3>
+        <level4>
+            <a>
+                <b abc="111">wert 345</b>
+                <b abc="222">wert 765</b>
+                <b abc="333">wert 637</b>
+            </a>
+        </level4>
+        <level5 att5="attribute of 5" />
+        <level6>
+            <child6 att6="attribute of 6" />
+        </level6>
+        <level7 nogo1="not possible">
+            <a nogo2="not possible">
+                <b go="possible">bbbbb</b>
+            </a>
+        </level7>
+    </xmlmap>
+</tcmj>
