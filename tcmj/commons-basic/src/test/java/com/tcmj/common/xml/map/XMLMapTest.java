@@ -642,13 +642,43 @@ public class XMLMapTest {
 
 
     @Test
-    public void testConstructor() {
-        LOG.info("testConstructor");
+    public void testConstructorEmpty() {
+        LOG.info("testConstructorEmpty");
         XMLMap xmap = new XMLMap();
-        File xfile = xmap.getXMLFileHandle();
-        LOG.info(xfile.getName());
-        assertEquals("XMLMap.xml", xfile.getName());
+        assertThat("FileHandle may not be null", xmap.getXMLFileHandle(), notNullValue());
+        assertThat("FileHandle Name", xmap.getXMLFileHandle().getName(), equalTo("XMLMap.xml"));
     }
 
+    @Test
+    public void testConstructorString() {
+        LOG.info("testConstructorString");
+        XMLMap xmap = new XMLMap("FooBar.xml");
+        assertThat("FileHandle may not be null", xmap.getXMLFileHandle(), notNullValue());
+        assertThat("FileHandle Name", xmap.getXMLFileHandle().getName(), equalTo("FooBar.xml"));
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testConstructorStringNull() {
+        LOG.info("testConstructorStringNull");
+        String fileName = null;
+        new XMLMap(fileName);
+    }
+
+    @Test
+    public void testConstructorFile() {
+        LOG.info("testConstructorFile");
+        File file = new File("FooBar.xml");
+        XMLMap xmap = new XMLMap(file);
+        assertThat("FileHandle may not be null", xmap.getXMLFileHandle(), notNullValue());
+        assertThat("FileHandle Name", xmap.getXMLFileHandle().getName(), equalTo("FooBar.xml"));
+        assertThat("FileHandle instance", xmap.getXMLFileHandle(), is(file));
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testConstructorFileNull() {
+        LOG.info("testConstructorFileNull");
+        File file = null;
+        new XMLMap(file);
+    }
 
 }

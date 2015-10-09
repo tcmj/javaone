@@ -93,7 +93,7 @@ public class XMLMap implements Map<String, String>, Serializable {
      * @param xmlFilePath which goes to: 'new XMLMap(new File(String)).
      */
     public XMLMap(final String xmlFilePath) {
-        this(new File(xmlFilePath));
+        this(new File(Objects.notNull(xmlFilePath, "XML File name (String) may not be null!")));
     }
 
     /**
