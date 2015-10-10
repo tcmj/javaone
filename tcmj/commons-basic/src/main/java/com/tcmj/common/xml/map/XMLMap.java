@@ -344,7 +344,7 @@ public class XMLMap implements Map<String, String>, Serializable {
         accessor.setLevelSeparator(getLevelSeparator());
         accessor.setXmlRootNodeName(getXMLRootNodeName());
         accessor.setXmlEntryPoint(getXMLEntryPoint());
-        accessor.setRexpattern(this.rexpattern);
+        accessor.setRegexPattern(this.rexpattern);
         return accessor;
     }
 

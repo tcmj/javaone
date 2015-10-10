@@ -52,13 +52,13 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
     /**
      * compiled pattern to split the keys.
      */
-    private Pattern rexpattern;
+    private Pattern regexpattern;
 
-    public XMLMapDomAccessor(String xmlRootNodeName, String xmlEntryPoint, String levelSeparator, Pattern rexpattern) {
+    public XMLMapDomAccessor(String xmlRootNodeName, String xmlEntryPoint, String levelSeparator, Pattern regexpattern) {
         this.xmlRootNodeName = xmlRootNodeName;
         this.xmlEntryPoint = xmlEntryPoint;
         this.levelSeparator = levelSeparator;
-        this.rexpattern = rexpattern;
+        this.regexpattern = regexpattern;
     }
 
     @Override
@@ -206,8 +206,7 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
 
     /**
      * Iterates recursive throug the XML Nodes.
-     *
-     * @param parent Parent Node
+     * @param node Parent Node
      */
     private void deeper(Node node, String path) {
 
@@ -215,26 +214,24 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
 
         if (child != null) {
 
-            String value = child.getNodeValue();
+            String childNodeValue = child.getNodeValue();
 
-            if (value != null && !"".equals(value.trim())) {
-//            if (value != null && !"".equals(value)) {
-//            if (value != null ) {
+            if (childNodeValue != null && !"".equals(childNodeValue.trim())) {
 
                 XMLEntry entry = data.get(path);
 
                 if (entry == null) {
-                    entry = new XMLEntry(path, value);
+                    entry = new XMLEntry(path, childNodeValue);
                     this.data.put(path, entry);
                 } else {
-                    entry.addValue(value);
+                    entry.addValue(childNodeValue);
                 }
 
                 parseAttributes(node, entry);
 
             } else {
 
-                LOG.trace("going deeper above {}...{}", new Object[]{path, value});
+                LOG.trace("loading next xml node underneath '{}'...", path);
 
                 while (child != null) {
 
@@ -254,6 +251,10 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
                             entry.addValue(child.getNodeValue());
                         }
                         entry.setXmlNodeType(child.getNodeType());
+                    }else if (child.getNodeType() == Node.COMMENT_NODE) {
+                        LOG.trace("skipping comment: {}", child.getNodeValue());
+                    }else {
+                        LOG.trace("skipping nodeType: {}", child.getNodeType());
                     }
 
                     child = child.getNextSibling();
@@ -378,6 +379,7 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
                 Map<String, String> allattribs = xmlentry.getAttributes();
                 if (allattribs != null) {
                     for (Map.Entry<String, String> aentry : allattribs.entrySet()) {
+                        System.out.println("aentry = " + aentry.getKey() +"aentry = " + aentry.getValue() );
                         element.setAttribute(aentry.getKey(), aentry.getValue());
                     }
                 }
@@ -488,7 +490,7 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
 
     @Override
     public Pattern getRegexPattern() {
-        return this.rexpattern;
+        return this.regexpattern;
     }
 
     /**
@@ -513,9 +515,9 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
     }
 
     /**
-     * @param rexpattern the rexpattern to set
+     * @param rexpattern the regexpattern to set
      */
-    public void setRexpattern(Pattern rexpattern) {
-        this.rexpattern = rexpattern;
+    public void setRegexPattern(Pattern rexpattern) {
+        this.regexpattern = rexpattern;
     }
 }

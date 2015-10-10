@@ -2,7 +2,7 @@ package com.tcmj.common.xml.map.intern;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -146,7 +146,7 @@ public class XMLEntry implements Map.Entry<String, String>, Serializable {
 
     public void addAttribute(String name, String value) {
         if (this.attributes == null) {
-            this.attributes = new HashMap<String, String>();
+            this.attributes = new LinkedHashMap<>();
         }
         this.attributes.put(name, value);
     }
