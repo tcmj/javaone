@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tcmj>
     <xmlmap>
+        <!--Level 1 with attributes and value -->
         <level1 myat="12" myotherat="435">value1</level1>
         <level2>
+            <!--Level 2.2 with attributes and value -->
             <childlevel2 level="2">value2</childlevel2>
         </level2>
         <level3>

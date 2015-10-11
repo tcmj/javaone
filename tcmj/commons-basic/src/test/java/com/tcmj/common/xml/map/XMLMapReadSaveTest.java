@@ -155,6 +155,7 @@ public class XMLMapReadSaveTest {
             xmap.readXML();
 
             assertEquals(separatormsg, 2, xmap.size());
+            LOG.info(" Separator: {}", xmap.showDataEntries(true,true));
 
         }
     }
@@ -184,6 +185,10 @@ public class XMLMapReadSaveTest {
 
         assertEquals("2", xmap.getAttribute("level2.childlevel2", "level"));
         assertEquals("eins", xmap.getAttribute("level3.level3.level3A", "abc"));
+
+        //todo create own comment test
+        assertThat("Comment available", xmap.getComment("level2.childlevel2"), equalTo("Level 2.2 with attributes and value "));
+
 
         //save...
         File destfile = new File(outputFilePath, "out_xmlmapreadsavetest_testgetattribute.xml");

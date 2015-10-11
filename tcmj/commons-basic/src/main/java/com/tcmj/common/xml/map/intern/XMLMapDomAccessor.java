@@ -221,8 +221,13 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
                 XMLEntry entry = data.get(path);
 
                 if (entry == null) {
+                    LOG.trace("creating a new map entry with key '{}' and value '{}'",  path, childNodeValue);
                     entry = new XMLEntry(path, childNodeValue);
                     this.data.put(path, entry);
+
+                    //search for comments:
+                    entry.setComment(searchBackwardForComment(child));
+
                 } else {
                     entry.addValue(childNodeValue);
                 }
@@ -245,18 +250,13 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
                         XMLEntry entry = data.get(path);
 
                         if (entry == null) {
+                            LOG.trace("creating a new map entry with key '{}' and value '{}'",  path, child.getNodeValue());
                             entry = new XMLEntry(path, child.getNodeValue());
                             this.data.put(path, entry);
                         } else {
                             entry.addValue(child.getNodeValue());
                         }
                         entry.setXmlNodeType(child.getNodeType());
-                    }else if (child.getNodeType() == Node.COMMENT_NODE) {
-                        LOG.trace("skipping comment: {}", child.getNodeValue());
-                    }else if (child.getNodeType() == Node.TEXT_NODE) {
-                        LOG.trace("skipping text node: {}", child.getNodeValue());
-                    }else {
-                        LOG.trace("skipping nodeType: {}", child.getNodeType());
                     }
 
                     child = child.getNextSibling();
@@ -270,12 +270,26 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
         }
     }
 
+    /**
+     * Searching backwards for a comment
+     * @return the comment
+     */
+    private String searchBackwardForComment(Node node) {
+        String comment = null;
+        Node actualNode =  node.getParentNode();
+        do {
+            if (actualNode != null && actualNode.getNodeType() == Node.COMMENT_NODE) {
+                LOG.error("comment found: {}", actualNode);
+                comment = actualNode.getNodeValue();
+            }
+            actualNode = actualNode.getPreviousSibling();
+        } while (comment == null && actualNode != null);
+        return comment;
+    }
+
     private void parseAttributes(Node node, XMLEntry entry) {
-
         if (node.hasAttributes()) {
-
             NamedNodeMap nnm = node.getAttributes();
-
             for (int index = 0; index < nnm.getLength(); index++) {
                 Node attnode = nnm.item(index);
                 LOG.trace("reading attribute of element '{}': '{}' = '{}'", node, attnode.getNodeName(), attnode.getNodeValue());
@@ -291,9 +305,8 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
         try {
             //ensure existing dirs
             outputfile.getParentFile().mkdirs();
-//        private void saveXML(File outputfile)
-//            throws FileNotFoundException, TransformerConfigurationException,
-//            UnsupportedEncodingException, TransformerException, IOException, ParserConfigurationException {
+
+
             Element root;
 
             if (document == null) {
@@ -359,9 +372,9 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
                 String keypart = null;
 
                 //Schleife durch alle parts des keys, wobei nicht vorhandene ebenen
-                //angelegt werden und bereits vorhandene �bersprungen!
-                //Zudem wird immer der aktuelle Knoten (actnode) und der Vorg�nger
-                //gespeichert (Vorg�nger wird ben�tigt bei Listen-Values)
+                //angelegt werden und bereits vorhandene übersprungen!
+                //Zudem wird immer der aktuelle Knoten (actnode) und der Vorgänger
+                //gespeichert (Vorgänger wird benötigt bei Listen-Values)
                 for (String part : keyparts) {
                     keypart = part;
                     //Key-Part suchen:
@@ -381,7 +394,6 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
                 Map<String, String> allattribs = xmlentry.getAttributes();
                 if (allattribs != null) {
                     for (Map.Entry<String, String> aentry : allattribs.entrySet()) {
-                        System.out.println("aentry = " + aentry.getKey() +"aentry = " + aentry.getValue() );
                         element.setAttribute(aentry.getKey(), aentry.getValue());
                     }
                 }
@@ -394,22 +406,14 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
                         actualnode.appendChild(document.createTextNode(xmlentry.getValue()));
                     }
                 } else {
-
                     String[] values = xmlentry.getListValue();
-
                     String val = values == null ? null : values[0];
-
                     if (values != null) {
                         actualnode.appendChild(document.createTextNode(val));
-
                         for (int ix = 1; ix < values.length; ix++) {
-
                             Node ngroup = document.createElement(keypart);
-
                             prevnode.appendChild(ngroup);
-
                             ngroup.appendChild(document.createTextNode(values[ix]));
-
                         }
                     }
                 }
