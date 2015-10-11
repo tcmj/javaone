@@ -253,6 +253,8 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
                         entry.setXmlNodeType(child.getNodeType());
                     }else if (child.getNodeType() == Node.COMMENT_NODE) {
                         LOG.trace("skipping comment: {}", child.getNodeValue());
+                    }else if (child.getNodeType() == Node.TEXT_NODE) {
+                        LOG.trace("skipping text node: {}", child.getNodeValue());
                     }else {
                         LOG.trace("skipping nodeType: {}", child.getNodeType());
                     }
@@ -324,7 +326,7 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
                 Node prevnode = uppernode.getPreviousSibling();
 
                 //...löschen:
-                if (prevnode.getNodeType() == Node.TEXT_NODE) {
+                if (prevnode != null && prevnode.getNodeType() == Node.TEXT_NODE) {
                     root.removeChild(prevnode);
                 }
 
