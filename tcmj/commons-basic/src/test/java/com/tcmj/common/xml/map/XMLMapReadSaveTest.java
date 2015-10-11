@@ -26,6 +26,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static junit.framework.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 
@@ -35,7 +37,7 @@ import static org.junit.Assert.assertThat;
  * The output files will be stored in: 'com.tcmj.common.xml.map.out' which can/will be deleted before testing
  * @author tcmj - Thomas Deutsch
  */
-@FixMethodOrder(MethodSorters.DEFAULT)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class XMLMapReadSaveTest {
 
     /** slf4j Logging framework. */
@@ -50,8 +52,6 @@ public class XMLMapReadSaveTest {
     /** delete test files after exiting this test. */
     private static final boolean deleteOnExit = false;
 
-    /** Model. */
-    private XMLMap xmlMap;
 
 
     @BeforeClass
@@ -80,50 +80,63 @@ public class XMLMapReadSaveTest {
     @Before
     public void beforeEachTest() {
         LOG.info(StringUtils.repeat('-', 130));
-        xmlMap = new XMLMap();
     }
 
-    /**
-     * Test of readXML method, of class com.tcmj.tools.xml.model.XMLMap.
-     */
     @Test
-    public void testReadXMLSaveXML() throws FileNotFoundException, TransformerConfigurationException, UnsupportedEncodingException, TransformerException, IOException, XMLMapException, ParserConfigurationException {
-        LOG.info("testReadXMLSaveXML");
-        int size = xmlMap.size();
-        LOG.info("size: " + size);
+    public void test_01_SimpleCreateAndSaveToXML() throws FileNotFoundException, TransformerConfigurationException, UnsupportedEncodingException, TransformerException, IOException, XMLMapException, ParserConfigurationException {
+        LOG.info("test_01_SimpleCreateAndSaveToXML");
+        XMLMap xmlMap = new XMLMap();
+        xmlMap.setXMLRootNodeName("XMLMapReadSaveTest");
 
-        File outputFile = new File(outputFilePath, "out_xmlmapreadsavetest_testreadxmlsavexml.xml");
+        //insert some values
+        xmlMap.put("bob", "cpp");
+        xmlMap.put("phil", "phyton");
+        xmlMap.put("john", "java");
+
+        assertThat("Looking for John", xmlMap.get("john"), equalTo("java"));
+        assertThat("Looking non-existing Norbert", xmlMap.get("norbert"), nullValue());
+        assertThat("3 values", xmlMap.size(), is(3));
+
+        File outputFile = new File(outputFilePath, "XMLMapReadSaveTest_test_01_SimpleCreateAndSaveToXML.xml");
         xmlMap.setXMLFileHandle(outputFile);
-
         xmlMap.saveXML();
-
-        xmlMap.readXML();
-
-        int size2 = xmlMap.size();
-
-        assertEquals(size, size2);
-
-        xmlMap.put("a", "a");
-        xmlMap.put("b", "b");
-        xmlMap.put("c", "John");
-        xmlMap.put("x.y.z", "myvalueXYZ");
-        xmlMap.saveXML();
-        xmlMap.readXML();
-
-        size2 = xmlMap.size();
-
-        assertEquals(4, size2);
 
         XMLMap map2 = new XMLMap(xmlMap.getXMLFileHandle());
         map2.readXML();
-        assertThat("Looking for John", map2.get("c"), equalTo("John"));
-
+        assertThat("Looking for John", map2.get("john"), equalTo("java"));
+        assertThat("Looking non-existing Norbert", map2.get("norbert"), nullValue());
+        assertThat("3 values", map2.size(), is(3));
 
     }
 
-    /**
-     * Test of LevelSeparators.
-     */
+    @Test
+    public void test_02_CreateLevelsAndSaveToXML() throws FileNotFoundException, TransformerConfigurationException, UnsupportedEncodingException, TransformerException, IOException, XMLMapException, ParserConfigurationException {
+        LOG.info("test_02_CreateLevelsAndSaveToXML");
+        XMLMap xmlMap = new XMLMap();
+        xmlMap.setXMLRootNodeName("XMLMapReadSaveTest");
+
+        //insert some values
+        xmlMap.put("a.b.one", "apple");
+        xmlMap.put("a.b.two", "banana");
+        xmlMap.put("a.b.three", "orange");
+
+        assertThat("Looking for a.b.two", xmlMap.get("a.b.two"), equalTo("banana"));
+        assertThat("Looking non-existing Norbert", xmlMap.get("norbert"), nullValue());
+        assertThat("3 values", xmlMap.size(), is(3));
+
+        File outputFile = new File(outputFilePath, "XMLMapReadSaveTest_test_02_CreateLevelsAndSaveToXML.xml");
+        xmlMap.setXMLFileHandle(outputFile);
+        xmlMap.saveXML();
+
+        XMLMap map2 = new XMLMap(xmlMap.getXMLFileHandle());
+        map2.readXML();
+        assertThat("Looking for a.b.two", map2.get("a.b.two"), equalTo("banana"));
+        assertThat("Looking non-existing Norbert", map2.get("norbert"), nullValue());
+        assertThat("3 values", map2.size(), is(3));
+
+    }
+
+
     @Test
     public void testLevelSeparators() throws Exception {
         LOG.info("testLevelSeparators");
@@ -131,12 +144,9 @@ public class XMLMapReadSaveTest {
         String[] cases = new String[]{
                 ".", "-", "\\", ",", "*", "_", "ooo", "@", "/", "|", "=", "?",
                 "...", "x", "-|-", "||", "+"};
-        LOG.info(" Separators to Test: {}", Arrays.asList(cases));
-
+        LOG.info("Separators to Test: {}", Arrays.asList(cases));
+        File outFile = new File(outputFilePath, "XMLMapReadSaveTest_testLevelSeparators.xml");
         for (int i = 0; i < cases.length; i++) {
-
-            File outFile = new File(outputFilePath, "out_xmlmapreadsavetest_testlevelseparators_" + i + ".xml");
-
             String sep = cases[i];
             String separatormsg = "Separator[" + sep + "]";
 
@@ -144,11 +154,9 @@ public class XMLMapReadSaveTest {
             xmap.setLevelSeparator(sep);
 
             xmap.put("a" + sep + "b" + sep + "one", "xmap");
-
             assertEquals(separatormsg, 1, xmap.size());
 
             xmap.put("a" + sep + "b" + sep + "two", "xmap");
-
             assertEquals(separatormsg, 2, xmap.size());
 
             xmap.saveXML();
@@ -170,13 +178,6 @@ public class XMLMapReadSaveTest {
         xmap.setXMLEntryPoint("xmlmap");
         xmap.readXML();
 
-//        xmap.put("level1", "level1");
-//        xmap.put("level2.level2", "level2");
-//        xmap.put("level3.level3.level3A", "level3");
-//        xmap.put("level3.level3.level3B", "level3");
-//        xmap.put("level3.level3.level3C", "level3");
-//        xmap.saveXML();
-//        logger.info(xmap.showDataEntries(false, true));
         xmap.getAttribute("level1", "myat");
 
         assertEquals("value1", xmap.get("level1"));
@@ -191,7 +192,7 @@ public class XMLMapReadSaveTest {
 
 
         //save...
-        File destfile = new File(outputFilePath, "out_xmlmapreadsavetest_testgetattribute.xml");
+        File destfile = new File(outputFilePath, "XMLMapReadSaveTest_testgetattribute.xml");
         xmap.setXMLFileHandle(destfile);
         xmap.saveXML();
 
@@ -202,7 +203,7 @@ public class XMLMapReadSaveTest {
         LOG.info("testSetAttribute");
 
 
-        File destfile = new File(outputFilePath, "out_xmlmapreadsavetest_testsetattribute.xml");
+        File destfile = new File(outputFilePath, "XMLMapReadSaveTest_testsetattribute.xml");
         XMLMap xmap = new XMLMap(destfile);
 
         xmap.put("level1", "valuexy");
