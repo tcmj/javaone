@@ -263,7 +263,7 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
                 }
             }
         } else {
-            LOG.trace("!!!! no childs: {}", path);
+            LOG.trace("no more childs: '{}'", path);
             XMLEntry entry = new XMLEntry(path, node.getNodeValue());
             parseAttributes(node, entry);
             this.data.put(path, entry);
@@ -278,7 +278,7 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
 
             for (int index = 0; index < nnm.getLength(); index++) {
                 Node attnode = nnm.item(index);
-                LOG.trace("reading attribute of element '{}': {} = {}", new Object[]{node, attnode.getNodeName(), attnode.getNodeValue()});
+                LOG.trace("reading attribute of element '{}': '{}' = '{}'", node, attnode.getNodeName(), attnode.getNodeValue());
                 entry.addAttribute(attnode.getNodeName(), attnode.getNodeValue());
             }
         }
