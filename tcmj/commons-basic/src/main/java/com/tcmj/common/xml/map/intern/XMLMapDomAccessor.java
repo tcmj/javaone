@@ -14,6 +14,7 @@ import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.ErrorListener;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -24,6 +25,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Comment;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -279,7 +281,7 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
         Node actualNode =  node.getParentNode();
         do {
             if (actualNode != null && actualNode.getNodeType() == Node.COMMENT_NODE) {
-                LOG.error("comment found: {}", actualNode);
+                LOG.trace("comment found: {}", actualNode);
                 comment = actualNode.getNodeValue();
             }
             actualNode = actualNode.getPreviousSibling();
@@ -338,20 +340,20 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
             if (uppernode != null) { //wenn er ein Kind namens <xMLEntryPoint> hat...
                 Node prevnode = uppernode.getPreviousSibling();
 
-                //...löschen:
+                //...delete the previous whitespace
                 if (prevnode != null && prevnode.getNodeType() == Node.TEXT_NODE) {
                     root.removeChild(prevnode);
                 }
-
+                //...delete the whole xml entry point
                 root.removeChild(uppernode);
 
             }
 
             if (getXMLEntryPoint() == null) {
-                //benutze root als <xMLEntryPoint>
+                //use root as xml entry point
                 uppernode = root;
             } else {
-                //Element <xMLEntryPoint> anlegen (default=<xmlprop>)
+                //create the xml-entry-point element
                 uppernode = document.createElement(getXMLEntryPoint());
                 root.appendChild(uppernode);
             }
@@ -381,6 +383,14 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
                     Node ngroup = searchNode(keypart, actualnode);
                     //wenn nicht gefunden --> anlegen:
                     if (ngroup == null) {
+
+                        //vor dem anlegen der letzten Ebene muss ggf der Kommentar geschrieben werden:
+                        //if a comment is available we have to write it before the last level
+                        if(xmlentry.getComment()!=null && part.equals(keyparts[keyparts.length-1])) {
+                            Comment comment = document.createComment(xmlentry.getComment());
+                            actualnode.appendChild(comment);
+                        }
+
                         ngroup = document.createElement(keypart);
                     }
                     actualnode.appendChild(ngroup);
@@ -429,8 +439,23 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
                 Transformer transformer = tfactory.newTransformer();
 
                 initOutputProperties(transformer);
+                transformer.setErrorListener(new ErrorListener() {
+                    @Override
+                    public void warning(TransformerException exception) throws TransformerException {
+                        LOG.warn("Transformer warning!",exception);
+                    }
+                    @Override
+                    public void error(TransformerException exception) throws TransformerException {
+                        LOG.error("Transformer error!", exception);
+                    }
 
+                    @Override
+                    public void fatalError(TransformerException exception) throws TransformerException {
+                        error(exception);
+                    }
+                });
                 transformer.transform(new DOMSource(document), new StreamResult(new OutputStreamWriter(outpt, "UTF-8")));
+
 
             } catch (IOException ioe) {
                 throw ioe;
@@ -448,7 +473,7 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
         outprops.put(OutputKeys.METHOD, "xml");
         outprops.put(OutputKeys.MEDIA_TYPE, "text/xml");
         outprops.put(OutputKeys.ENCODING, "UTF-8");
-        outprops.put(OutputKeys.INDENT, "2");
+        outprops.put(OutputKeys.INDENT, "yes");
         outprops.put("{http://xml.apache.org/xalan}indent-amount", "2");
 
         for (Map.Entry<String, String> entrySet : outprops.entrySet()) {
