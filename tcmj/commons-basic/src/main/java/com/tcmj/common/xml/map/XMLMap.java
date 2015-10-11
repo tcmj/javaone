@@ -395,6 +395,23 @@ public class XMLMap implements Map<String, String>, Serializable {
         entry.addAttribute(attribname, value);
     }
 
+
+    public String getComment(String key) {
+        XMLEntry entry = data.get(key);
+        if (entry == null) {
+            throw new XMLMapException("Entry not found for key: " + key);
+        }
+        return entry.getComment();
+    }
+
+    public void setComment(String key, String value) {
+        XMLEntry entry = data.get(key);
+        if (entry == null) {
+            throw new XMLMapException("Entry not found for key: " + key);
+        }
+        entry.setComment(value);
+    }
+
     /** Clears all entries in the model.
      * if you save the model (after calling this method) you will get an empty
      * xmlfile area (non XMLMap - nodes will not be deleted)

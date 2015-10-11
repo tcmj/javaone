@@ -681,4 +681,33 @@ public class XMLMapTest {
         new XMLMap(file);
     }
 
+    @Test
+    public void testComments() throws Exception {
+        LOG.info("testComments");
+        //given
+        XMLMap map = new XMLMap();
+        String key = "one.two.three";
+        String comment = "This is the comment for one.two.three: ";
+        map.put(key, "theValue!");
+        //initially no comment was set so we want a null value
+        assertThat("No comment returns null", map.getComment(key), nullValue());
+        //when we set a comment
+        map.setComment(key, comment);
+        //we expect the same comment in return
+        assertThat("getComment", map.getComment(key), equalTo(comment));
+        //deletion of the comment by setting null
+        map.setComment(key, null);
+        assertThat("No comment returns null", map.getComment(key), nullValue());
+
+        //finally we want a exception if we work on a non existant key
+        try {
+            map.setComment("no.existant.key", null);
+            fail("No exception thrown! XMLMapException expected!");
+        }catch (XMLMapException mex){
+            assertThat("Exception", mex.getMessage(), equalTo("Entry not found for key: no.existant.key"));
+        }
+
+
+    }
+
 }

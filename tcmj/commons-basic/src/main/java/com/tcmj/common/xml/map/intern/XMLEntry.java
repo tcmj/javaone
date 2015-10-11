@@ -25,7 +25,8 @@ public class XMLEntry implements Map.Entry<String, String>, Serializable {
     private Object[] object;
     /** Attributes. */
     private Map<String, String> attributes;
-
+    /** Comment. */
+    private String comment;
     /**
      * Constructor 1.
      * @param key keyname
@@ -218,5 +219,13 @@ public class XMLEntry implements Map.Entry<String, String>, Serializable {
      */
     public void setXmlNodeType(int xmlNodeType) {
         this.xmlNodeType = xmlNodeType;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }
