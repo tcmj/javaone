@@ -124,6 +124,11 @@ public class XMLEntry implements Map.Entry<String, String>, Serializable {
         return old;
     }
 
+    /**
+     * Used for multiple values on the last node.
+     * The type of the entity will be marked as TYPE_MULTI.
+     * @param val the value to be added (on the same key)
+     */
     public void addValue(String val) {
 
         type = TYPE_MULTI;
