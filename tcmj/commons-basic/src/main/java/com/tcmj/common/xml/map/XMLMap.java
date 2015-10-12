@@ -275,6 +275,7 @@ public class XMLMap implements Map<String, String>, Serializable {
         return (entry == null) ? null : entry.getListValue();
     }
 
+
     /**
      * Adds one ore more values to a key.<br>
      * This Property can be saved with {@link #saveXML }
@@ -368,20 +369,36 @@ public class XMLMap implements Map<String, String>, Serializable {
     }
 
     public String getAttribute(String key, String attribname) {
-
         XMLEntry entry = data.get(key);
-
         if (entry == null) {
             throw new XMLMapException("Entry not found for key: " + key);
         }
-
         Map<String, String> allattribs = entry.getAttributes();
         if (allattribs == null) {
-            throw new XMLMapException("No Attributes found for key: " + key);
+            //throw new XMLMapException("No Attributes found for key: " + key);
+            return null;
         }
         String attribvalue = allattribs.get(attribname);
 
         return attribvalue;
+    }
+
+    /**
+     * Gets the attribute value of a specific key on multi type entries.
+     * @param key full path to look for
+     * @return the value or null if entry not found.
+     */
+    public String[] getListAttribute(String key, String attribname) {
+        XMLEntry entry = data.get(key);
+        if (entry == null) {
+            throw new XMLMapException("Entry not found for key: " + key);
+        }
+        Map<String, String> allattribs = entry.getListAttributes();
+        if (allattribs == null) {
+            return null;
+        }
+        String attribvalue = allattribs.get(attribname);
+        return attribvalue.split(mask("|"));
     }
 
     public void setAttribute(String key, String attribname, String value) {
@@ -454,7 +471,10 @@ public class XMLMap implements Map<String, String>, Serializable {
                     if (map != null) {
                         buffer.append(" A:[").append(map.entrySet()).append("]");
                     }
-
+                     map = entry.getListAttributes();
+                    if (map != null) {
+                        buffer.append(" A:").append(map.entrySet());
+                    }
                 }
 
                 buffer.append(line);

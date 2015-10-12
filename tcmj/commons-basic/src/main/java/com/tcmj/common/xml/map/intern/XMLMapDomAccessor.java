@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -398,47 +399,75 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
                     actualnode = ngroup;
                 }
 
-                Element element = (Element) actualnode;
+                if (xmlentry.getValue() != null) { //create single value...
 
-                //Attribute anlegen
-                Map<String, String> allattribs = xmlentry.getAttributes();
-                if (allattribs != null) {
-                    for (Map.Entry<String, String> aentry : allattribs.entrySet()) {
-                        element.setAttribute(aentry.getKey(), aentry.getValue());
+                    //create and set all available attributes on the (single) xml element
+                    Map<String, String> allattribs = xmlentry.getAttributes();
+                    if (allattribs != null) {
+                        for (Map.Entry<String, String> aentry : allattribs.entrySet()) {
+                            ((Element) actualnode).setAttribute(aentry.getKey(), aentry.getValue());
+                        }
                     }
-                }
 
-                //Value oder Values anlegen:
-                if (xmlentry.getValue() != null) {
+                    //create and append the text node / cdata text node
+                    //todo also implement cdata text node for multiple values aka list values
                     if (xmlentry.getXmlNodeType() == Node.CDATA_SECTION_NODE) {
                         actualnode.appendChild(document.createCDATASection(xmlentry.getValue()));
                     } else {
                         actualnode.appendChild(document.createTextNode(xmlentry.getValue()));
                     }
-                } else {
+                } else { //..or create list values
+
+                    //Prepare to create attributes
+                    Map<String, String> allattribs = xmlentry.getListAttributes();
+
                     String[] values = xmlentry.getListValue();
                     String val = values == null ? null : values[0];
                     if (values != null) {
+                        //Append the value on the allready existing first tag
                         actualnode.appendChild(document.createTextNode(val));
+                        //Process first attribute (if any)
+                        if (allattribs != null) {
+                            Map.Entry<String, String> aentry = allattribs.entrySet().stream().findFirst().orElse(null);
+                            if(aentry!=null){
+                                String[] attrvalues = aentry.getValue().split("\\|");
+                                if (attrvalues[0] != null) {
+                                    ((Element) actualnode).setAttribute(aentry.getKey(), attrvalues[0]);
+                                }
+                            }
+                        }
+
+                        //Process second to last list elements and attributes (if more than once)
                         for (int ix = 1; ix < values.length; ix++) {
-                            Node ngroup = document.createElement(keypart);
+                            Element ngroup = document.createElement(keypart);
+                            if (allattribs != null) {
+                                for (Map.Entry<String, String> aentry : allattribs.entrySet()) {
+                                    String[] attrvalues = aentry.getValue().split("\\|");
+                                    if(attrvalues[ix-1]!=null){
+                                        ngroup.setAttribute(aentry.getKey(), attrvalues[ix]);
+                                    }
+                                }
+                            }
+                            //append the xml tag
                             prevnode.appendChild(ngroup);
+                            //append the real value of the (list) element (TextNode = value between tags)
                             ngroup.appendChild(document.createTextNode(values[ix]));
                         }
                     }
                 }
             }
 
+            //write the - in memory created - xml document to a file
             try (FileOutputStream outpt = new FileOutputStream(outputfile)) {
-
                 TransformerFactory tfactory = TransformerFactory.newInstance();
                 try {
-                    tfactory.setAttribute("indent-number", 2);
+                    tfactory.setAttribute("indent-number", 4);
                 } catch (IllegalArgumentException e) {
                 }
                 Transformer transformer = tfactory.newTransformer();
 
                 initOutputProperties(transformer);
+
                 transformer.setErrorListener(new ErrorListener() {
                     @Override
                     public void warning(TransformerException exception) throws TransformerException {
@@ -454,8 +483,9 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
                         error(exception);
                     }
                 });
-                transformer.transform(new DOMSource(document), new StreamResult(new OutputStreamWriter(outpt, "UTF-8")));
 
+                //this last call does the job:
+                transformer.transform(new DOMSource(document), new StreamResult(new OutputStreamWriter(outpt, "UTF-8")));
 
             } catch (IOException ioe) {
                 throw ioe;
@@ -474,7 +504,7 @@ public class XMLMapDomAccessor implements XMLMapAccessor {
         outprops.put(OutputKeys.MEDIA_TYPE, "text/xml");
         outprops.put(OutputKeys.ENCODING, "UTF-8");
         outprops.put(OutputKeys.INDENT, "yes");
-        outprops.put("{http://xml.apache.org/xalan}indent-amount", "2");
+        outprops.put("{http://xml.apache.org/xalan}indent-amount", "4");
 
         for (Map.Entry<String, String> entrySet : outprops.entrySet()) {
             try {

@@ -149,13 +149,25 @@ public class XMLEntry implements Map.Entry<String, String>, Serializable {
         }
         if(!this.attributes.containsKey(name)){
             this.attributes.put(name, value);
-        }else{
-            System.err.println("Warning cannot handle attributes on list values at the moment!");
+        }else {
+            //Get the value using the key and append the value with a '|' as separator
+            String attrValue = this.attributes.get(name);
+            this.attributes.put(name, attrValue + "|" + value);
         }
     }
 
     public Map<String, String> getAttributes() {
-        return this.attributes;
+        if (type == TYPE_SINGLE) {
+            return this.attributes;
+        }
+        return null;
+    }
+
+    public Map<String, String> getListAttributes() {
+        if (type == TYPE_MULTI) {
+            return this.attributes;
+        }
+        return null;
     }
 
     @Override

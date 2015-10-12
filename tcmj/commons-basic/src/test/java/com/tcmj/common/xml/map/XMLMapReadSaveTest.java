@@ -136,8 +136,42 @@ public class XMLMapReadSaveTest {
 
     }
 
-
     @Test
+    public void test_03_AttributesOnListValues() throws Exception {
+        LOG.info("test_03_AttributesOnListValues");
+        XMLMap xmlMap = new XMLMap();
+        xmlMap.setXMLRootNodeName("tcmj");
+        xmlMap.setXMLEntryPoint("xmlmap");
+        File inputFile = new File(inputFilePath, "xmlmapreadsavetest_testattributesonmultivalues.xml");
+        xmlMap.setXMLFileHandle(inputFile);
+        xmlMap.readXML();
+        LOG.info("test_03_AttributesOnListValues {}", xmlMap.showDataEntries(false,true));
+
+        String value = xmlMap.get("level.a.b");
+        assertThat("get should return null on multi-entries", value, nullValue());
+
+        String[] values = xmlMap.getListValue("level.a.b");
+        assertThat("Looking for a.b.two - 1", values[0], equalTo("wert 345"));
+        assertThat("Looking for a.b.two - 2", values[1], equalTo("wert 765"));
+        assertThat("Looking for a.b.two - 3", values[2], equalTo("wert 637"));
+
+        String attribute = xmlMap.getAttribute("level.a.b","abc");
+        assertThat("getAttribute should return null on multi-entries", attribute, nullValue());
+
+        String[] attrValues = xmlMap.getListAttribute("level.a.b", "abc");
+        assertThat("Looking for a.b.two - 1", attrValues[0], equalTo("111"));
+        assertThat("Looking for a.b.two - 2", attrValues[1], equalTo("222"));
+        assertThat("Looking for a.b.two - 3", attrValues[2], equalTo("333"));
+
+        File outFile = new File(outputFilePath, "XMLMapReadSaveTest_test_03_AttributesOnListValues.xml");
+        xmlMap.setXMLFileHandle(outFile);
+        xmlMap.saveXML();
+
+        //todo test if saving doesn't destruct the xml file
+    }
+
+
+        @Test
     public void testLevelSeparators() throws Exception {
         LOG.info("testLevelSeparators");
 
