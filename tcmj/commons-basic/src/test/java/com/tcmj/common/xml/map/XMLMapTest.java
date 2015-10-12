@@ -739,4 +739,50 @@ public class XMLMapTest {
         }
     }
 
+    @Test
+    public void testAttributesOnListValues() throws Exception {
+        LOG.info("testAttributesOnListValues");
+        //given ..multi type / list entry
+        XMLMap map = new XMLMap();
+        String listkey = "year.week.day";
+        map.putListValue(listkey, new String[]{"Monday", "Tuesday", "Wednesday", "Thursday", "Friday"});
+        LOG.info("{}", map.showDataEntries(false, true));
+
+        String attributeKey = "no";
+
+        //initially we expect both methods to return null because of non existing attribute
+        assertThat("getAttribute 1", map.getAttribute(listkey, attributeKey), nullValue());
+        assertThat("getListAttribute 1", map.getListAttribute(listkey, attributeKey), nullValue());
+
+        //when we set attributes on the list values we have to use same amount and order
+        //todo implement setAttribute with index option
+        //todo change this to putListAttributes (same like putListValues) !!!!!!!!!!!
+        map.setAttribute(listkey, attributeKey, "1"); //Monday
+        map.setAttribute(listkey, attributeKey, "2");
+        map.setAttribute(listkey, attributeKey, "3");
+        map.setAttribute(listkey, attributeKey, "4");
+        map.setAttribute(listkey, attributeKey, "5"); //Friday
+
+        LOG.info("{}", map.showDataEntries(false, true));
+
+        //then...getAttribute returns null even on existing key and attributeName
+        assertThat("getAttribute 2", map.getAttribute(listkey, attributeKey), nullValue());
+
+        //then...getListAttribute returns the values we want to get
+        String[] listAttributes = map.getListAttribute(listkey, attributeKey);
+
+        assertThat("getAttribute", listAttributes[0], equalTo("1"));
+        assertThat("getAttribute", listAttributes[1], equalTo("2"));
+        assertThat("getAttribute", listAttributes[2], equalTo("3"));
+        assertThat("getAttribute", listAttributes[3], equalTo("4"));
+        assertThat("getAttribute", listAttributes[4], equalTo("5"));
+
+        //we want a exception if we try to delete a attribute of a list value
+        try {
+            map.setAttribute(listkey, attributeKey, null);
+            fail("No exception thrown! XMLMapException expected!");
+        }catch (UnsupportedOperationException mex){
+            assertThat("Exception", mex.getMessage(), equalTo("deletion on multi types not supported!"));
+        }
+    }
 }
