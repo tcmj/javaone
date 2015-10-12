@@ -11,7 +11,6 @@ import java.util.Map;
  * @author tcmj - Thomas Deutsch - tdeut
  */
 public class XMLEntry implements Map.Entry<String, String>, Serializable {
-
     private static final long serialVersionUID = -3974837921466840353L;
     private static final int TYPE_SINGLE = 0x0;
     private static final int TYPE_MULTI = 0x1;
@@ -131,30 +130,28 @@ public class XMLEntry implements Map.Entry<String, String>, Serializable {
      * @param val the value to be added (on the same key)
      */
     public void addValue(String val) {
-
         type = TYPE_MULTI;
-
         int newsize = this.value.length + 1;
-
         String nvalue[] = new String[newsize];
         Object nobject[] = new Object[newsize];
-
         for (int i = 0; i < this.value.length; i++) {
             nvalue[i] = value[i];
             nobject[i] = object[i];
         }
         nvalue[newsize - 1] = val;
-
         this.value = nvalue;
         this.object = nobject;
-
     }
 
     public void addAttribute(String name, String value) {
         if (this.attributes == null) {
             this.attributes = new LinkedHashMap<>();
         }
-        this.attributes.put(name, value);
+        if(!this.attributes.containsKey(name)){
+            this.attributes.put(name, value);
+        }else{
+            System.err.println("Warning cannot handle attributes on list values at the moment!");
+        }
     }
 
     public Map<String, String> getAttributes() {
@@ -169,25 +166,18 @@ public class XMLEntry implements Map.Entry<String, String>, Serializable {
 
     @Override
     public boolean equals(Object no2) {
-
         if (!(no2 instanceof XMLEntry) && !(no2 instanceof String)) {
             return false;
         } else {
-
             if (no2 instanceof XMLEntry) {
-
                 XMLEntry obj = (XMLEntry) no2;
-
                 if (obj.key == null || this.key.equals(obj.getKey())) {
-
                     if (this.value.length != obj.value.length) {
                         return false;
                     } else {
-
                         if (!this.value[0].equals(obj.value[0])) {
                             return false;
                         } else {
-
                             for (int i = 1; i < value.length; i++) {
                                 if (!this.value[i].equals(obj.value[i])) {
                                     return false;
@@ -204,7 +194,6 @@ public class XMLEntry implements Map.Entry<String, String>, Serializable {
                 return this.value[0].equals(obj2);
             }
         }
-
     }
 
     /**
