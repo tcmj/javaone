@@ -147,12 +147,22 @@ public class XMLEntry implements Map.Entry<String, String>, Serializable {
         if (this.attributes == null) {
             this.attributes = new LinkedHashMap<>();
         }
-        if(!this.attributes.containsKey(name)){
+        if (!this.attributes.containsKey(name)) {
             this.attributes.put(name, value);
-        }else {
+        } else {
             //Get the value using the key and append the value with a '|' as separator
             String attrValue = this.attributes.get(name);
-            this.attributes.put(name, attrValue + "|" + value);
+
+            //deletion or add ?
+            if (type == TYPE_SINGLE && value == null) {
+                this.attributes.remove(name);
+            } else if (type == TYPE_MULTI && value == null) {
+                throw new UnsupportedOperationException("deletion on multi types not supported!");
+            } else if (type == TYPE_SINGLE && value != null) {
+                this.attributes.put(name, value);
+            } else if (type == TYPE_MULTI && value != null) {
+                this.attributes.put(name, attrValue + "|" + value);
+            }
         }
     }
 

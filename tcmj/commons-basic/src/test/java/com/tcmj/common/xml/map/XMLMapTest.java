@@ -710,4 +710,33 @@ public class XMLMapTest {
 
     }
 
+    @Test
+    public void testAttributes() throws Exception {
+        LOG.info("testAttributes");
+        //given ..single type entry
+        XMLMap map = new XMLMap();
+        String key = "cars.mitsubishi";
+        String attributeKey = "color";
+        String attributeValue = "black";
+        map.put(key, "SpaceStar");
+
+        assertThat("No attribute returns null", map.getAttribute(key, attributeKey), nullValue());
+
+        //when we set the attribute
+        map.setAttribute(key, attributeKey, attributeValue);
+        //we expect to get the same
+        assertThat("getAttribute", map.getAttribute(key, attributeKey), equalTo(attributeValue));
+        //deletion of the attribute by setting null
+        map.setAttribute(key, attributeKey, null);
+        assertThat("No attribute returns null", map.getAttribute(key, attributeKey), nullValue());
+
+        //finally we want a exception if we work on a non existant key
+        try {
+            map.setAttribute("no.existant.key", "bla", "blub");
+            fail("No exception thrown! XMLMapException expected!");
+        }catch (XMLMapException mex){
+            assertThat("Exception", mex.getMessage(), equalTo("Entry not found for key: no.existant.key"));
+        }
+    }
+
 }
