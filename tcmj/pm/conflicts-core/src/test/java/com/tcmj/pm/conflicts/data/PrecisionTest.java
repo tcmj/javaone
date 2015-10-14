@@ -12,13 +12,9 @@ import java.io.ObjectOutputStream;
 import org.junit.Test;
 
 /**
- *
- * @author Administrator
+ * PrecisionTest.
  */
 public class PrecisionTest {
-
-    public PrecisionTest() {
-    }
 
 
     /**

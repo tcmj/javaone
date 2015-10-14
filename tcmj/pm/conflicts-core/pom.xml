@@ -23,11 +23,11 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
-         <dependency>
-            <groupId>com.tcmj.common</groupId>
-            <artifactId>commons-basic</artifactId>
-        </dependency>
-        <!-- TEST DEPENDENCIES -->
+        <!--<dependency>
+           <groupId>com.tcmj.common</groupId>
+           <artifactId>commons-basic</artifactId>
+       </dependency>-->
+       <!-- TEST DEPENDENCIES -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

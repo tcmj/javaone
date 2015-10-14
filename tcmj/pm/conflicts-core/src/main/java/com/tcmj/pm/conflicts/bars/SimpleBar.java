@@ -13,7 +13,7 @@ import java.util.Map;
  * Represents a TimePeriod fragment with start and end date.
  * You can also set a weight (eg. jobtime).
  * Last Modify: $Date: 2009/04/02 10:07:05 $ by $Author: TDEUT $
- * @version $Revision: 1.2 $ 
+ * @version $Revision: 1.2 $
  * @author tdeut Thomas Deutsch
  */
 public class SimpleBar implements Bar {
@@ -30,8 +30,6 @@ public class SimpleBar implements Bar {
     /** Weight (default = 1.0). */
     private double weight = 1.0D;
 
-//    /** Origin object (can be any java object eg.: Assignment, Task etc). */
-//    private Object _origin;
     /** Properties of bar. can be used individually. Is not used in the algorithmus! */
     protected Map<String, Object> properties;
 

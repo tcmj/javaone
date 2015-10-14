@@ -40,7 +40,7 @@ public class SCaseTest {
 //            PatternLayout pl = new PatternLayout(" %m %n");
 //            ConsoleAppender console = new ConsoleAppender(pl);
 //            console.setName("unique");
-//            logger.addAppender(console);
+//            LOG.addAppender(console);
 //
 //    }
 
@@ -104,7 +104,7 @@ public class SCaseTest {
 
 
 
-        //expect one conflict 
+        //expect one conflict
         List<OutputBar> resultC = cfinder.getOutputConflictList();
         assertEquals("conflicts", 1, resultC.size());
         assertBar(result, 1, date(2009, 3, 1), date(2009, 3, 31), 2D);

@@ -12,13 +12,12 @@ import com.tcmj.pm.conflicts.bars.Bar;
 /**
  * SortItem.
  * Last Modify: $Date: 2009/04/30 09:57:04 $ by $Author: TDEUT $
- * @version $Rev$  
+ * @version $Rev$
  * @author tdeut Thomas Deutsch
  */
 public class SortItem implements Comparable<SortItem> {
 
     public enum SortItemType {
-
         STARTITEM, ENDITEM
     };
 

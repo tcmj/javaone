@@ -5,35 +5,38 @@
  */
 package com.tcmj.pm.conflicts.data;
 
-import com.tcmj.pm.conflicts.bars.OutputBar;
-import com.tcmj.pm.conflicts.bars.SimpleBar;
-import org.slf4j.Logger;
-
-import com.tcmj.pm.conflicts.ConflictFinder;
-import com.tcmj.pm.conflicts.bars.Bar;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import com.tcmj.pm.conflicts.ConflictFinder;
+import com.tcmj.pm.conflicts.bars.Bar;
+import com.tcmj.pm.conflicts.bars.OutputBar;
+import com.tcmj.pm.conflicts.bars.SimpleBar;
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static com.tcmj.pm.junit.BarAssert.assertBar;
+import static com.tcmj.pm.junit.BarAssert.assertConflict;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertThat;
 
-import static com.tcmj.common.date.DateTool.date;
-import static com.tcmj.pm.junit.BarAssert.*;
-
-import static org.junit.Assert.*;
-
-/**
- *
- * @author tdeut
- */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ConflictFinderTest {
 
-    /** Logging framework. */
-    protected static final transient Logger logger = LoggerFactory.getLogger(ConflictFinderTest.class);
+    /** Logging framework slf4j. */
+    private static final Logger LOG = LoggerFactory.getLogger(ConflictFinderTest.class);
 
     /** Internal Dateformatter. */
     private static final DateFormat DFORM = new SimpleDateFormat("yyyy-MM-dd (H' Uhr')");
@@ -43,8 +46,21 @@ public class ConflictFinderTest {
     public void beforeEachTest() {
     }
 
-
-    /** internal helper method to display the in-/outputbars.*/
+    public static Date date(int year, int month, int day) {
+        return date(year, month, day, 0);
+    }
+    public static Date date(int year, int month, int day, int hour) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.MONTH, (month - 1));
+        calendar.set(Calendar.DAY_OF_MONTH, day);
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTime();
+    }
+    /** internal helper method to display the in-/outputbars. */
     private void outputBarList(List<? extends Bar> barlist, char type) {
         String prefix;
         if (type == 'I' || type == 'i') {
@@ -56,80 +72,73 @@ public class ConflictFinderTest {
         } else {
             prefix = "";
         }
-        logger.info("  >-outputBarList()------------------------------------------------------------>");
+        LOG.info("  >-outputBarList()------------------------------------------------------------>");
         for (Bar bar : barlist) {
-            logger.info("   {}-Bar : {}  to  {}  weight: {}", new Object[]{prefix, DFORM.format(bar.getStartDate()), DFORM.format(bar.getEndDate()), bar.getWeight()});
+            LOG.info("   {}-Bar : {}  to  {}  weight: {}", prefix, DFORM.format(bar.getStartDate()), DFORM.format(bar.getEndDate()), bar.getWeight());
         }
-        logger.info("  <----------------------------------------------------------------------------<");
+        LOG.info("  <----------------------------------------------------------------------------<");
 
     }
 
 
-   
-
-
     @Test
-    public void test_00_SetGetName() {
-        logger.info("test_00_SetGetName");
-        ConflictFinder cfinder = new ConflictFinder();
-        assertEquals("1", "Resources", cfinder.getName());
-        cfinder.setName("abc345");
-        assertEquals("2", "abc345", cfinder.getName());
+    public void test_01_SetNameGetName() {
+        LOG.info("test_01_SetNameGetName");
+        //given
+        ConflictFinder<Bar> cfinder = new ConflictFinder<>();
+        assertThat("getName().initial", cfinder.getName(), equalTo("ConflictFinder"));
+        //when a different name is set
+        cfinder.setName("different");
+        assertThat("getName().differnt", cfinder.getName(), equalTo("different"));
+        //when a null name is set
         cfinder.setName(null);
-        assertEquals("3", null, cfinder.getName());
+        assertThat("getName().null", cfinder.getName(), nullValue());
     }
 
 
     @Test(expected = java.lang.IllegalArgumentException.class)
-    public void test_00_calculate_empty_inputlist() {
-        logger.info("test_00_calculate_empty_inputlist");
-        List<Bar> barlist = new ArrayList<Bar>();
-        ConflictFinder cfinder = new ConflictFinder();
-        cfinder.setInputList(barlist);
+    public void test_02_calculate_empty_inputlist() {
+        LOG.info("test_02_calculate_empty_inputlist");
+        ConflictFinder<Bar> cfinder = new ConflictFinder<>();
+        cfinder.setInputList(new ArrayList<>());
         cfinder.calculate();
     }
 
-
-    @Test
-    public void test_00_SetGetInputlist() {
-        logger.info("test_00_SetGetInputlist");
-        ConflictFinder cfinder = new ConflictFinder();
-
-        assertNull("null", cfinder.getInputList());
-
-        List<Bar> barlist = new ArrayList<Bar>();
-        cfinder.setInputList(barlist);
-
-        assertSame(barlist, cfinder.getInputList());
-
-
+    @Test(expected = java.lang.IllegalArgumentException.class)
+    public void test_02_calculate_null_inputlist() {
+        LOG.info("test_02_calculate_null_inputlist");
+        ConflictFinder<Bar> cfinder = new ConflictFinder<>();
+        assertThat("getInputList().null", cfinder.getInputList(), nullValue());
+        cfinder.calculate();
     }
 
+    @Test
+    public void test_03_SetInputlistGetInputlist() {
+        LOG.info("test_03_SetInputlistGetInputlist");
+        ConflictFinder<Bar> cfinder = new ConflictFinder<>();
+        List<Bar> barlist = new ArrayList<>();
+        cfinder.setInputList(barlist);
+        assertThat("getInputList()", cfinder.getInputList(), is(barlist));
+    }
 
-    @Test(expected = java.lang.IllegalArgumentException.class)
+    @Test
     public void test_00_calculate_null_inputlist() {
-        logger.info("test_00_calculate_null_inputlist");
-        List<Bar> barlist = null;
-        ConflictFinder cfinder = new ConflictFinder();
-        cfinder.setInputList(barlist);
-        cfinder.calculate();
+        LOG.info("test_00_calculate_null_inputlist");
+
     }
 
-
     @Test
-    public void test_00_addToInputList_inputlist_not_initialized() {
-        logger.info("test_00_addToInputList_inputlist_not_initialized");
+    public void test_05_addToInputList_inputlist_not_initialized() {
+        LOG.info("test_00_addToInputList_inputlist_not_initialized");
 
         //create some bars
-        List<Bar> barlist = new ArrayList<Bar>();
+        List<SimpleBar> barlist = new ArrayList<>();
         SimpleBar bar1 = new SimpleBar("1", date(2010, 1, 1), date(2010, 12, 31), 0.5);
         SimpleBar bar2 = new SimpleBar("2", date(2010, 5, 1), date(2010, 10, 31), 0.5);
         barlist.add(bar1);
         barlist.add(bar2);
 
-        ConflictFinder cfinder = new ConflictFinder();
-
-        assertNull("getInputList must return null", cfinder.getInputList());
+        ConflictFinder<SimpleBar> cfinder = new ConflictFinder<>();
 
         cfinder.addToInputList(barlist);
         assertNotNull("getInputList must return a list object now", cfinder.getInputList());
@@ -148,20 +157,21 @@ public class ConflictFinderTest {
 
 
     @Test(expected = java.lang.NullPointerException.class)
-    public void test_00_addToInputList_with_null_parameter() {
-        logger.info("test_00_addToInputList_with_null_parameter");
-        ConflictFinder cfinder = new ConflictFinder();
+    public void test_06_addToInputList_with_null_parameter() {
+        LOG.info("test_00_addToInputList_with_null_parameter");
+        ConflictFinder<Bar> cfinder = new ConflictFinder<>();
         List<Bar> nullList = null;
+
         cfinder.addToInputList(nullList);
     }
 
 
     @Test
-    public void test_01_First_Testdata() {
+    public void test_07_First_Testdata() {
 
-        logger.info("test_01_First_Testdata");
+        LOG.info("test_01_First_Testdata");
 
-        List<Bar> barlist = new ArrayList<Bar>();
+        List<Bar> barlist = new ArrayList<>();
 
         SimpleBar bar1 = new SimpleBar("1", date(2009, 1, 1), date(2009, 3, 31), 0.3);
         SimpleBar bar2 = new SimpleBar("2", date(2009, 3, 1), date(2009, 6, 30), 0.4);
@@ -175,7 +185,7 @@ public class ConflictFinderTest {
 
         outputBarList(barlist, 'i');
 
-        ConflictFinder cfinder = new ConflictFinder();
+        ConflictFinder<Bar> cfinder = new ConflictFinder<>();
         cfinder.setInputList(barlist);
         cfinder.calculate();
 
@@ -191,24 +201,21 @@ public class ConflictFinderTest {
         assertBar(result, 6, date(2009, 6, 30), date(2009, 7, 31), 0.2D);
 
 
-
-        //expect one conflict 
+        //expect one conflict
         List<OutputBar> resultC = cfinder.getOutputConflictList();
         assertEquals("conflicts", 1, resultC.size());
         assertConflict(resultC, 0, date(2009, 3, 1), date(2009, 3, 31), 1.2D);
-
 
 
     }
 
 
     @Test
-    public void test_02_NoOverlapping_NoConflicts() {
+    public void test_08_NoOverlapping_NoConflicts() {
 
+        LOG.info("test_02_NoOverlapping_NoConflicts");
 
-        logger.info("test_02_NoOverlapping_NoConflicts");
-
-        List<Bar> barlist = new ArrayList<Bar>();
+        List<Bar> barlist = new ArrayList<>();
 
         SimpleBar bar1 = new SimpleBar("1", date(2009, 1, 1), date(2009, 1, 30), 1.0);
         SimpleBar bar2 = new SimpleBar("2", date(2009, 3, 1), date(2009, 3, 30), 1.0);
@@ -218,11 +225,11 @@ public class ConflictFinderTest {
         barlist.add(bar3);
         outputBarList(barlist, 'i');
 
-        ConflictFinder cfinder = new ConflictFinder();
+        ConflictFinder<Bar> cfinder = new ConflictFinder<>();
         cfinder.setInputList(barlist);
         cfinder.calculate();
 
-        //expect no conflict 
+        //expect no conflict
         List<OutputBar> resultC = cfinder.getOutputConflictList();
         assertEquals("conflicts", 0, resultC.size());
 
@@ -235,17 +242,17 @@ public class ConflictFinderTest {
 
 
     @Test
-    public void test_03_OnlyOneConflictTask() {
+    public void test_09_OnlyOneConflictTask() {
 
-        logger.info("test_03_OnlyOneConflictTask");
+        LOG.info("test_03_OnlyOneConflictTask");
 
         //Nur 1 Task der als Konflikt ausgegeben werden muss (130%WL)
 
-        List<Bar> barlist = new ArrayList<Bar>();
+        List<Bar> barlist = new ArrayList<>();
         SimpleBar bar1 = new SimpleBar("1", date(2009, 1, 1), date(2009, 1, 10), 1.3);
         barlist.add(bar1);
         outputBarList(barlist, 'i');
-        ConflictFinder cfinder = new ConflictFinder();
+        ConflictFinder<Bar> cfinder = new ConflictFinder<>();
         cfinder.setInputList(barlist);
         cfinder.calculate();
 
@@ -258,31 +265,29 @@ public class ConflictFinderTest {
         List<OutputBar> result = cfinder.getOutputBarListAll();
         assertEquals("bars", 1, result.size());
         assertBar(result, 0, date(2009, 1, 1), date(2009, 1, 10), 1.3D);
-
-
-
+        outputBarList(result, 'b');
+        outputBarList(resultC, 'c');
     }
 
 
     @Test
-    public void test_04_OnlyOneNormalTask() {
+    public void test_10_OnlyOneNormalTask() {
 
-        logger.info("test_04_OnlyOneNormalTask");
+        LOG.info("test_04_OnlyOneNormalTask");
         //Nur 1 Task der nicht als Konflikt ausgegeben werden muss (100%WL)
 
         //-------Fall 1 mit exakt 1.0
 
-        List<Bar> barlist = new ArrayList<Bar>();
+        List<Bar> barlist = new ArrayList<>();
         SimpleBar bar1 = new SimpleBar("1", date(2009, 1, 1), date(2009, 1, 10), 1.0);
         barlist.add(bar1);
         outputBarList(barlist, 'i');
-        ConflictFinder cfinder = new ConflictFinder();
+        ConflictFinder<Bar> cfinder = new ConflictFinder<>();
         cfinder.setInputList(barlist);
         cfinder.calculate();
 
         List<OutputBar> resultC = cfinder.getOutputConflictList();
         assertEquals("Fall 1 mit exakt 1.0: conflicts", 0, resultC.size());
-
 
 
         List<OutputBar> result = cfinder.getOutputBarListAll();
@@ -292,11 +297,11 @@ public class ConflictFinderTest {
 
         //-------Fall 2 mit weniger als 0.5
 
-        List<Bar> barlist2 = new ArrayList<Bar>();
+        List<Bar> barlist2 = new ArrayList<>();
         SimpleBar bar21 = new SimpleBar("1", date(2009, 1, 1), date(2009, 1, 10), 0.3);
         barlist2.add(bar21);
         outputBarList(barlist2, 'i');
-        ConflictFinder cfinder2 = new ConflictFinder();
+        ConflictFinder<Bar> cfinder2 = new ConflictFinder<>();
         cfinder2.setInputList(barlist2);
         cfinder2.calculate();
         List<OutputBar> resultC2 = cfinder2.getOutputConflictList();
@@ -311,20 +316,20 @@ public class ConflictFinderTest {
 
 
     @Test
-    public void test_05_TwoEqualBarsAsConflict() {
+    public void test_11_TwoEqualBarsAsConflict() {
 
 
-        logger.info("test_05_TwoEqualBarsAsConflict");
+        LOG.info("test_05_TwoEqualBarsAsConflict");
         //2 Exakt gleich lange Buchungen mit je 1.0
 
-        List<Bar> barlist = new ArrayList<Bar>();
+        List<Bar> barlist = new ArrayList<>();
         SimpleBar bar1 = new SimpleBar("1", date(2009, 1, 1), date(2009, 1, 30), 1.0);
         SimpleBar bar2 = new SimpleBar("2", date(2009, 1, 1), date(2009, 1, 30), 1.0);
         barlist.add(bar1);
         barlist.add(bar2);
         outputBarList(barlist, 'i');
 
-        ConflictFinder cfinder = new ConflictFinder();
+        ConflictFinder<Bar> cfinder = new ConflictFinder<>();
         cfinder.setInputList(barlist);
         cfinder.calculate();
         List<OutputBar> resultC = cfinder.getOutputConflictList();
@@ -342,12 +347,12 @@ public class ConflictFinderTest {
 
 
     @Test
-    public void test_06_SameStartDatesDifferentEndDates() {
+    public void test_12_SameStartDatesDifferentEndDates() {
 
-        logger.info("test_06_SameStartDatesDifferentEndDates");
+        LOG.info("test_06_SameStartDatesDifferentEndDates");
         //Gleiche Start- andere EndTermine
 
-        List<Bar> barlist = new ArrayList<Bar>();
+        List<Bar> barlist = new ArrayList<>();
 
         SimpleBar bar1 = new SimpleBar("1", date(2009, 10, 1), date(2009, 10, 5), 0.5);
         SimpleBar bar2 = new SimpleBar("2", date(2009, 10, 1), date(2009, 10, 10), 0.3);
@@ -360,10 +365,10 @@ public class ConflictFinderTest {
         barlist.add(bar4);
 
         outputBarList(barlist, 'i');
-        ConflictFinder cfinder = new ConflictFinder();
+        ConflictFinder<Bar> cfinder = new ConflictFinder<>();
         cfinder.setInputList(barlist);
         cfinder.calculate();
-        //expect one conflict 
+        //expect one conflict
         List<OutputBar> resultC = cfinder.getOutputConflictList();
         outputBarList(resultC, 'c');
         assertEquals("conflicts", 1, resultC.size());
@@ -385,13 +390,13 @@ public class ConflictFinderTest {
 
 
     @Test
-    public void test_07_TimeTest() {
+    public void test_13_TimeTest() {
 
 
-        logger.info("test_07_TimeTest");
+        LOG.info("test_07_TimeTest");
         //Problemprojekt mit Uhrzeit (88% Resource)
 
-        List<Bar> barlist = new ArrayList<Bar>();
+        List<Bar> barlist = new ArrayList<>();
 
         SimpleBar bar1 = new SimpleBar("TD1", date(2009, 3, 16, 8), date(2009, 3, 19, 16), 0.88);
         SimpleBar bar2 = new SimpleBar("TD2", date(2009, 3, 18, 8), date(2009, 3, 20, 16), 0.88);
@@ -400,12 +405,10 @@ public class ConflictFinderTest {
 
         /*
          *_______________XXXX
-         *_________________XXX  
+         *_________________XXX
          *______________________XXXXX
-         *______________________XXXXX 
+         *______________________XXXXX
          */
-
-
 
 
         barlist.add(bar1);
@@ -414,16 +417,14 @@ public class ConflictFinderTest {
         barlist.add(bar4);
         outputBarList(barlist, 'i');
 
-        ConflictFinder cfinder = new ConflictFinder();
+        ConflictFinder<Bar> cfinder = new ConflictFinder<>();
         cfinder.setMaxAllowedWeight(0.88);
         cfinder.setInputList(barlist);
         cfinder.calculate();
-        //expect no conflict 
+        //expect no conflict
         List<OutputBar> resultC = cfinder.getOutputConflictList();
         assertEquals("conflicts", 1, resultC.size());
         assertConflict(resultC, 0, date(2009, 3, 18, 8), date(2009, 3, 19, 16), 1.76D);
-
-
 
 
         List<OutputBar> result = cfinder.getOutputBarListAll();
@@ -438,24 +439,22 @@ public class ConflictFinderTest {
 
 
     @Test
-    public void test_08_ClassTest() {
+    public void test_14_ClassTest() {
 
 
-        logger.info("test_08_ClassTest");
+        LOG.info("test_08_ClassTest");
         //Verwendungsmoeglichkeit der Klasse
 
-        ConflictFinder cfinder = new ConflictFinder();
+        ConflictFinder<Bar> cfinder = new ConflictFinder<>();
 
         cfinder.addToInputList(new SimpleBar("TD1", date(2009, 3, 10), date(2009, 3, 20), 1.0));
         cfinder.addToInputList(new SimpleBar("TD1", date(2009, 3, 16), date(2009, 3, 30), 1.0));
         cfinder.calculate();
 
-        //expect no conflict 
+        //expect no conflict
         List<OutputBar> resultC = cfinder.getOutputConflictList();
         assertEquals("conflicts", 1, resultC.size());
         assertConflict(resultC, 0, date(2009, 3, 16), date(2009, 3, 20), 2.0D);
-
-
 
 
         List<OutputBar> result = cfinder.getOutputBarListAll();
@@ -470,13 +469,13 @@ public class ConflictFinderTest {
 
 
     @Test
-    public void test_09_MaxAllowedWeightTest() {
+    public void test_15_MaxAllowedWeightTest() {
 
-        logger.info("test_09_MaxAllowedWeightTest");
+        LOG.info("test_09_MaxAllowedWeightTest");
         //Maximal erlaubt (50% Resource)
 
-        List<Bar> barlist = new ArrayList<Bar>();
-        ConflictFinder cfinder = new ConflictFinder();
+        List<Bar> barlist = new ArrayList<>();
+        ConflictFinder<Bar> cfinder = new ConflictFinder<>();
         cfinder.setPrecision(new Precision(10000000000L));
         cfinder.setMaxAllowedWeight(0.50);
         SimpleBar bar1 = new SimpleBar("TD1", date(2009, 3, 10), date(2009, 3, 20), 0.50);
@@ -489,7 +488,7 @@ public class ConflictFinderTest {
 
         cfinder.calculate();
 
-        //expect no conflict 
+        //expect no conflict
         List<OutputBar> resultC = cfinder.getOutputConflictList();
         assertEquals("conflictsA", 1, resultC.size());
 
@@ -515,16 +514,15 @@ public class ConflictFinderTest {
         assertBar(resultB, 2, date(2009, 3, 20), date(2009, 3, 25), 0.5D);
 
 
-
     }
 
 
     @Test
-    public void test_10_InternalCalculations() {
+    public void test_16_InternalCalculations() {
 
-        logger.info("test_10_InternalCalculations");
+        LOG.info("test_10_InternalCalculations");
 
-        ConflictFinder cfinder = new ConflictFinder();
+        ConflictFinder<Bar> cfinder = new ConflictFinder<>();
         cfinder.setMaxAllowedWeight(1.5);
         double maw = cfinder.getMaxAllowedWeight();
 
@@ -540,20 +538,20 @@ public class ConflictFinderTest {
 
 
     @Test
-    public void test_11_DataIntegrity1_Testdata() {
+    public void test_17_DataIntegrity1_Testdata() {
 
 
-        logger.info("test_11_DataIntegrity1_Testdata");
+        LOG.info("test_11_DataIntegrity1_Testdata");
         //Testdata Datenintegritaet
 
-        List<Bar> barlist = new ArrayList<Bar>();
+        List<Bar> barlist = new ArrayList<>();
 
         barlist.add(new SimpleBar("1", date(2009, 1, 1), date(2009, 3, 31), 0.3));
         barlist.add(new SimpleBar("2", date(2009, 3, 1), date(2009, 6, 30), 0.4));
         barlist.add(new SimpleBar("3", date(2009, 6, 1), date(2009, 7, 31), 0.2));
         barlist.add(new SimpleBar("4", date(2009, 2, 1), date(2009, 4, 30), 0.5));
         outputBarList(barlist, 'i');
-        ConflictFinder cfinder = new ConflictFinder();
+        ConflictFinder<Bar> cfinder = new ConflictFinder<>();
         cfinder.setInputList(barlist);
         cfinder.calculate();
 
@@ -593,7 +591,7 @@ public class ConflictFinderTest {
 
         assertEquals("bars", 7, result.size());
 
-        //expect one conflict 
+        //expect one conflict
         List<OutputBar> resultC = cfinder.getOutputConflictList();
         assertEquals("conflicts", 1, resultC.size());
 
@@ -611,12 +609,12 @@ public class ConflictFinderTest {
 
 
     @Test
-    public void test_12_DataIntegrity2_Bizimis_Case() {
+    public void test_18_DataIntegrity2_Bizimis_Case() {
 
-        logger.info("test_12_DataIntegrity2_Bizimis_Case");
+        LOG.info("test_12_DataIntegrity2_Bizimis_Case");
         //Spezieller Praxis-Sonderfall Datenintegritaet
 
-        List<Bar> barlist = new ArrayList<Bar>();
+        List<Bar> barlist = new ArrayList<>();
 
         int type_emp = 33, type_shift = 50;
 
@@ -630,7 +628,7 @@ public class ConflictFinderTest {
         bar2.setProperty("type", type_shift);
         barlist.add(bar2);
         outputBarList(barlist, 'i');
-        ConflictFinder cfinder = new ConflictFinder();
+        ConflictFinder<Bar> cfinder = new ConflictFinder<>();
         cfinder.setInputList(barlist);
         cfinder.calculate();
 
@@ -672,30 +670,29 @@ public class ConflictFinderTest {
 
         assertEquals("bars", 3, result.size());
 
-        //expect one conflict 
+        //expect one conflict
         List<OutputBar> resultC = cfinder.getOutputConflictList();
         assertEquals("conflicts", 1, resultC.size());
 
         assertConflict(resultC, 0, date(2009, 1, 10), date(2009, 1, 11), 2.0D);
 
 
-
     }
 
 
     @Test
-    public void test_13_DataIntegrity3_Four_Same_Bars_Test() {
+    public void test_19_DataIntegrity3_Four_Same_Bars_Test() {
 
-        logger.info("test_13_DataIntegrity3_Four_Same_Bars_Test");
+        LOG.info("test_13_DataIntegrity3_Four_Same_Bars_Test");
 
-        List<Bar> barlist = new ArrayList<Bar>();
+        List<Bar> barlist = new ArrayList<>();
 
         barlist.add(new SimpleBar("1", date(2009, 1, 1), date(2009, 1, 30), 1.0));
         barlist.add(new SimpleBar("2", date(2009, 1, 1), date(2009, 1, 30), 1.0));
         barlist.add(new SimpleBar("3", date(2009, 1, 1), date(2009, 1, 30), 1.0));
         barlist.add(new SimpleBar("4", date(2009, 1, 1), date(2009, 1, 30), 1.0));
         outputBarList(barlist, 'i');
-        ConflictFinder cfinder = new ConflictFinder();
+        ConflictFinder<Bar> cfinder = new ConflictFinder<>();
         cfinder.setInputList(barlist);
         cfinder.calculate();
         assertEquals("bars", 1, cfinder.getOutputBarListAll().size());
@@ -713,26 +710,25 @@ public class ConflictFinderTest {
         assertBar(cfinder.getOutputBarListAll(), 0, date(2009, 1, 1), date(2009, 1, 30), 4.0D);
 
 
-
     }
 
 
     @Test
-    public void test_14_SonderfallTest() {
+    public void test_20_SonderfallTest() {
 
-        logger.info("test_14_SonderfallTest");
+        LOG.info("test_14_SonderfallTest");
 
-        List<Bar> barlist = new ArrayList<Bar>();
+        List<Bar> barlist = new ArrayList<>();
 
         SimpleBar bar1 = new SimpleBar("KWB", date(2009, 1, 27), date(2009, 5, 29), 1.0);
         SimpleBar bar2 = new SimpleBar("KKG", date(2009, 4, 14), date(2009, 5, 3), 1.0);
         SimpleBar bar3 = new SimpleBar("KCB", date(2009, 4, 12), date(2009, 4, 15), 1.0);
 
         /*
-         *_XXXXXXXXXXXXXXXXXXXXXXXXXXXX KWB 
-         *___________XXXXXXX KKG 
+         *_XXXXXXXXXXXXXXXXXXXXXXXXXXXX KWB
+         *___________XXXXXXX KKG
          *_________XXXXX KCB
-         *_0000000011222333344444444444  
+         *_0000000011222333344444444444
          */
 
         barlist.add(bar1);
@@ -741,16 +737,15 @@ public class ConflictFinderTest {
         outputBarList(barlist, 'i');
 
 
-        ConflictFinder cfinder = new ConflictFinder();
+        ConflictFinder<Bar> cfinder = new ConflictFinder<>();
         cfinder.setInputList(barlist);
         cfinder.calculate();
-        //expect no conflict 
+        //expect no conflict
         List<OutputBar> resultC = cfinder.getOutputConflictList();
         assertEquals("conflicts", 3, resultC.size());
         assertConflict(resultC, 0, date(2009, 4, 12), date(2009, 4, 14), 2.0D);
         assertConflict(resultC, 1, date(2009, 4, 14), date(2009, 4, 15), 3.0D);
         assertConflict(resultC, 2, date(2009, 4, 15), date(2009, 5, 3), 2.0D);
-
 
 
         List<OutputBar> result = cfinder.getOutputBarListAll();
@@ -765,12 +760,12 @@ public class ConflictFinderTest {
 
 
     @Test
-    public void test_15_SonderfallTest2() {
+    public void test_21_SonderfallTest2() {
 
 
-        logger.info("test_15_SonderfallTest2");
+        LOG.info("test_15_SonderfallTest2");
 
-        List<Bar> barlist = new ArrayList<Bar>();
+        List<Bar> barlist = new ArrayList<>();
 
         SimpleBar bar1 = new SimpleBar("94891", date(2009, 3, 23, 8), date(2009, 3, 27, 17), 1.0);
         SimpleBar bar2 = new SimpleBar("95588", date(2009, 3, 23, 8), date(2009, 4, 14, 10), 0.1);
@@ -783,17 +778,16 @@ public class ConflictFinderTest {
          */
 
 
-
         barlist.add(bar1);
         barlist.add(bar2);
         barlist.add(bar3);
         outputBarList(barlist, 'i');
 
 
-        ConflictFinder cfinder = new ConflictFinder();
+        ConflictFinder<Bar> cfinder = new ConflictFinder<>();
         cfinder.setInputList(barlist);
         cfinder.calculate();
-        //expect no conflict 
+        //expect no conflict
         List<OutputBar> resultC = cfinder.getOutputConflictList();
         assertEquals("conflicts", 1, resultC.size());
         assertConflict(resultC, 0, date(2009, 3, 23, 8), date(2009, 3, 27, 17), 1.2D);
@@ -804,18 +798,17 @@ public class ConflictFinderTest {
         assertBar(result, 1, date(2009, 3, 27, 17), date(2009, 4, 14, 10), 0.2D);
 
 
-
         assertEquals("bars", 2, result.size());
     }
 
 
     @Test
-    public void test_16_SonderfallTest3() {
+    public void test_22_SonderfallTest3() {
 
 
-        logger.info("test_16_SonderfallTest3");
+        LOG.info("test_16_SonderfallTest3");
 
-        List<Bar> barlist = new ArrayList<Bar>();
+        List<Bar> barlist = new ArrayList<>();
         barlist.add(new SimpleBar("D1", date(2009, 1, 1, 0), date(2009, 1, 1, 24), 0.8));
         barlist.add(new SimpleBar("D2", date(2009, 1, 1, 0), date(2009, 1, 1, 24), 0.8));
         barlist.add(new SimpleBar("D1", date(2009, 1, 2, 0), date(2009, 1, 2, 24), 0.8));
@@ -823,7 +816,7 @@ public class ConflictFinderTest {
 
         outputBarList(barlist, 'i');
 
-        ConflictFinder cfinder = new ConflictFinder();
+        ConflictFinder<Bar> cfinder = new ConflictFinder<>();
         cfinder.setInputList(barlist);
         cfinder.calculate();
 
@@ -832,7 +825,6 @@ public class ConflictFinderTest {
         assertEquals("bars", 2, result.size());
         assertBar(result, 0, date(2009, 1, 1, 0), date(2009, 1, 1, 24), 1.6D);
         assertBar(result, 1, date(2009, 1, 2, 0), date(2009, 1, 2, 24), 1.6D);
-
 
 
         //expect one conflict
@@ -846,13 +838,13 @@ public class ConflictFinderTest {
 
 
     @Test
-    public void test_17_MassTest() {
+    public void test_23_MassTest() {
 
 
-        logger.info("test_17_MassTest");
+        LOG.info("test_17_MassTest");
         //2 Exakt gleich lange Buchungen mit je 1.0
 
-        List<Bar> barlist = new ArrayList<Bar>();
+        List<Bar> barlist = new ArrayList<>();
 
         double amt = 500;
 
@@ -864,7 +856,7 @@ public class ConflictFinderTest {
         }
 
 
-        ConflictFinder cfinder = new ConflictFinder();
+        ConflictFinder<Bar> cfinder = new ConflictFinder<>();
         cfinder.setInputList(barlist);
         cfinder.calculate();
 
