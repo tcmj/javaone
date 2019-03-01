@@ -1,0 +1,145 @@
+= DocBookRx: The ℞ for all your DocBook pain
+Dan Allen <https://github.com/mojavelinux[@mojavelinux]>
+// Settings:
+:idprefix:
+:idseparator: -
+:icons: font
+ifdef::env-github,env-browser[]
+:toc: preamble
+:toclevels: 1
+endif::[]
+ifdef::env-github[]
+:status:
+:outfilesuffix: .adoc
+:!toc-title:
+endif::[]
+// Aliases:
+:project-name: DocBookRx
+:project-handle: docbookrx
+// URIs:
+:uri-asciidoc: http://asciidoc.org
+:uri-docbook: http://docbook.org
+:uri-repo: https://github.com/asciidoctor/docbookrx
+:uri-rvm: http://rvm.io
+:uri-rvm-install: https://rvm.io/rvm/install
+:uri-build-status: http://travis-ci.org/asciidoctor/docbookrx
+:img-build-status: https://img.shields.io/travis/asciidoctor/docbookrx/master.svg
+
+ifdef::status[]
+image:{img-build-status}[Build Status Badge,link={uri-build-status}]
+endif::[]
+
+{project-name} (gem: *{project-handle}*) is the prescription (℞) you need to get rid of your DocBook pain.
+This tool converts DocBook XML (hell) to AsciiDoc.
+
+{project-name} is the start of a {uri-docbook}[DocBook] to {uri-asciidoc}[AsciiDoc] converter written in Ruby.
+This converter is far from perfect at the moment and some of the conversion is done hastily.
+The plan is to evolve it into a robust library for performing this conversion in a reliable way.
+
+== Installing the Development Version
+
+Currently, {project-name} is only available in source form.
+You'll need to retrieve the source and run the application out the source directory.
+
+=== Retrieve the Source Code
+
+Simply copy the {uri-repo}[GitHub repository URL] and pass it to the `git clone` command:
+
+[subs=attributes+]
+ $ git clone {uri-repo}
+
+Next, switch to the project directory:
+
+[subs=attributes+]
+ $ cd {project-handle}
+
+=== Prepare RVM (optional)
+
+We recommend using {uri-rvm}[RVM] when developing applications with Ruby.
+Follow the {uri-rvm-install}[installation instructions] on the RVM site to setup RVM and install Ruby.
+
+Once you have RVM setup, switch to the version of Ruby you installed:
+
+[subs=attributes+]
+ $ rvm use 2.3.0
+
+If you want RVM to set the version of Ruby automatically whenever you switch to the project, write the version of Ruby to a file at the root of the project named [path]_.ruby-version_:
+
+ $ echo 2.3.0 > .ruby-version
+
+We like RVM because it keeps the dependencies required by various projects isolated from each other and from your system.
+
+=== Install the Dependencies
+
+The dependencies needed to use {project-name} are defined in the [path]_Gemfile_ at the root of the project.
+You'll use Bundler to install these dependencies.
+
+To check if you have Bundler available, use the `bundle` command to query the version installed:
+
+ $ bundle --version
+
+If it's not installed, use the `gem` command to install it.
+
+ $ gem install bundler
+
+Next, configure the `bundle` command (provided by the bundler gem) to use the system-wide Nokogiri library if available, which dramatically cuts down on installation time:
+
+ $ bundle config --local build.nokogiri --use-system-libraries
+
+Finally, use the `bundle` command (which is provided by the bundler gem) to install the dependencies into the project:
+
+ $ bundle --path=.bundle/gems
+
+NOTE: You must invoke `bundle` from the project's root directory so it can locate the [path]_Gemfile_.
+
+IMPORTANT: Since we've installed dependencies inside the project, it's necessary to prefix all commands (e.g., rake and docbookrx) with `bundle exec`.
+
+== Running the Converter
+
+To run the converter, execute the launch script and pass a DocBook file to convert as the first argument.
+
+ $ bundle exec docbookrx sample.xml
+
+The script will automatically create the output file [path]_sample.adoc_, replacing the DocBook file extension, `.xml` with the AsciiDoc file extension, `.adoc`.
+
+The converter is not perfect yet, but we'll get there with your help.
+You'll can find a list of tasks that need attention listed in the WORKLOG.adoc file.
+
+=== Conditional attribute
+
+The DocBook conditional attribute "condition" is replaced to "ifdef" macro.
+
+Take note the marco is on a line by itself.
+
+For example, in the case of there is the DocBook inline element with condition.
+
+ a<phrase condition="foo">b</phrase>c
+
+It is converted to below AsciiDoc format.
+
+ a
+ ifdef::foo[]
+ b
+ endif::foo[]
+ c
+
+When it is converted to html format, the output is displayed with both a space before "b" and a space after "b".
+
+ a b c
+
+== About this Project
+
+=== Authors
+
+*docbookrx* was written by https://github.com/mojavelinux[Dan Allen].
+
+=== Credits
+
+Gem structure originally created using https://github.com/bkuhlmann/gemsmith[Gemsmith].
+
+=== Copyright
+
+Copyright (C) 2013-2018 Dan Allen and the Asciidoctor Project.
+Free use of this software is granted under the terms of the MIT License.
+
+See the link:LICENSE[LICENSE] file for details.
